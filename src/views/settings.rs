@@ -147,7 +147,7 @@ pub fn SettingsView() -> Element {
             ListRow {
                 title: "Share App", tint: "#0a7aff", chevron: true,
                 icon: rsx! { Share { size: 17, stroke_width: "2.2" } },
-                onclick: move |_| js::share_text(APP_NAME, &format!("{APP_NAME}: the Bible and this week's Sunday School lesson. {}", crate::config::APP_URL)),
+                onclick: move |_| js::share_text(APP_NAME, &format!("{APP_NAME}: the Bible and this week's Sunday School lesson. {}", crate::config::APP_URL.trim_end_matches("app/"))),
             }
             ListRow {
                 title: "Send Feedback", tint: "#34c759", chevron: true,

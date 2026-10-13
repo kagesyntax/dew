@@ -3,8 +3,9 @@
 # vX.Y.Z tag. The workflow:
 #   1. reads the version from Cargo.toml and skips if that release already exists
 #   2. builds desktop installers (macOS, Windows, Linux) and the Android APK
-#   3. builds the web app and publishes version.json (read by Settings -> Software Update)
-#   4. deploys the web app to GitHub Pages and creates the GitHub Release with every installer
+#   3. builds the website (landing page + live demo + the web app under /app/) and version.json
+#      (read by the site's download buttons and by Settings -> Software Update)
+#   4. deploys the website to GitHub Pages and creates the GitHub Release with every installer
 name: Release
 
 on:
@@ -119,28 +120,28 @@ jobs:
       - run: cargo binstall -y dioxus-cli@${{ env.DX_VERSION }}
       - name: Write version.json
         run: python3 tools/release_notes.py manifest "${{ needs.prepare.outputs.version }}" "${{ github.repository }}" ${{ inputs.minimum_version }} > public/version.json
-      - name: Build
+      - name: Build website + web app
+        # Landing page at /<repo>/ (download buttons + What's New read version.json), the real app at
+        # /<repo>/app/, embedded live on the landing page. Rebuilt on every release, so the site
+        # always offers the newest version and the newest app.
         env:
           RELEASE_CHANNEL: Stable
           CHURCH_NAME: ${{ vars.CHURCH_NAME }}
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_READONLY_TOKEN }}
-          UPDATE_MANIFEST_URL: version.json
+          UPDATE_MANIFEST_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/version.json
           REPO_URL: https://github.com/${{ github.repository }}
-          APP_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+          APP_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/app/
         run: |
-          sed -i 's|^\[web.app\]|[web.app]\nbase_path = "${{ github.event.repository.name }}"|' Dioxus.toml
-          dx bundle --platform web --release
-          OUT=target/dx/dew/release/web/public
-          cp "$OUT/index.html" "$OUT/404.html"   # SPA deep links on GitHub Pages
-          (cd "$OUT" && zip -qr "$GITHUB_WORKSPACE/Dew-web.zip" .)
+          tools/build-site.sh "${{ github.event.repository.name }}"
+          (cd target/dx/dew/release/web/public && zip -qr "$GITHUB_WORKSPACE/Dew-web.zip" .)
       - uses: actions/upload-artifact@v4
         with:
           name: installer-web
           path: Dew-web.zip
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: target/dx/dew/release/web/public
+          path: target/site
       - id: deploy
         uses: actions/deploy-pages@v4
 

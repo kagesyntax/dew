@@ -5,10 +5,6 @@ All notable changes to this app. The release workflow copies the section for eac
 Format: [Keep a Changelog](https://keepachangelog.com), versions follow [SemVer](https://semver.org).
 
 ## [Unreleased]
-### Changed
-- The app is now called Dew, with a new icon and launch screen
-### Added
-- Android app, built and signed by every release
 
 ## [0.1.0] - 2026-10-14
 ### Added
@@ -19,3 +15,5 @@ Format: [Keep a Changelog](https://keepachangelog.com), versions follow [SemVer]
 - Welcome tour and in-context tips
 - Light and dark appearance, text size, and verse-number options
 - Software Update in Settings, delivered from GitHub releases
+- Apps for Android, Windows, Mac and Linux, plus the web
+- The Dew website, where you can try the app before downloading it

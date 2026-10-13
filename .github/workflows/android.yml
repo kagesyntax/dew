@@ -62,7 +62,7 @@ jobs:
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_READONLY_TOKEN }}
           UPDATE_MANIFEST_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/version.json
           REPO_URL: https://github.com/${{ github.repository }}
-          APP_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+          APP_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/app/
         run: |
           dx bundle --platform android --release --no-default-features --features mobile
           APK=$(find target/dx -name '*.apk' | grep -i release | head -1)
