@@ -5,6 +5,7 @@ mod reader;
 mod reader_bar;
 mod selection_bar;
 mod translation_picker;
+mod verse_scrubber;
 
 pub use books::BibleHome;
 pub use reader::Reader;
