@@ -1,0 +1,26 @@
+/* iOS-style switch (51x31), restyled from the dioxus-components registry copy. */
+.dx-switch {
+  all: unset;
+  position: relative;
+  flex-shrink: 0;
+  width: 51px;
+  height: 31px;
+  border-radius: 9999px;
+  background-color: var(--app-fill);
+  cursor: pointer;
+  transition: background-color 200ms ease;
+}
+.dx-switch[data-state="checked"] { background-color: #34c759; }
+.dx-switch:focus-visible { box-shadow: 0 0 0 3px color-mix(in oklab, var(--app-accent) 45%, transparent); }
+.dx-switch-thumb {
+  display: block;
+  width: 27px;
+  height: 27px;
+  border-radius: 9999px;
+  background-color: #fff;
+  box-shadow: 0 3px 8px rgb(0 0 0 / 15%), 0 1px 1px rgb(0 0 0 / 16%);
+  transform: translateX(2px) translateY(2px);
+  transition: transform 220ms cubic-bezier(.3,.7,.4,1.2);
+}
+.dx-switch[data-state="checked"] .dx-switch-thumb { transform: translateX(22px) translateY(2px); }
+.dx-switch[data-disabled="true"] { cursor: not-allowed; opacity: 0.5; }

@@ -1,6 +1,7 @@
-//! The components module contains all shared components for our app. Components are the building blocks of dioxus apps.
-//! They can be used to defined common UI elements like buttons, forms, and modals. In this template, we define a Hero
-//! component  to be used in our app.
+//! Styled primitives copied from the Dioxus Labs component registry with `dx components add`.
+//! They are owned by this app (restyled to iOS look) and wrap `dioxus-primitives` for
+//! accessibility and keyboard handling.
 
-mod hero;
-pub use hero::Hero;
+pub mod sheet;
+pub mod switch;
+pub mod toggle_group;
