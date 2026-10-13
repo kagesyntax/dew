@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer-core');
 const BASE = process.env.BASE || 'http://127.0.0.1:8765';
 const OUT = process.env.OUT || '.';
-const NS = 'church-app.v1.';
+const NS = 'dew.v1.';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function page(browser, dark) {

@@ -495,21 +495,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "church-app"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "church-core",
- "dioxus",
- "dioxus-icons",
- "dioxus-primitives",
- "reqwest",
- "serde",
- "serde_json",
- "thiserror 2.0.21",
-]
-
-[[package]]
 name = "church-core"
 version = "0.1.0"
 dependencies = [
@@ -965,6 +950,21 @@ dependencies = [
  "rustc_version",
  "syn 2.0.119",
  "unicode-xid",
+]
+
+[[package]]
+name = "dew"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "church-core",
+ "dioxus",
+ "dioxus-icons",
+ "dioxus-primitives",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
 ]
 
 [[package]]

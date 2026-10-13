@@ -15,6 +15,6 @@ pub use acknowledgements::Acknowledgements;
 pub use layout::{Shell, TabLayout};
 pub use not_found::NotFound;
 pub use settings::SettingsView;
-pub use software_update::SoftwareUpdate;
+pub use software_update::{SoftwareUpdate, APP_ICON};
 pub use today::Today;
 pub use whats_new::WhatsNew;

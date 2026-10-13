@@ -40,10 +40,10 @@ def manifest(version, repo, minimum=None):
         "url": f"https://github.com/{repo}/releases/tag/{tag}",
         "published_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "downloads": {
-            "macos": f"{base}/BibleManual-macos.dmg",
-            "windows": f"{base}/BibleManual-windows.msi",
-            "linux": f"{base}/BibleManual-linux.AppImage",
-            "android": f"{base}/BibleManual-android.apk",
+            "macos": f"{base}/Dew-macos.dmg",
+            "windows": f"{base}/Dew-windows.msi",
+            "linux": f"{base}/Dew-linux.AppImage",
+            "android": f"{base}/Dew-android.apk",
         },
     }
     if minimum:

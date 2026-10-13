@@ -1,7 +1,7 @@
-# Bible & Manual
+# Dew
 
-A minimal, Apple-style church app built with **Rust + Dioxus 0.7**: a Bible reader and the
-Sunday School manual (Radiant Life) in one place. Any scripture reference in a lesson, such as
+*Fresh Word every morning.* Dew is the Bible and the teens' Sunday School manual for
+**Assemblies of God Church (AGC) Oshodi, Lagos**, in one Apple-style app built with **Rust + Dioxus 0.7**. Any scripture reference in a lesson, such as
 `Read Heb 11:1-3,6`, becomes a link that previews the verses, expands them inline, or jumps to
 the Bible with a **Back to Study 4** pill that returns you to the exact spot in the lesson.
 
@@ -46,11 +46,13 @@ New or corrected lessons appear in the app on next launch (cached for offline us
 Only bundle texts you are licensed to distribute (the LSB allows at most 1,000 verses in an app without written permission from The Lockman Foundation).
 
 ## Releases and in-app updates
+The full pipeline (the 7 C's of DevOps) is in [docs/DEVOPS.md](docs/DEVOPS.md).
+
 1. Write user-facing changes under `## [Unreleased]` in [CHANGELOG.md](CHANGELOG.md) as you go.
 2. **Actions → Prepare Release → Run workflow** (patch / minor / major). It bumps `Cargo.toml`,
    dates the changelog section and opens a `release/vX.Y.Z` PR into `main`.
 3. Merge the PR. **Release** builds the web app (GitHub Pages), macOS `.dmg`, Windows `.msi`,
-   Linux `.AppImage` and an experimental Android `.apk`, publishes `version.json`, and creates the
+   Linux `.AppImage` and a signed Android `.apk`, publishes `version.json`, and creates the
    GitHub Release. Then merge `main` back into `develop`.
 4. Every installed app sees it in **Settings → Software Update** (a red badge appears when
    automatic checks are on). The web app updates in place; native builds download their installer.

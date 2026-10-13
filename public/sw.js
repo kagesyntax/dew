@@ -1,6 +1,6 @@
 // Offline support: network-first for pages (so updates arrive), cache-first for static files
 // (Bible JSON, wasm, css). The in-app updater clears these caches before reloading.
-const CACHE = 'church-app-v1';
+const CACHE = 'dew-v1';
 
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim()));

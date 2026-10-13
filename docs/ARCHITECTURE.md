@@ -1,7 +1,7 @@
 # Architecture
 
 ```
-church-app/
+dew/
 ├── crates/core/            # pure Rust, no UI: tested in CI on any host
 │   └── src/
 │       ├── scripture/      # books.rs (66 books + aliases), parser.rs (find refs in text), reference.rs

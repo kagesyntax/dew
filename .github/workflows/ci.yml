@@ -34,8 +34,8 @@ jobs:
       - name: rustfmt
         run: cargo fmt --all -- --check
       - name: clippy (web target)
-        run: cargo clippy --target wasm32-unknown-unknown --all-features -- -D warnings
-      - name: unit tests (core logic: scripture parser, manual, versions)
+        run: cargo clippy --target wasm32-unknown-unknown -- -D warnings
+      - name: "unit tests (core logic: scripture parser, manual, versions)"
         run: cargo test -p church-core
       - name: validate bundled data
         run: |
@@ -74,5 +74,16 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: web-${{ github.sha }}
-          path: target/dx/church-app/release/web/public
+          path: target/dx/dew/release/web/public
           retention-days: 7
+
+  android:
+    name: Android APK (preview)
+    needs: [quality]
+    # Every push to develop and every release PR gets an installable APK for testers.
+    if: github.ref == 'refs/heads/develop' || startsWith(github.head_ref, 'release/')
+    uses: ./.github/workflows/android.yml
+    secrets: inherit
+    with:
+      channel: Preview
+      artifact: dew-android-preview

@@ -4,7 +4,7 @@
 use dioxus::prelude::*;
 use serde::{de::DeserializeOwned, Serialize};
 
-const NAMESPACE: &str = "church-app.v1";
+const NAMESPACE: &str = "dew.v1";
 
 fn full_key(key: &str) -> String {
     format!("{NAMESPACE}.{key}")
