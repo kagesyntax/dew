@@ -46,7 +46,7 @@ fn regex() -> &'static Regex {
     RE.get_or_init(|| {
         let num = r"\d+(?::\d+)?(?:\s*[-–—]\s*\d+(?::\d+)?)?";
         let pattern = format!(
-            r"(?i)\b(?P<prefix>(?:[123]|iii|ii|i|first|second|third)\s*)?(?P<book>{books})\b\.?\s*(?P<body>{num}(?:\s*[,;]\s*{num})*)",
+            r"(?i)\b(?P<prefix>[123]\s*|(?:iii|ii|i|first|second|third)\s+)?(?P<book>{books})\b\.?\s*(?P<body>{num}(?:\s*[,;]\s*{num})*)",
             books = book_alternation(),
             num = num
         );
@@ -229,6 +229,9 @@ mod tests {
         assert_eq!(label("Gen 1:1-2:3"), "Genesis 1:1–2:3");
         assert_eq!(label("Philemon 1:6"), "Philemon 1:6");
         assert_eq!(label("Song of Solomon 2:4"), "Song of Solomon 2:4");
+        assert_eq!(label("Isa 59:1-2"), "Isaiah 59:1–2");
+        assert_eq!(label("2 Chron 20:14-21"), "2 Chronicles 20:14–21");
+        assert_eq!(label("Php 1:3-6, 12-30"), "Philippians 1:3–6, 12–30");
     }
 
     #[test]
