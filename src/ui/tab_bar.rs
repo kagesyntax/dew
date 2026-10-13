@@ -15,7 +15,7 @@ fn active_tab(route: &Route) -> Tab {
     match route {
         Route::BibleHome {} | Route::Reader { .. } => Tab::Bible,
         Route::ManualHome {} | Route::LessonView { .. } => Tab::Manual,
-        Route::SettingsView {} => Tab::Settings,
+        Route::SettingsView {} | Route::SoftwareUpdate {} | Route::Acknowledgements {} => Tab::Settings,
         _ => Tab::Today,
     }
 }
@@ -32,6 +32,7 @@ pub fn TabBar() -> Element {
         None => Route::BibleHome {},
     };
 
+    let update_ready = matches!(*app.update.read(), crate::services::updater::UpdateStatus::Available(_));
     rsx! {
         nav { class: "bar-blur safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-separator",
             div { class: "mx-auto grid max-w-2xl grid-cols-4 pt-1.5",
@@ -45,7 +46,12 @@ pub fn TabBar() -> Element {
                     GraduationCap { size: 25, stroke_width: if active == Tab::Manual { "2.3" } else { "1.8" } }
                 }
                 TabItem { to: Route::SettingsView {}, label: "Settings", active: active == Tab::Settings,
-                    Settings { size: 25, stroke_width: if active == Tab::Settings { "2.3" } else { "1.8" } }
+                    span { class: "relative",
+                        Settings { size: 25, stroke_width: if active == Tab::Settings { "2.3" } else { "1.8" } }
+                        if update_ready {
+                            span { class: "absolute -top-1 -right-1.5 h-[11px] w-[11px] rounded-full border-2 border-bg bg-[#ff3b30]", aria_label: "Update available" }
+                        }
+                    }
                 }
             }
         }

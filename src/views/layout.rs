@@ -36,6 +36,7 @@ pub fn TabLayout() -> Element {
             main { class: "min-h-screen pb-32", Outlet::<Route> {} }
             ReturnPill {}
             TabBar {}
+            crate::views::WhatsNew {}
         }
     }
 }

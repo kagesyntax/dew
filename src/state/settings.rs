@@ -72,6 +72,8 @@ pub struct Settings {
     /// Teacher mode: show the manual's bracketed [Note:]/[Hint:] guidance.
     pub leader_notes: bool,
     pub display_name: String,
+    /// Last version whose What's New sheet was shown.
+    pub last_seen_version: String,
 }
 
 impl Default for Settings {
@@ -86,6 +88,7 @@ impl Default for Settings {
             auto_update_check: true,
             leader_notes: false,
             display_name: String::new(),
+            last_seen_version: String::new(),
         }
     }
 }

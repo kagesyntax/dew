@@ -5,7 +5,7 @@ use crate::views::{
     bible::{BibleHome, Reader},
     manual::{LessonView, ManualHome},
     onboarding::TourReplay,
-    NotFound, SettingsView, Shell, TabLayout, Today,
+    Acknowledgements, NotFound, SettingsView, Shell, SoftwareUpdate, TabLayout, Today,
 };
 use dioxus::prelude::*;
 
@@ -28,6 +28,10 @@ pub enum Route {
             LessonView { id: String },
             #[route("/settings")]
             SettingsView {},
+            #[route("/settings/update")]
+            SoftwareUpdate {},
+            #[route("/settings/acknowledgements")]
+            Acknowledgements {},
         #[end_layout]
         /// Replay of the onboarding walkthrough (Settings → Feature Tour).
         #[route("/tour")]

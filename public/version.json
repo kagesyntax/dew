@@ -1,6 +1,21 @@
 {
   "version": "0.1.0",
-  "notes": "First release: Bible (KJV, WEB, BSB, ASV), Sunday School manual with tappable verses, themes and offline support.",
-  "url": null,
-  "published_at": null
+  "notes": "Bible reader with King James, World English, Berean Standard and American Standard versions, fully offline",
+  "highlights": [
+    "Bible reader with King James, World English, Berean Standard and American Standard versions, fully offline",
+    "Sunday School manual with memory verse, discussion questions, leader notes and Daily Dew Drops",
+    "Tap any reference in a lesson to preview it, expand it inline, or jump to the Bible and back",
+    "Highlights in four colours, bookmarks, copy and share",
+    "Welcome tour and in-context tips",
+    "Light and dark appearance, text size, and verse-number options",
+    "Software Update in Settings, delivered from GitHub releases"
+  ],
+  "url": "https://github.com/your-church/church-app/releases/tag/v0.1.0",
+  "published_at": "2026-10-13T20:28:39Z",
+  "downloads": {
+    "macos": "https://github.com/your-church/church-app/releases/download/v0.1.0/BibleManual-macos.dmg",
+    "windows": "https://github.com/your-church/church-app/releases/download/v0.1.0/BibleManual-windows.msi",
+    "linux": "https://github.com/your-church/church-app/releases/download/v0.1.0/BibleManual-linux.AppImage",
+    "android": "https://github.com/your-church/church-app/releases/download/v0.1.0/BibleManual-android.apk"
+  }
 }

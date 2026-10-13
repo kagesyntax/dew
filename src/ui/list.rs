@@ -42,14 +42,14 @@ pub fn ListRow(
             if let Some(i) = icon {
                 div { class: "flex h-[29px] w-[29px] shrink-0 items-center justify-center rounded-[7px] text-white", style: "background: {tint}", {i} }
             }
-            div { class: "min-w-0 flex-1",
-                p { class: "truncate text-[17px]", "{title}" }
+            div { class: "flex-1",
+                p { class: "text-[17px] whitespace-nowrap", "{title}" }
                 if let Some(s) = subtitle {
                     p { class: "text-[13px] leading-snug text-label-2", "{s}" }
                 }
             }
             if let Some(d) = detail {
-                span { class: "shrink-0 text-[17px] text-label-2", "{d}" }
+                span { class: "min-w-0 shrink truncate text-right text-[17px] text-label-2", "{d}" }
             }
             {trailing}
             if chevron {

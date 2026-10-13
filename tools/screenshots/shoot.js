@@ -38,7 +38,7 @@ async function clickText(p, text) {
 
 (async () => {
   const browser = await puppeteer.launch({ executablePath: '/usr/bin/chromium', args: ['--no-sandbox', '--disable-gpu'] });
-  const done = { onboarded: true, theme: 'system', translation: 'kjv', text_size: 2, verse_numbers: true, link_mode: 'sheet', auto_update_check: false, leader_notes: true, display_name: '' };
+  const done = { onboarded: true, theme: 'system', translation: 'kjv', text_size: 2, verse_numbers: true, link_mode: 'sheet', auto_update_check: false, leader_notes: true, display_name: '', last_seen_version: '0.1.0' };
   const progress = { last_read: { book: 'HEB', chapter: 11 }, last_lesson: null, completed_lessons: ['2026-10-11'], highlights: { 'HEB.11.1': 'yellow', 'HEB.11.6': 'green' }, bookmarks: [], seen_tips: ['today.week','lesson.links','reader.select','bible.goto'] };
 
   // Onboarding (fresh install): welcome, 3 tour pages, 3 setup pages
