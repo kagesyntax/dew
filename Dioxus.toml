@@ -1,21 +1,19 @@
 [application]
+name = "church-app"
+# Static files copied verbatim to the web root (PWA manifest, service worker, version manifest, icons).
+public_dir = "public"
 
 [web.app]
+title = "Bible & Manual"
 
-# HTML title tag content
-title = "church-app"
-
-# include `assets` in web platform
 [web.resource]
-
-# Additional CSS style files
 style = []
-
-# Additional JavaScript files
 script = []
 
 [web.resource.dev]
-
-# Javascript code file
-# serve: [dev-server] only
 script = []
+
+[bundle]
+identifier = "org.church.biblemanual"
+publisher = "Church"
+icon = ["public/icons/icon-512.png"]

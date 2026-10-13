@@ -17,7 +17,10 @@ pub struct UpdateManifest {
 
 /// True when `remote` is a strictly newer semver than `current`.
 pub fn is_newer(current: &str, remote: &str) -> bool {
-    match (semver::Version::parse(current.trim_start_matches('v')), semver::Version::parse(remote.trim_start_matches('v'))) {
+    match (
+        semver::Version::parse(current.trim_start_matches('v')),
+        semver::Version::parse(remote.trim_start_matches('v')),
+    ) {
         (Ok(c), Ok(r)) => r > c,
         _ => false,
     }

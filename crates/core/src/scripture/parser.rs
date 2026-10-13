@@ -34,11 +34,7 @@ fn book_alternation() -> String {
     words.push("song of songs".into());
     // Longest first so "philemon" wins over "phil".
     words.sort_by_key(|w| std::cmp::Reverse(w.len()));
-    words
-        .iter()
-        .map(|w| regex::escape(w).replace(' ', r"\s+"))
-        .collect::<Vec<_>>()
-        .join("|")
+    words.iter().map(|w| regex::escape(w).replace(' ', r"\s+")).collect::<Vec<_>>().join("|")
 }
 
 fn regex() -> &'static Regex {
@@ -125,7 +121,9 @@ fn parse_body(book: &'static Book, body: &str) -> Option<Vec<Passage>> {
                 (None, false) => {
                     chapter = Some(ln);
                     match rhs.map(parse_cv) {
-                        Some(Some((None, c2))) => Passage { book, chapter: ln, end_chapter: c2.max(ln), start_verse: None, end_verse: None },
+                        Some(Some((None, c2))) => {
+                            Passage { book, chapter: ln, end_chapter: c2.max(ln), start_verse: None, end_verse: None }
+                        }
                         Some(Some((Some(c2), v2))) => Passage {
                             book,
                             chapter: ln,
