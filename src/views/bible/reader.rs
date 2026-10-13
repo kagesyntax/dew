@@ -4,7 +4,7 @@
 
 use super::reader_bar::ReaderBar;
 use super::selection_bar::SelectionBar;
-use super::translation_picker::TranslationPill;
+use super::verse_scrubber::{VerseScrubber, MIN_VERSES};
 use crate::bible::load_book;
 use crate::platform::js;
 use crate::routes::Route;
@@ -94,7 +94,6 @@ pub fn Reader(book: String, chapter: u16, focus: String) -> Element {
             back_label: "Books",
             onback: move |_| { nav.push(Route::BibleHome {}); },
             title: format!("{} {}", meta.name, chapter),
-            trailing: rsx! { TranslationPill {} },
         }
 
         article { class: "mx-auto max-w-2xl bg-bg px-6 pt-6 pb-24 sm:rounded-b-card",
@@ -115,6 +114,9 @@ pub fn Reader(book: String, chapter: u16, focus: String) -> Element {
                 Some(Ok(data)) => match data.get(chapter as usize - 1) {
                     None => rsx! { p { class: "py-10 text-center text-label-2", "This chapter isn't available." } },
                     Some(verses) => rsx! {
+                        if verses.len() >= MIN_VERSES {
+                            VerseScrubber { key: "{meta.id}-{chapter}", label: format!("{} {}", meta.name, chapter), count: verses.len() }
+                        }
                         p { class: "reader-text",
                             for (i, v) in verses.iter().enumerate() {
                                 {

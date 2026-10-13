@@ -118,3 +118,33 @@ body:has(.reader-bar) .return-pill { bottom: calc(env(safe-area-inset-bottom) + 
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   backdrop-filter: saturate(180%) blur(20px);
 }
+
+/* Verse scrubber (long chapters): iOS-style fast-scroll handle on the right edge */
+.verse-scrubber {
+  position: fixed; right: 0; z-index: 35; width: 40px;
+  top: calc(env(safe-area-inset-top) + 64px);
+  bottom: calc(max(env(safe-area-inset-bottom), 8px) + 72px);
+  touch-action: none; user-select: none; -webkit-user-select: none;
+  opacity: 0; pointer-events: none; transition: opacity 220ms ease;
+  --vs-y: 22px;
+}
+.verse-scrubber.is-visible { opacity: 1; pointer-events: auto; }
+.vs-thumb {
+  position: absolute; right: 5px; top: var(--vs-y); transform: translateY(-50%);
+  width: 7px; height: 44px; border-radius: 99px;
+  background: var(--app-label-2);
+  transition: width 160ms ease, right 160ms ease, background-color 160ms ease;
+}
+.verse-scrubber:hover .vs-thumb, .verse-scrubber.is-dragging .vs-thumb { width: 10px; right: 4px; background: var(--app-accent); }
+.vs-bubble {
+  position: absolute; right: 26px; top: var(--vs-y); transform: translateY(-50%) scale(.92);
+  white-space: nowrap; padding: 8px 14px; border-radius: 14px;
+  background: var(--app-surface); color: var(--app-label);
+  box-shadow: 0 8px 28px rgb(0 0 0 / .18), 0 0 0 .5px var(--app-separator);
+  font: 600 17px/1.2 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  font-variant-numeric: tabular-nums;
+  opacity: 0; transition: opacity 140ms ease, transform 140ms ease;
+}
+.verse-scrubber.is-dragging .vs-bubble { opacity: 1; transform: translateY(-50%) scale(1); }
+@keyframes verse-flash { from { background: color-mix(in srgb, var(--app-accent) 22%, transparent); } to { background: transparent; } }
+.verse.verse-flash { animation: verse-flash 1.6s ease-out; }
