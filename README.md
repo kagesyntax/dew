@@ -46,7 +46,7 @@ New or corrected lessons appear in the app on next launch (cached for offline us
 Only bundle texts you are licensed to distribute (the LSB allows at most 1,000 verses in an app without written permission from The Lockman Foundation).
 
 ## Releases and in-app updates
-The full pipeline (the 7 C's of DevOps) is in [docs/DEVOPS.md](docs/DEVOPS.md).
+The full pipeline (the 7 C's of DevOps) and the website are described in [docs/DEVOPS.md](docs/DEVOPS.md).
 
 1. Write user-facing changes under `## [Unreleased]` in [CHANGELOG.md](CHANGELOG.md) as you go.
 2. **Actions → Prepare Release → Run workflow** (patch / minor / major). It bumps `Cargo.toml`,

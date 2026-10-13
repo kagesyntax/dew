@@ -8,14 +8,16 @@
     "Highlights in four colours, bookmarks, copy and share",
     "Welcome tour and in-context tips",
     "Light and dark appearance, text size, and verse-number options",
-    "Software Update in Settings, delivered from GitHub releases"
+    "Software Update in Settings, delivered from GitHub releases",
+    "Apps for Android, Windows, Mac and Linux, plus the web",
+    "The Dew website, where you can try the app before downloading it"
   ],
-  "url": "https://github.com/your-church/church-app/releases/tag/v0.1.0",
-  "published_at": "2026-10-13T20:28:39Z",
+  "url": "https://github.com/agc-oshodi/dew/releases/tag/v0.1.0",
+  "published_at": "2026-10-13T21:42:22Z",
   "downloads": {
-    "macos": "https://github.com/your-church/church-app/releases/download/v0.1.0/BibleManual-macos.dmg",
-    "windows": "https://github.com/your-church/church-app/releases/download/v0.1.0/BibleManual-windows.msi",
-    "linux": "https://github.com/your-church/church-app/releases/download/v0.1.0/BibleManual-linux.AppImage",
-    "android": "https://github.com/your-church/church-app/releases/download/v0.1.0/BibleManual-android.apk"
+    "macos": "https://github.com/agc-oshodi/dew/releases/download/v0.1.0/Dew-macos.dmg",
+    "windows": "https://github.com/agc-oshodi/dew/releases/download/v0.1.0/Dew-windows.msi",
+    "linux": "https://github.com/agc-oshodi/dew/releases/download/v0.1.0/Dew-linux.AppImage",
+    "android": "https://github.com/agc-oshodi/dew/releases/download/v0.1.0/Dew-android.apk"
   }
 }
