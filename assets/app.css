@@ -105,25 +105,22 @@ html, body {
 @keyframes sheet-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 .sheet-up { animation: sheet-up 360ms cubic-bezier(.2,.8,.2,1) both; }
 
-/* Reader toolbar: tucks away while reading down, returns on scroll up */
-.reader-bar { transition: transform 280ms cubic-bezier(.2,.8,.2,1), opacity 200ms ease; }
-html[data-chrome="hidden"] .reader-bar { transform: translateY(24px); opacity: 0; }
-html[data-chrome="hidden"] .reader-bar > * { pointer-events: none; }
+/* Reader toolbar: docked on the tab bar, one piece of bottom chrome */
+.reader-bar {
+  bottom: calc(max(env(safe-area-inset-bottom), 8px) + var(--tabbar-h, 51px));
+  box-shadow: inset 0 0.5px 0 var(--app-separator);
+}
+body:has(.reader-bar) nav.tab-bar { border-top-color: transparent; }
 /* The "Back to Study" pill rides above the reader toolbar */
-body:has(.reader-bar) .return-pill { bottom: calc(env(safe-area-inset-bottom) + 132px) !important; }
+body:has(.reader-bar) .return-pill { bottom: calc(env(safe-area-inset-bottom) + 124px) !important; }
 /* Passage picker: a tall sheet */
 .dx-sheet.passage-sheet { height: 88vh; }
-.reader-capsule {
-  background: color-mix(in srgb, var(--app-surface) 94%, transparent);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  backdrop-filter: saturate(180%) blur(20px);
-}
 
 /* Verse scrubber (long chapters): iOS-style fast-scroll handle on the right edge */
 .verse-scrubber {
   position: fixed; right: 0; z-index: 35; width: 40px;
   top: calc(env(safe-area-inset-top) + 64px);
-  bottom: calc(max(env(safe-area-inset-bottom), 8px) + 72px);
+  bottom: calc(max(env(safe-area-inset-bottom), 8px) + 116px);
   touch-action: none; user-select: none; -webkit-user-select: none;
   opacity: 0; pointer-events: none; transition: opacity 220ms ease;
   --vs-y: 22px;
@@ -148,3 +145,6 @@ body:has(.reader-bar) .return-pill { bottom: calc(env(safe-area-inset-bottom) + 
 .verse-scrubber.is-dragging .vs-bubble { opacity: 1; transform: translateY(-50%) scale(1); }
 @keyframes verse-flash { from { background: color-mix(in srgb, var(--app-accent) 22%, transparent); } to { background: transparent; } }
 .verse.verse-flash { animation: verse-flash 1.6s ease-out; }
+
+/* Verse list rows: inset hairlines like an iOS table */
+.verse-row + .verse-row:not(.bg-fill) { box-shadow: inset 60px 0.5px 0 0 var(--app-surface-2), inset 0 0.5px 0 0 var(--app-separator); }

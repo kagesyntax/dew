@@ -36,7 +36,7 @@ pub fn TabBar() -> Element {
 
     let update_ready = matches!(*app.update.read(), crate::services::updater::UpdateStatus::Available(_));
     rsx! {
-        nav { class: "bar-blur safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-separator",
+        nav { class: "tab-bar bar-blur safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-separator",
             div { class: "mx-auto grid max-w-2xl grid-cols-4 pt-1.5",
                 TabItem { to: Route::Today {}, label: "Today", active: active == Tab::Today,
                     House { size: 25, stroke_width: if active == Tab::Today { "2.3" } else { "1.8" } }

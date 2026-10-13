@@ -33,7 +33,6 @@ fn install() {
         r#"
         if (!window.__dewScrubber) {
             window.__dewScrubber = true;
-            const html = document.documentElement;
             let hideTimer = 0, dragging = false, lastVerse = 0;
             const el = () => document.querySelector('.verse-scrubber');
             const geom = (s) => {
@@ -81,7 +80,6 @@ fn install() {
                 dragging = true; lastVerse = 0;
                 s.setPointerCapture(e.pointerId);
                 s.classList.add('is-visible', 'is-dragging');
-                html.dataset.chrome = 'hidden';
                 clearTimeout(hideTimer);
                 scrubTo(s, e.clientY);
                 const move = (ev) => scrubTo(s, ev.clientY);
