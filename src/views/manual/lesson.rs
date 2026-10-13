@@ -6,10 +6,12 @@ use crate::manual::use_manual;
 use crate::platform::{clock, js};
 use crate::routes::Route;
 use crate::state::use_app;
-use crate::ui::scripture::{LessonContext, Preview};
-use crate::ui::{BackBar, Card, ScriptureText};
+use crate::ui::scripture::LessonContext;
+use crate::ui::{tips, BackBar, Card, ScriptureText, Tip};
 use dioxus::prelude::*;
-use dioxus_icons::lucide::{ChevronLeft, ChevronRight, CircleCheck, Flag, Lightbulb, ListChecks, Quote, Rocket, Share};
+use dioxus_icons::lucide::{
+    ChevronLeft, ChevronRight, CircleCheck, Flag, Lightbulb, Link2, ListChecks, Quote, Rocket, Share,
+};
 
 /// Route entry: keyed so each lesson mounts fresh (its own LessonContext and scroll restore).
 #[component]
@@ -34,7 +36,6 @@ fn LessonPage(id: String) -> Element {
     let ctx =
         LessonContext { label: format!("Study {}", lesson.study_number), route: Route::LessonView { id: id.clone() } };
     use_context_provider(|| ctx.clone());
-    let chip_ctx = ctx.clone();
 
     // Remember the lesson and restore scroll when coming back from the Bible.
     let effect_id = id.clone();
@@ -48,8 +49,6 @@ fn LessonPage(id: String) -> Element {
     let (prev, next) = manual.neighbours(&id);
     let (prev, next) = (prev.cloned(), next.cloned());
     let done = app.progress.read().is_completed(&id);
-    let refs = lesson.references();
-    let preview = try_use_context::<Preview>();
     let share_text = format!(
         "{} — {} ({})\nMemory verse: {} {}",
         lesson.title,
@@ -73,34 +72,19 @@ fn LessonPage(id: String) -> Element {
         div { class: "mx-auto max-w-2xl px-5 pt-5",
             // Header
             p { class: "text-[13px] font-semibold uppercase tracking-wide text-accent", "{clock::pretty_date(&lesson.date)}" }
-            p { class: "mt-2 text-[15px] font-medium text-label-2", "Unit {lesson.unit_number}: {lesson.unit_title}" }
-            h1 { class: "mt-0.5 font-serif text-[32px] font-bold leading-tight tracking-tight", "{lesson.title}" }
-            div { class: "mt-2 flex flex-wrap items-center gap-x-2 text-[15px]",
-                span { class: "rounded-md bg-label px-1.5 py-0.5 text-[12px] font-bold uppercase text-bg", "Study {lesson.study_number}" }
-                span { class: "text-label-2", "Text:" }
+            h1 { class: "mt-1.5 font-serif text-[32px] font-bold leading-[1.15] tracking-tight", "{lesson.title}" }
+            p { class: "mt-1.5 text-[15px] text-label-2", "Unit {lesson.unit_number} · Study {lesson.study_number} — {lesson.unit_title}" }
+            div { class: "mt-4 flex items-baseline gap-2 border-y border-separator py-3 text-[16px]",
+                span { class: "text-label-2", "Text" }
                 ScriptureText { text: lesson.text.clone(), class: "inline" }
             }
 
-            // Scripture in this lesson: quick chips
-            if refs.len() > 1 {
-                div { class: "no-scrollbar -mx-5 mt-4 flex gap-2 overflow-x-auto px-5 pb-1",
-                    for r in refs {
-                        {
-                        let chip_ctx = chip_ctx.clone();
-                        rsx! {
-                        button {
-                            key: "{r.label()}",
-                            class: "press shrink-0 rounded-full bg-surface px-3 py-1.5 text-[13px] font-semibold text-accent shadow-sm",
-                            onclick: move |_| if let Some(mut p) = preview {
-                                p.1.set(Some(chip_ctx.clone()));
-                                p.0.set(Some(r.clone()));
-                            },
-                            "{r.label()}"
-                        }
-                        }
-                        }
-                    }
-                }
+            Tip {
+                id: tips::LESSON_LINKS,
+                title: "Tap a blue reference",
+                message: "Read the verses without leaving the lesson. Change how this works in Settings.",
+                icon: rsx! { Link2 { size: 22, stroke_width: "2" } },
+                class: "mt-4",
             }
 
             // Memory verse

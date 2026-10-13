@@ -45,18 +45,13 @@ pub fn ManualHome() -> Element {
                 if let Some(l) = current.clone() {
                     p { class: "mb-1.5 px-4 text-[13px] uppercase tracking-wide text-label-2", "This Sunday" }
                     Link { to: Route::LessonView { id: l.id.clone() }, class: "press mb-6 block",
-                        div { class: "overflow-hidden rounded-card bg-surface",
-                            div { class: "bg-gradient-to-br from-indigo-600 to-blue-500 px-5 pt-5 pb-4 text-white",
-                                p { class: "text-[13px] font-semibold uppercase tracking-wide text-white/75", "{clock::pretty_date(&l.date)}" }
-                                p { class: "mt-1 text-[26px] font-bold leading-tight", "{l.title}" }
-                                p { class: "mt-1 text-[15px] text-white/85", "Unit {l.unit_number}: {l.unit_title}" }
-                            }
-                            div { class: "flex items-center justify-between px-5 py-3",
-                                div {
-                                    p { class: "text-[13px] text-label-2", "Text" }
-                                    p { class: "text-[15px] font-medium", "{l.text}" }
-                                }
-                                ChevronRight { size: 20, class: "text-label-3", stroke_width: "2.5" }
+                        div { class: "rounded-card bg-surface p-5",
+                            p { class: "text-[13px] font-semibold uppercase tracking-wide text-accent", "{clock::pretty_date(&l.date)}" }
+                            p { class: "mt-1 text-[24px] font-bold leading-tight", "{l.title}" }
+                            p { class: "mt-0.5 text-[15px] text-label-2", "Unit {l.unit_number} · {l.unit_title}" }
+                            div { class: "mt-4 flex items-center justify-between border-t border-separator pt-3",
+                                p { class: "text-[15px] text-label-2", "{l.text}" }
+                                ChevronRight { size: 18, class: "text-label-3", stroke_width: "2.5" }
                             }
                         }
                     }

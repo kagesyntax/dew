@@ -1,20 +1,24 @@
-//! First-run experience: launch screen + a four-step setup flow.
+//! First-run experience, in Apple's order:
+//! 1. Welcome — "Welcome to Bible & Manual" with three feature rows (like Apple's own apps)
+//! 2. Tour — three illustrated walkthrough pages built from real UI, skippable
+//! 3. Setup — translation, appearance, verse-link behaviour / teacher mode
+//!
+//! After that, TipKit-style tips (`ui::tip`) teach the rest in context. The tour can be
+//! replayed from Settings → Feature Tour.
 
-mod app_icon;
 mod flow;
+mod illustrations;
 mod steps;
+mod tour;
+mod welcome;
 
-pub use app_icon::AppIcon;
 pub use flow::Onboarding;
+pub use tour::TourReplay;
 
 use dioxus::prelude::*;
 
-/// Launch screen shown while persisted state loads (usually a few milliseconds).
+/// Launch screen: like iOS, just the app's background while state loads.
 #[component]
 pub fn Splash() -> Element {
-    rsx! {
-        div { class: "flex min-h-screen items-center justify-center bg-bg",
-            div { class: "fade-in", AppIcon { size: 96 } }
-        }
-    }
+    rsx! { div { class: "min-h-screen bg-bg" } }
 }

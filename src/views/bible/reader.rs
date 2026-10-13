@@ -9,10 +9,10 @@ use crate::platform::js;
 use crate::routes::Route;
 use crate::state::progress::ReadingPosition;
 use crate::state::use_app;
-use crate::ui::{BackBar, Spinner};
+use crate::ui::{tips, BackBar, Spinner, Tip};
 use church_core::scripture::{books, verse_key, BOOKS};
 use dioxus::prelude::*;
-use dioxus_icons::lucide::{ChevronLeft, ChevronRight};
+use dioxus_icons::lucide::{ChevronLeft, ChevronRight, Highlighter};
 use std::collections::BTreeSet;
 
 fn parse_focus(focus: &str) -> Option<(u16, u16)> {
@@ -90,6 +90,13 @@ pub fn Reader(book: String, chapter: u16, focus: String) -> Element {
             header { class: "mb-6 text-center",
                 p { class: "text-[15px] font-semibold uppercase tracking-[0.18em] text-label-2", "{meta.name}" }
                 p { class: "font-serif text-[64px] leading-none font-light", "{chapter}" }
+            }
+            Tip {
+                id: tips::READER_SELECT,
+                title: "Tap a verse",
+                message: "Select verses to highlight, bookmark, copy or share them.",
+                icon: rsx! { Highlighter { size: 22, stroke_width: "2" } },
+                class: "mb-6 font-sans",
             }
             match &*text.read() {
                 None => rsx! { Spinner {} },

@@ -1,55 +1,18 @@
 //! The individual onboarding pages.
 
-use super::AppIcon;
 use crate::bible::TRANSLATIONS;
 use crate::components::switch::Switch;
-use crate::config::{APP_NAME, CHURCH_NAME};
 use crate::state::settings::{LinkMode, ThemeMode};
 use crate::state::use_app;
 use dioxus::prelude::*;
-use dioxus_icons::lucide::{BookOpen, Check, GraduationCap, Link2, Monitor, Moon, Sun};
+use dioxus_icons::lucide::{Check, Monitor, Moon, Sun};
 
 #[component]
 fn StepHeader(title: String, subtitle: String) -> Element {
     rsx! {
-        div { class: "pt-8 pb-6 text-center",
-            h1 { class: "text-[30px] font-bold leading-tight tracking-tight", "{title}" }
+        div { class: "pt-6 pb-7",
+            h1 { class: "text-[32px] font-bold leading-tight tracking-tight", "{title}" }
             p { class: "mt-2 text-[17px] leading-snug text-label-2", "{subtitle}" }
-        }
-    }
-}
-
-#[component]
-pub fn WelcomeStep() -> Element {
-    rsx! {
-        div { class: "flex flex-1 flex-col items-center justify-center pb-6 text-center",
-            AppIcon { size: 104 }
-            h1 { class: "mt-7 text-[34px] font-bold tracking-tight", "{APP_NAME}" }
-            p { class: "mt-1 text-[17px] text-label-2", "{CHURCH_NAME}" }
-            div { class: "mt-10 w-full space-y-6 text-left",
-                Feature { title: "The Bible, offline", text: "Four free translations, fast and beautiful to read.",
-                    BookOpen { size: 26, stroke_width: "2" }
-                }
-                Feature { title: "Your Sunday School manual", text: "Every lesson, memory verse and Daily Dew Drop in your pocket.",
-                    GraduationCap { size: 26, stroke_width: "2" }
-                }
-                Feature { title: "Tap any verse", text: "Read it in place, or jump to the Bible and come right back to your lesson.",
-                    Link2 { size: 26, stroke_width: "2" }
-                }
-            }
-        }
-    }
-}
-
-#[component]
-fn Feature(title: String, text: String, children: Element) -> Element {
-    rsx! {
-        div { class: "flex items-start gap-4",
-            div { class: "mt-0.5 text-accent", {children} }
-            div {
-                p { class: "text-[17px] font-semibold", "{title}" }
-                p { class: "text-[15px] leading-snug text-label-2", "{text}" }
-            }
         }
     }
 }

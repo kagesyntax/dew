@@ -9,10 +9,10 @@ use crate::platform::{clock, js};
 use crate::routes::Route;
 use crate::services::updater::{self, UpdateStatus};
 use crate::state::use_app;
-use crate::ui::{Card, LargeTitle, PassageText, ScriptureText};
+use crate::ui::{tips, Card, LargeTitle, PassageText, ScriptureText, Tip};
 use church_core::scripture::{books, parse};
 use dioxus::prelude::*;
-use dioxus_icons::lucide::{BookOpen, ChevronRight, Droplets, Share, Sparkles};
+use dioxus_icons::lucide::{BookOpen, CalendarDays, ChevronRight, Droplets, Share, Sparkles};
 
 #[component]
 pub fn Today() -> Element {
@@ -41,7 +41,7 @@ pub fn Today() -> Element {
             title: clock::greeting().to_string(),
             subtitle: clock::header_date(),
             trailing: rsx! {
-                Link { to: Route::SettingsView {}, class: "press flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-blue-500 text-[15px] font-semibold text-white", "{initial}" }
+                Link { to: Route::SettingsView {}, class: "press flex h-9 w-9 items-center justify-center rounded-full bg-fill text-[15px] font-semibold text-label-2", "{initial}" }
             },
         }
 
@@ -58,19 +58,25 @@ pub fn Today() -> Element {
 
             VerseOfTheDay {}
 
+            Tip {
+                id: tips::TODAY,
+                title: "Your week at a glance",
+                message: "This Sunday's lesson and today's Daily Dew Drop always live here.",
+                icon: rsx! { CalendarDays { size: 22, stroke_width: "2" } },
+            }
+
             if let Some(l) = lesson {
                 Link { to: Route::LessonView { id: l.id.clone() }, class: "press block",
-                    div { class: "relative overflow-hidden rounded-card bg-gradient-to-br from-indigo-600 to-blue-500 p-5 text-white shadow-lg shadow-blue-900/15",
-                        p { class: "text-[13px] font-semibold uppercase tracking-wide text-white/75", "Sunday School · {clock::short_date(&l.date)}" }
-                        p { class: "mt-1 text-[24px] font-bold leading-tight", "{l.title}" }
-                        p { class: "mt-0.5 text-[15px] text-white/80", "{l.kicker()} · {l.unit_title}" }
-                        div { class: "mt-4 rounded-xl bg-white/15 p-3 backdrop-blur",
-                            p { class: "font-serif text-[16px] italic leading-snug", "“{l.memory_verse.text}”" }
-                            p { class: "mt-1 text-[13px] font-semibold text-white/80", "{l.memory_verse.reference}" }
-                        }
-                        div { class: "mt-4 flex items-center justify-between text-[15px] font-semibold",
-                            span { "Open lesson" }
-                            ChevronRight { size: 20, stroke_width: "2.5" }
+                    Card { class: "p-5",
+                        p { class: "text-[13px] font-semibold uppercase tracking-wide text-accent", "This Sunday · {clock::short_date(&l.date)}" }
+                        p { class: "mt-1 text-[22px] font-bold leading-tight", "{l.title}" }
+                        p { class: "mt-0.5 text-[15px] text-label-2", "{l.kicker()}" }
+                        div { class: "my-4 h-px bg-separator" }
+                        p { class: "font-serif text-[17px] leading-snug", "{l.memory_verse.text}" }
+                        p { class: "mt-1.5 text-[14px] text-label-2", "{l.memory_verse.reference}" }
+                        div { class: "mt-4 flex items-center gap-0.5 text-[15px] font-medium text-accent",
+                            "Open Lesson"
+                            ChevronRight { size: 17, stroke_width: "2.4" }
                         }
                     }
                 }

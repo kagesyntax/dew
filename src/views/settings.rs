@@ -14,7 +14,8 @@ use crate::ui::{GroupedList, LargeTitle, ListRow};
 use crate::views::bible::TranslationSheet;
 use dioxus::prelude::*;
 use dioxus_icons::lucide::{
-    ArrowDownToLine, BookOpen, CloudDownload, Database, Hash, Info, Link2, NotebookPen, Palette, RotateCcw, Type,
+    ArrowDownToLine, BookOpen, CloudDownload, Compass, Database, Hash, Info, Lightbulb, Link2, NotebookPen, Palette,
+    RotateCcw, Type,
 };
 use std::collections::HashSet;
 
@@ -148,6 +149,19 @@ pub fn SettingsView() -> Element {
                 title: "Check Automatically", tint: "#30b0c7",
                 icon: rsx! { ArrowDownToLine { size: 17, stroke_width: "2.2" } },
                 trailing: rsx! { Switch { checked: s.auto_update_check, on_checked_change: move |v| app.settings.write().auto_update_check = v } },
+            }
+        }
+
+        GroupedList { header: "Help",
+            ListRow {
+                title: "Feature Tour", chevron: true, tint: "#0a7aff",
+                icon: rsx! { Compass { size: 17, stroke_width: "2.2" } },
+                onclick: move |_| { navigator().push(crate::routes::Route::TourReplay {}); },
+            }
+            ListRow {
+                title: "Show Tips Again", tint: "#ffcc00",
+                icon: rsx! { Lightbulb { size: 17, stroke_width: "2.2" } },
+                onclick: move |_| app.progress.write().seen_tips.clear(),
             }
         }
 
