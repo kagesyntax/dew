@@ -1,18 +1,21 @@
 //! Chapter reader in the style of YouVersion / Apple Books: serif text, verse numbers,
-//! tap-to-select with a highlight/copy/bookmark bar, previous/next chapter buttons, and the
-//! "Back to lesson" pill when you arrived from the manual.
+//! tap-to-select with a highlight/copy/bookmark bar, a floating reader toolbar (previous, passage
+//! picker, translation, next), and the "Back to lesson" pill when you arrived from the manual.
 
+use super::reader_bar::ReaderBar;
 use super::selection_bar::SelectionBar;
 use super::translation_picker::TranslationPill;
+use super::verse_scrubber::{VerseScrubber, MIN_VERSES};
 use crate::bible::load_book;
 use crate::platform::js;
 use crate::routes::Route;
 use crate::state::progress::ReadingPosition;
+use crate::state::settings::VerseNav;
 use crate::state::use_app;
 use crate::ui::{tips, BackBar, Spinner, Tip};
 use church_core::scripture::{books, verse_key, BOOKS};
 use dioxus::prelude::*;
-use dioxus_icons::lucide::{ChevronLeft, ChevronRight, Highlighter};
+use dioxus_icons::lucide::{ChevronRight, Highlighter};
 use std::collections::BTreeSet;
 
 fn parse_focus(focus: &str) -> Option<(u16, u16)> {
@@ -40,6 +43,15 @@ fn neighbour(book_id: &str, chapter: u16, forward: bool) -> Option<Route> {
     }
 }
 
+fn route_label(r: &Route) -> String {
+    match r {
+        Route::Reader { book, chapter, .. } => {
+            format!("{} {}", books::by_id(book).map(|b| b.name).unwrap_or(book), chapter)
+        }
+        _ => String::new(),
+    }
+}
+
 #[component]
 pub fn Reader(book: String, chapter: u16, focus: String) -> Element {
     let mut app = use_app();
@@ -51,8 +63,8 @@ pub fn Reader(book: String, chapter: u16, focus: String) -> Element {
     let mut selected: Signal<BTreeSet<u16>> = use_signal(BTreeSet::new);
 
     // Remember position for the Bible tab and "Continue reading".
-    use_effect(use_reactive!(|book, chapter| {
-        app.progress.write().last_read = Some(ReadingPosition { book: book.clone(), chapter });
+    use_effect(use_reactive!(|book, chapter, focus| {
+        app.progress.write().last_read = Some(ReadingPosition { book: book.clone(), chapter, focus: focus.clone() });
         selected.write().clear();
     }));
 
@@ -77,6 +89,12 @@ pub fn Reader(book: String, chapter: u16, focus: String) -> Element {
     let show_numbers = app.settings.read().verse_numbers;
     let highlights = app.progress.read().highlights.clone();
     let nav = navigator();
+    let verse_nav = app.settings.read().verse_nav;
+    let verses: Vec<String> = match &*text.read() {
+        Some(Ok(data)) => data.get(chapter as usize - 1).cloned().unwrap_or_default(),
+        _ => Vec::new(),
+    };
+    let start_verse = focus_range.map(|(s, _)| s).unwrap_or(1);
 
     rsx! {
         BackBar {
@@ -86,7 +104,7 @@ pub fn Reader(book: String, chapter: u16, focus: String) -> Element {
             trailing: rsx! { TranslationPill {} },
         }
 
-        article { class: "mx-auto max-w-2xl bg-bg px-6 pt-6 pb-10 sm:rounded-b-card",
+        article { class: "mx-auto max-w-2xl bg-bg px-6 pt-6 pb-36 sm:rounded-b-card",
             header { class: "mb-6 text-center",
                 p { class: "text-[15px] font-semibold uppercase tracking-[0.18em] text-label-2", "{meta.name}" }
                 p { class: "font-serif text-[64px] leading-none font-light", "{chapter}" }
@@ -104,6 +122,9 @@ pub fn Reader(book: String, chapter: u16, focus: String) -> Element {
                 Some(Ok(data)) => match data.get(chapter as usize - 1) {
                     None => rsx! { p { class: "py-10 text-center text-label-2", "This chapter isn't available." } },
                     Some(verses) => rsx! {
+                        if verse_nav == VerseNav::Scrubber && verses.len() >= MIN_VERSES {
+                            VerseScrubber { key: "{meta.id}-{chapter}", label: format!("{} {}", meta.name, chapter), count: verses.len() }
+                        }
                         p { class: "reader-text",
                             for (i, v) in verses.iter().enumerate() {
                                 {
@@ -137,22 +158,22 @@ pub fn Reader(book: String, chapter: u16, focus: String) -> Element {
                 },
             }
 
-            nav { class: "mt-10 flex items-center justify-between",
-                if let Some(p) = prev {
-                    Link { to: p, class: "press flex h-11 w-11 items-center justify-center rounded-full bg-surface shadow-md shadow-black/10", aria_label: "Previous chapter",
-                        ChevronLeft { size: 24, stroke_width: "2.3" }
+            // End of chapter: carry straight on, Apple Books style.
+            if let Some(n) = next.clone() {
+                Link { to: n.clone(), class: "press mt-10 flex items-center justify-between rounded-card bg-surface px-4 py-3.5 font-sans",
+                    span {
+                        span { class: "block text-[13px] text-label-2", "Next Chapter" }
+                        span { class: "text-[17px] font-semibold", "{route_label(&n)}" }
                     }
-                } else { span {} }
-                if let Some(n) = next {
-                    Link { to: n, class: "press flex h-11 w-11 items-center justify-center rounded-full bg-surface shadow-md shadow-black/10", aria_label: "Next chapter",
-                        ChevronRight { size: 24, stroke_width: "2.3" }
-                    }
-                } else { span {} }
+                    ChevronRight { size: 22, class: "text-label-3", stroke_width: "2.4" }
+                }
             }
         }
 
         if !selected.read().is_empty() {
             SelectionBar { book: meta.id.to_string(), chapter, selected }
+        } else {
+            ReaderBar { book: meta.id.to_string(), book_name: meta.name.to_string(), chapter, prev: prev.clone(), next: next.clone(), verses, start_verse, show_verse: verse_nav == VerseNav::List }
         }
     }
 }

@@ -11,7 +11,7 @@ use crate::routes::Route;
 use crate::state::{navigation, settings::LinkMode, use_app, AppState};
 use church_core::scripture::{segment, Reference, Segment};
 use dioxus::prelude::*;
-use dioxus_icons::lucide::{BookOpen, ChevronDown, ChevronRight, Copy, X};
+use dioxus_icons::lucide::{BookOpen, ChevronDown, ChevronRight, ChevronUp, Copy, X};
 
 /// Present in a lesson so links know where "Back to …" should return.
 #[derive(Clone, PartialEq)]
@@ -43,8 +43,18 @@ fn open_in_bible(app: AppState, lesson: Option<LessonContext>, reference: &Refer
     }
 }
 
+/// A paragraph of manual text with tappable references.
+///
+/// Renders as a block (`div`) so an inline expansion always opens *below* the paragraph at full
+/// width, whatever layout the caller sits in. `prefix` (bold) and `suffix` (secondary) sit on the
+/// same line as the text, e.g. "Faith — …" or "Hebrews 11:1 (KJV)".
 #[component]
-pub fn ScriptureText(text: String, #[props(default)] class: String) -> Element {
+pub fn ScriptureText(
+    text: String,
+    #[props(default)] class: String,
+    #[props(default)] prefix: Option<String>,
+    #[props(default)] suffix: Option<String>,
+) -> Element {
     let app = use_app();
     let mode = app.settings.read().link_mode;
     let preview = try_use_context::<Preview>();
@@ -53,7 +63,11 @@ pub fn ScriptureText(text: String, #[props(default)] class: String) -> Element {
     let segments = segment(&text);
 
     rsx! {
-        p { class: "{class}",
+        div { class: "min-w-0 {class}",
+        p {
+            if let Some(p) = &prefix {
+                span { class: "font-semibold", "{p} — " }
+            }
             for (i, seg) in segments.into_iter().enumerate() {
                 match seg {
                     Segment::Text(t) => rsx! { span { key: "{i}", "{t}" } },
@@ -63,7 +77,7 @@ pub fn ScriptureText(text: String, #[props(default)] class: String) -> Element {
                         rsx! {
                             button {
                                 key: "{i}",
-                                class: "press inline rounded-[5px] px-0.5 font-semibold text-accent decoration-accent/40 underline-offset-[3px] hover:underline",
+                                class: if is_open { "press inline whitespace-nowrap rounded-[6px] bg-accent/12 px-1 font-semibold text-accent" } else { "press inline whitespace-nowrap rounded-[6px] px-0.5 font-semibold text-accent decoration-accent/40 underline-offset-[3px] hover:underline" },
                                 "aria-expanded": if mode == LinkMode::Inline { if is_open { "true" } else { "false" } } else { "" },
                                 onclick: move |_| {
                                     js::haptic();
@@ -84,36 +98,53 @@ pub fn ScriptureText(text: String, #[props(default)] class: String) -> Element {
                                 },
                                 "{text}"
                                 if mode == LinkMode::Inline {
-                                    ChevronDown { size: 14, stroke_width: "2.5", class: if is_open { "ml-0.5 inline rotate-180 transition-transform" } else { "ml-0.5 inline transition-transform" } }
+                                    ChevronDown { size: 13, stroke_width: "2.8", class: if is_open { "ml-0.5 inline -mt-0.5 rotate-180 transition-transform" } else { "ml-0.5 inline -mt-0.5 transition-transform" } }
                                 }
                             }
                         }
                     }
                 }
             }
+            if let Some(sfx) = &suffix {
+                span { class: "text-label-2", " {sfx}" }
+            }
         }
         if let Some(r) = inline.read().clone() {
-            InlinePassage { key: "{r.label()}", reference: r }
+            InlinePassage { key: "{r.label()}", reference: r, on_close: move |_| inline.set(None) }
+        }
         }
     }
 }
 
-/// The "drop-down" under a paragraph.
+/// The "drop-down" under a paragraph: a full-width card in the reader's serif, long passages
+/// folded to the first few verses with "Show All".
 #[component]
-fn InlinePassage(reference: Reference) -> Element {
+fn InlinePassage(reference: Reference, on_close: EventHandler<()>) -> Element {
     let app = use_app();
     let lesson = try_use_context::<LessonContext>();
     let r2 = reference.clone();
     let label = reference.label();
+    let abbr = translation(&app.settings.read().translation).abbreviation;
     rsx! {
-        div { class: "fade-in my-3 rounded-2xl bg-fill px-4 pt-3.5 pb-3",
-            p { class: "mb-1.5 text-[15px] font-semibold", "{label}" }
-            PassageText { reference, compact: true }
-            button {
-                class: "press mt-2 flex items-center gap-1 text-[15px] font-medium text-accent",
-                onclick: move |_| open_in_bible(app, lesson.clone(), &r2),
-                "Open in Bible"
-                ChevronRight { size: 16, stroke_width: "2.4" }
+        div { class: "inline-passage fade-in mt-2.5 mb-3 rounded-2xl bg-fill px-4 pt-3 pb-1 text-left font-normal not-italic text-label",
+            div { class: "mb-1 flex items-baseline justify-between gap-3",
+                p { class: "text-[15px] font-semibold", "{label}" }
+                span { class: "text-[12px] font-bold tracking-wide text-label-2", "{abbr}" }
+            }
+            PassageText { reference, compact: true, fold: true }
+            div { class: "-mx-1 mt-1 flex items-center justify-between border-t border-separator",
+                button {
+                    class: "press flex h-11 items-center gap-1 px-1 text-[15px] font-medium text-accent",
+                    onclick: move |_| open_in_bible(app, lesson.clone(), &r2),
+                    "Open in Bible"
+                    ChevronRight { size: 16, stroke_width: "2.4" }
+                }
+                button {
+                    class: "press flex h-11 items-center gap-1 px-1 text-[15px] text-label-2",
+                    onclick: move |_| on_close.call(()),
+                    "Hide"
+                    ChevronUp { size: 16, stroke_width: "2.4" }
+                }
             }
         }
     }
@@ -121,8 +152,9 @@ fn InlinePassage(reference: Reference) -> Element {
 
 /// Loads and renders the verses of a reference in the reader's serif style.
 #[component]
-pub fn PassageText(reference: Reference, #[props(default)] compact: bool) -> Element {
+pub fn PassageText(reference: Reference, #[props(default)] compact: bool, #[props(default)] fold: bool) -> Element {
     let app = use_app();
+    let mut show_all = use_signal(|| false);
     let reference_sig = use_signal(|| reference.clone());
     let verses = use_resource(move || {
         let tr = app.settings.read().translation.clone();
@@ -138,9 +170,13 @@ pub fn PassageText(reference: Reference, #[props(default)] compact: bool) -> Ele
             Some(Err(e)) => rsx! { p { class: "text-[15px] text-label-2", "{e}" } },
             Some(Ok(list)) => {
                 let multi_chapter = list.first().map(|f| f.chapter) != list.last().map(|l| l.chapter);
+                const FOLD_AT: usize = 4;
+                let folded = fold && !show_all() && list.len() > FOLD_AT + 1;
+                let shown = if folded { &list[..FOLD_AT] } else { &list[..] };
+                let total = list.len();
                 rsx! {
                     p { class: "font-serif {size}",
-                        for v in list.iter() {
+                        for v in shown.iter() {
                             span { key: "{v.chapter}-{v.verse}",
                                 if show_numbers {
                                     sup { class: "mr-0.5 font-sans text-[0.62em] font-semibold text-label-2",
@@ -150,6 +186,14 @@ pub fn PassageText(reference: Reference, #[props(default)] compact: bool) -> Ele
                                 }
                                 "{v.text} "
                             }
+                        }
+                        if folded { span { class: "text-label-3", "…" } }
+                    }
+                    if folded {
+                        button {
+                            class: "press mt-1 mb-1 text-[15px] font-medium text-accent",
+                            onclick: move |_| show_all.set(true),
+                            "Show all {total} verses"
                         }
                     }
                 }

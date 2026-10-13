@@ -47,10 +47,7 @@ pub fn Discussion(sections: Vec<DiscussionSection>) -> Element {
                                         ul { class: "mt-2 space-y-2",
                                             for (bi, b) in q.bullets.iter().enumerate() {
                                                 li { key: "{bi}", class: "rounded-xl bg-surface-2 px-3 py-2.5 text-[16px] leading-snug",
-                                                    if let Some(t) = &b.title {
-                                                        span { class: "font-semibold", "{t} — " }
-                                                    }
-                                                    ScriptureText { text: b.text.clone(), class: "inline" }
+                                                    ScriptureText { text: b.text.clone(), prefix: b.title.clone() }
                                                 }
                                             }
                                         }
@@ -59,7 +56,7 @@ pub fn Discussion(sections: Vec<DiscussionSection>) -> Element {
                                         if let Some(n) = &q.leader_note {
                                             div { class: "mt-2 flex gap-2 rounded-xl bg-amber-400/15 px-3 py-2 text-[15px] leading-snug",
                                                 NotebookPen { size: 16, class: "mt-0.5 shrink-0 text-amber-600 dark:text-amber-400", stroke_width: "2.3" }
-                                                ScriptureText { text: n.clone() }
+                                                ScriptureText { text: n.clone(), class: "flex-1" }
                                             }
                                         }
                                     }
@@ -100,14 +97,14 @@ pub fn DewDrops(drops: Vec<DewDrop>, lesson_date: String) -> Element {
                 {
                     let is_today = today_idx.is_some_and(|t| d.day.to_lowercase().starts_with(DAY_NAMES[t]));
                     rsx! {
-                        div { key: "{i}", class: if is_today { "flex items-center gap-3 bg-teal-500/10 px-4 py-3" } else { "flex items-center gap-3 px-4 py-3" },
-                            span { class: if is_today { "w-10 text-[13px] font-bold uppercase text-teal-600 dark:text-teal-400" } else { "w-10 text-[13px] font-semibold uppercase text-label-2" }, "{d.day}" }
+                        div { key: "{i}", class: if is_today { "flex items-start gap-3 bg-teal-500/10 px-4 py-3" } else { "flex items-start gap-3 px-4 py-3" },
+                            span { class: if is_today { "w-10 shrink-0 pt-1 text-[13px] font-bold uppercase text-teal-600 dark:text-teal-400" } else { "w-10 shrink-0 pt-1 text-[13px] font-semibold uppercase text-label-2" }, "{d.day}" }
                             div { class: "min-w-0 flex-1",
                                 p { class: "text-[16px] font-medium", "{d.title}" }
                                 ScriptureText { text: d.reference.clone(), class: "text-[15px]" }
                             }
                             if is_today {
-                                span { class: "rounded-full bg-teal-500 px-2 py-0.5 text-[11px] font-bold uppercase text-white", "Today" }
+                                span { class: "mt-0.5 rounded-full bg-teal-500 px-2 py-0.5 text-[11px] font-bold uppercase text-white", "Today" }
                             }
                         }
                     }

@@ -5,19 +5,41 @@ use crate::state::use_app;
 use dioxus::prelude::*;
 use dioxus_icons::lucide::{Check, ExternalLink};
 
+/// One translation picker for the whole app, mounted at the root of the tab layout.
+/// Sheets are `position: fixed`, and a fixed element inside a blurred bar (backdrop-filter) is
+/// positioned against that bar instead of the screen, so the sheet must never live inside one.
+#[derive(Clone, Copy)]
+pub struct TranslationPicker(pub Signal<bool>);
+
+impl TranslationPicker {
+    pub fn open(mut self) {
+        self.0.set(true);
+    }
+}
+
+/// Mount once (TabLayout); provides `TranslationPicker` to everything below.
+#[component]
+pub fn TranslationHost(children: Element) -> Element {
+    let picker = use_context_provider(|| TranslationPicker(Signal::new(false)));
+    rsx! {
+        {children}
+        TranslationSheet { open: picker.0 }
+    }
+}
+
 /// Small pill that shows the active translation and opens the picker sheet.
 #[component]
 pub fn TranslationPill() -> Element {
     let app = use_app();
-    let mut open = use_signal(|| false);
+    let picker = use_context::<TranslationPicker>();
     let abbr = crate::bible::translation(&app.settings.read().translation).abbreviation;
     rsx! {
         button {
             class: "press rounded-full bg-fill px-3 py-1 text-[13px] font-bold tracking-wide",
-            onclick: move |_| open.set(true),
+            aria_label: "Translation {abbr}",
+            onclick: move |_| picker.open(),
             "{abbr}"
         }
-        TranslationSheet { open }
     }
 }
 
