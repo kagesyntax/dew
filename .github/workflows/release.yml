@@ -1,0 +1,165 @@
+# Continuous Delivery.
+# Ship a version by merging a release PR (made by "Prepare Release") into main, or by pushing a
+# vX.Y.Z tag. The workflow:
+#   1. reads the version from Cargo.toml and skips if that release already exists
+#   2. builds desktop installers (macOS, Windows, Linux) and the Android APK
+#   3. builds the web app and publishes version.json (read by Settings -> Software Update)
+#   4. deploys the web app to GitHub Pages and creates the GitHub Release with every installer
+name: Release
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      minimum_version:
+        description: "Force older builds to update (optional, e.g. 0.2.0)"
+        required: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  DX_VERSION: 0.7.10
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      ship: ${{ steps.v.outputs.ship }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: v
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          V=$(grep -m1 '^version' Cargo.toml | cut -d'"' -f2)
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          if [ "${GITHUB_REF_TYPE}" = "tag" ] && [ "v$V" != "${GITHUB_REF_NAME}" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match Cargo.toml version $V"; exit 1
+          fi
+          if gh release view "v$V" >/dev/null 2>&1; then
+            echo "Release v$V already exists, nothing to ship."; echo "ship=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ship=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Tests must pass before shipping
+        run: cargo test -p church-core
+
+  desktop:
+    needs: prepare
+    if: needs.prepare.outputs.ship == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: macos-latest, key: macos, pattern: "*.dmg", ext: dmg }
+          - { os: windows-latest, key: windows, pattern: "*.msi", ext: msi }
+          - { os: ubuntu-22.04, key: linux, pattern: "*.AppImage", ext: AppImage }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: cargo-bins/cargo-binstall@main
+      - run: cargo binstall -y dioxus-cli@${{ env.DX_VERSION }}
+      - if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev
+      - name: Bundle
+        shell: bash
+        env:
+          RELEASE_CHANNEL: Stable
+          CHURCH_NAME: ${{ vars.CHURCH_NAME }}
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_READONLY_TOKEN }}
+          UPDATE_MANIFEST_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/version.json
+          REPO_URL: https://github.com/${{ github.repository }}
+        run: |
+          dx bundle --platform desktop --release --no-default-features --features desktop
+          f=$(find target/dx -name "${{ matrix.pattern }}" | head -1)
+          test -n "$f" || { echo "::error::no ${{ matrix.pattern }} produced"; exit 1; }
+          cp "$f" "Dew-${{ matrix.key }}.${{ matrix.ext }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installer-${{ matrix.key }}
+          path: Dew-${{ matrix.key }}.*
+
+  android:
+    needs: prepare
+    if: needs.prepare.outputs.ship == 'true'
+    uses: ./.github/workflows/android.yml
+    secrets: inherit
+    with:
+      channel: Stable
+      artifact: installer-android
+
+  web:
+    needs: prepare
+    if: needs.prepare.outputs.ship == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+      - uses: cargo-bins/cargo-binstall@main
+      - run: cargo binstall -y dioxus-cli@${{ env.DX_VERSION }}
+      - name: Write version.json
+        run: python3 tools/release_notes.py manifest "${{ needs.prepare.outputs.version }}" "${{ github.repository }}" ${{ inputs.minimum_version }} > public/version.json
+      - name: Build
+        env:
+          RELEASE_CHANNEL: Stable
+          CHURCH_NAME: ${{ vars.CHURCH_NAME }}
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_READONLY_TOKEN }}
+          UPDATE_MANIFEST_URL: version.json
+          REPO_URL: https://github.com/${{ github.repository }}
+          APP_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+        run: |
+          sed -i 's|^\[web.app\]|[web.app]\nbase_path = "${{ github.event.repository.name }}"|' Dioxus.toml
+          dx bundle --platform web --release
+          OUT=target/dx/dew/release/web/public
+          cp "$OUT/index.html" "$OUT/404.html"   # SPA deep links on GitHub Pages
+          (cd "$OUT" && zip -qr "$GITHUB_WORKSPACE/Dew-web.zip" .)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installer-web
+          path: Dew-web.zip
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: target/dx/dew/release/web/public
+      - id: deploy
+        uses: actions/deploy-pages@v4
+
+  publish:
+    needs: [prepare, desktop, android, web]
+    if: always() && needs.prepare.outputs.ship == 'true' && needs.web.result == 'success' && needs.android.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: installer-*
+          merge-multiple: true
+          path: dist
+      - run: python3 tools/release_notes.py notes "${{ needs.prepare.outputs.version }}" > notes.md
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.prepare.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          name: Dew ${{ needs.prepare.outputs.version }}
+          body_path: notes.md
+          files: dist/*

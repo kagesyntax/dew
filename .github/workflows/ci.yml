@@ -1,0 +1,89 @@
+# Continuous Integration: runs on every push and pull request.
+# A change only reaches `main` when formatting, lints, tests, the security audit and a full
+# web build all pass (enable branch protection on main + develop requiring this workflow).
+name: CI
+
+on:
+  push:
+    branches: [main, develop, "feature/**", "fix/**", "release/**"]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+
+jobs:
+  quality:
+    name: Format, lint & test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: rustfmt
+        run: cargo fmt --all -- --check
+      - name: clippy (web target)
+        run: cargo clippy --target wasm32-unknown-unknown -- -D warnings
+      - name: "unit tests (core logic: scripture parser, manual, versions)"
+        run: cargo test -p church-core
+      - name: validate bundled data
+        run: |
+          python3 -m json.tool assets/manual/manual.json > /dev/null
+          for t in kjv web bsb asv; do test "$(ls assets/bible/$t | wc -l)" -eq 66; done
+
+  security:
+    name: Security audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: cargo-deny (advisories, licenses, banned/duplicate crates, sources)
+        uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check advisories licenses sources bans
+      - name: Secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build:
+    name: Web build
+    needs: [quality]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+      - uses: cargo-bins/cargo-binstall@main
+      - name: Install Dioxus CLI
+        run: cargo binstall -y dioxus-cli@0.7.10
+      - name: Build release bundle
+        run: dx bundle --platform web --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-${{ github.sha }}
+          path: target/dx/dew/release/web/public
+          retention-days: 7
+
+  android:
+    name: Android APK (preview)
+    needs: [quality]
+    # Every push to develop and every release PR gets an installable APK for testers.
+    if: github.ref == 'refs/heads/develop' || startsWith(github.head_ref, 'release/')
+    uses: ./.github/workflows/android.yml
+    secrets: inherit
+    with:
+      channel: Preview
+      artifact: dew-android-preview

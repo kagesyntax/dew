@@ -1,18 +1,20 @@
-//! The views module contains the components for all Layouts and Routes for our app. Each layout and route in our [`Route`]
-//! enum will render one of these components.
-//!
-//!
-//! The [`Home`] and [`Blog`] components will be rendered when the current route is [`Route::Home`] or [`Route::Blog`] respectively.
-//!
-//!
-//! The [`Navbar`] component will be rendered on all pages of our app since every page is under the layout. The layout defines
-//! a common wrapper around all child routes.
+//! Screens. Each tab has its own module; layouts live in `layout`.
 
-mod home;
-pub use home::Home;
+mod acknowledgements;
+pub mod bible;
+mod layout;
+pub mod manual;
+mod not_found;
+pub mod onboarding;
+mod settings;
+mod software_update;
+mod today;
+mod whats_new;
 
-mod blog;
-pub use blog::Blog;
-
-mod navbar;
-pub use navbar::Navbar;
+pub use acknowledgements::Acknowledgements;
+pub use layout::{Shell, TabLayout};
+pub use not_found::NotFound;
+pub use settings::SettingsView;
+pub use software_update::{SoftwareUpdate, APP_ICON};
+pub use today::Today;
+pub use whats_new::WhatsNew;

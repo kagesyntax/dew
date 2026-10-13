@@ -1,0 +1,102 @@
+# Android APK, as one reusable stage of the pipeline.
+#   * CI calls it on every push to develop / release PR  -> "Preview" APK artifact (testers sideload it)
+#   * Release calls it for every version                 -> "Stable" signed APK on the GitHub Release
+# Signing: add these repository secrets once (tools/android-keystore.sh generates them):
+#   ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD
+# Without them the APK is signed with a throwaway debug key: fine for testing, but users can't
+# upgrade from it to a properly signed build, so set the secrets before the first public release.
+name: Android
+
+on:
+  workflow_call:
+    inputs:
+      channel:
+        type: string
+        default: Preview
+      artifact:
+        type: string
+        default: android-apk
+  workflow_dispatch:
+    inputs:
+      channel:
+        type: choice
+        options: [Preview, Stable]
+        default: Preview
+      artifact:
+        type: string
+        default: android-apk
+
+env:
+  DX_VERSION: 0.7.10
+  NDK_VERSION: 27.0.12077973
+  BUILD_TOOLS: 35.0.0
+
+jobs:
+  apk:
+    name: Build ${{ inputs.channel }} APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: android
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v3
+      - name: Install NDK and build tools
+        run: sdkmanager "ndk;${NDK_VERSION}" "build-tools;${BUILD_TOOLS}" "platforms;android-35"
+      - uses: cargo-bins/cargo-binstall@main
+      - run: cargo binstall -y dioxus-cli@${{ env.DX_VERSION }}
+
+      - name: Bundle
+        env:
+          ANDROID_NDK_HOME: ${{ env.ANDROID_SDK_ROOT }}/ndk/${{ env.NDK_VERSION }}
+          RELEASE_CHANNEL: ${{ inputs.channel }}
+          CHURCH_NAME: ${{ vars.CHURCH_NAME }}
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_READONLY_TOKEN }}
+          UPDATE_MANIFEST_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/version.json
+          REPO_URL: https://github.com/${{ github.repository }}
+          APP_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+        run: |
+          dx bundle --platform android --release --no-default-features --features mobile
+          APK=$(find target/dx -name '*.apk' | grep -i release | head -1)
+          [ -n "$APK" ] || APK=$(find target/dx -name '*.apk' | head -1)
+          test -n "$APK" || { echo "::error::dx produced no APK"; exit 1; }
+          cp "$APK" unsigned.apk
+
+      - name: Sign
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          BT="$ANDROID_SDK_ROOT/build-tools/$BUILD_TOOLS"
+          "$BT/zipalign" -f -p 4 unsigned.apk aligned.apk
+          if [ -n "$KS_B64" ]; then
+            echo "$KS_B64" | base64 -d > release.jks
+          else
+            echo "::warning::No signing secrets: using a throwaway debug key (not upgradable)."
+            keytool -genkeypair -keystore release.jks -storepass android -keypass android -alias dew \
+              -keyalg RSA -keysize 2048 -validity 365 -dname "CN=Dew Preview"
+            KS_PASS=android KEY_PASS=android KEY_ALIAS=dew
+          fi
+          "$BT/apksigner" sign --ks release.jks --ks-pass "pass:$KS_PASS" --ks-key-alias "$KEY_ALIAS" \
+            --key-pass "pass:$KEY_PASS" --out Dew-android.apk aligned.apk
+          "$BT/apksigner" verify --print-certs Dew-android.apk | head -3
+          rm -f release.jks
+          V=$(grep -m1 '^version' Cargo.toml | cut -d'"' -f2)
+          echo "### Dew $V for Android (${{ inputs.channel }})" >> "$GITHUB_STEP_SUMMARY"
+          echo "Size: $(du -h Dew-android.apk | cut -f1)" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact }}
+          path: Dew-android.apk
+          retention-days: 30

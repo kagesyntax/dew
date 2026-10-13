@@ -1,0 +1,23 @@
+{
+  "id": "./",
+  "name": "Dew",
+  "short_name": "Dew",
+  "description": "Fresh Word every morning. The Bible and this week's Sunday School lesson for AGC Oshodi teens, offline.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f2f2f7",
+  "theme_color": "#f2f2f7",
+  "categories": ["books", "education", "lifestyle"],
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "This Sunday's Lesson", "url": "./manual", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Bible", "url": "./bible", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

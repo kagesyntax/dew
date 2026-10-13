@@ -1,0 +1,29 @@
+/* iOS segmented control, restyled from the dioxus-components registry copy. */
+.dx-toggle-group {
+  display: flex;
+  width: 100%;
+  padding: 2px;
+  border-radius: 9px;
+  background: var(--app-fill);
+  box-sizing: border-box;
+}
+.dx-toggle-item {
+  flex: 1;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--app-label);
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  transition: background-color 200ms ease, box-shadow 200ms ease;
+}
+.dx-toggle-item[data-state="on"] {
+  background: var(--app-surface);
+  box-shadow: 0 3px 8px rgb(0 0 0 / 12%), 0 3px 1px rgb(0 0 0 / 4%);
+  font-weight: 600;
+}
+html[data-theme="dark"] .dx-toggle-item[data-state="on"] { background: #636366; }
+.dx-toggle-item:focus-visible { outline: 2px solid var(--app-accent); outline-offset: 1px; }
