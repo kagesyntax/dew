@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Convert scrollmapper/bible_databases JSON into per-book asset files.
+"""Convert a full-Bible JSON (scrollmapper/bible_databases or midvash/bible-data format) into
+per-book asset files.
 
 Output layout (consumed by src/bible/loader.rs):
   assets/bible/<code>/<book_id>.json   -> [[verse, ...], ...]  (chapters -> verses)
@@ -20,7 +21,7 @@ def main(src, code):
     for bid, book in zip(BOOK_IDS, books):
         chapters = []
         for ch in sorted(book["chapters"], key=lambda c: c["chapter"]):
-            verses = [v["text"].strip() for v in sorted(ch["verses"], key=lambda v: v["verse"])]
+            verses = [v["text"].strip() for v in sorted(ch["verses"], key=lambda v: v.get("verse", v.get("number")))]
             chapters.append(verses)
         (out / f"{bid}.json").write_text(json.dumps(chapters, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     print(f"wrote {len(books)} books to {out}")
