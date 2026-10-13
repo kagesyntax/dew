@@ -1,8 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="115" fill="#0a7aff"/>
-  <g transform="translate(78 92) scale(5.6)" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M32 14v38"/>
-    <path d="M32 14c-6-4-14-5-22-4v38c8-1 16 0 22 4"/>
-    <path d="M32 14c6-4 14-5 22-4v38c-8-1-16 0-22 4"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- "Radiant Dew": a morning dew drop holding a sunrise. Daily Dew Drops + Radiant Life,
+       daily light from the Word, without a literal book or cross. -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#22297A"/>
+      <stop offset="1" stop-color="#4B3FC4"/>
+    </linearGradient>
+    <linearGradient id="drop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFE38A"/>
+      <stop offset="0.55" stop-color="#FFB547"/>
+      <stop offset="1" stop-color="#FF7A45"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="512" cy="600" r="420" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFB547" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#FFB547" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="dropClip">
+      <path id="dropPath" d="M512 168 C 512 168 286 430 286 604 C 286 729 387 830 512 830 C 637 830 738 729 738 604 C 738 430 512 168 512 168 Z"/>
+    </clipPath>
+  </defs>
+  <rect width="1024" height="1024" rx="228" fill="url(#sky)"/>
+  <circle cx="512" cy="600" r="420" fill="url(#glow)" clip-path="inset(0 round 228px)"/>
+  <path d="M512 168 C 512 168 286 430 286 604 C 286 729 387 830 512 830 C 637 830 738 729 738 604 C 738 430 512 168 512 168 Z" fill="url(#drop)"/>
+  <g clip-path="url(#dropClip)">
+    <!-- sunrise inside the drop: sun disc + horizon -->
+    <circle cx="512" cy="676" r="104" fill="#FFF6D8"/>
+    <path d="M260 690 C 380 664 452 664 512 682 C 572 700 650 704 764 680 L 764 900 L 260 900 Z" fill="#F2552F"/>
   </g>
+  <!-- glint -->
+  <path d="M398 560 C 398 486 432 420 468 372" fill="none" stroke="#FFFFFF" stroke-opacity="0.7" stroke-width="26" stroke-linecap="round"/>
 </svg>

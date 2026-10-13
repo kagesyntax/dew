@@ -11,7 +11,25 @@ pub enum UpdateStatus {
     Checking,
     UpToDate,
     Available(UpdateManifest),
+    Installing,
     Failed(String),
+}
+
+/// Platform key used in `UpdateManifest.downloads`.
+pub fn platform_key() -> &'static str {
+    if cfg!(feature = "web") {
+        "web"
+    } else if cfg!(target_os = "macos") {
+        "macos"
+    } else if cfg!(target_os = "windows") {
+        "windows"
+    } else if cfg!(target_os = "android") {
+        "android"
+    } else if cfg!(target_os = "ios") {
+        "ios"
+    } else {
+        "linux"
+    }
 }
 
 fn manifest_url() -> String {
@@ -21,13 +39,12 @@ fn manifest_url() -> String {
     format!("{url}{sep}t={}", chrono::Utc::now().timestamp())
 }
 
-/// Resolve a relative manifest path against the page origin (reqwest needs absolute URLs).
+/// Resolve a relative manifest path against the app's base URL (works under a GitHub Pages sub-path) (reqwest needs absolute URLs).
 async fn absolute(url: String) -> String {
     if url.starts_with("http") {
         return url;
     }
-    let js =
-        format!("return new URL({}, location.origin + '/').href;", serde_json::to_string(&url).unwrap_or_default());
+    let js = format!("return new URL({}, document.baseURI).href;", serde_json::to_string(&url).unwrap_or_default());
     dioxus::prelude::document::eval(&js).join::<String>().await.unwrap_or(url)
 }
 
@@ -49,6 +66,8 @@ pub async fn check() -> UpdateStatus {
 pub fn apply(manifest: &UpdateManifest) {
     if cfg!(feature = "web") {
         crate::platform::js::reload_fresh();
+    } else if let Some(url) = manifest.downloads.get(platform_key()) {
+        crate::platform::js::open_url(url);
     } else {
         let url = manifest.url.clone().unwrap_or_else(|| format!("{}/releases/latest", crate::config::REPO_URL));
         crate::platform::js::open_url(&url);

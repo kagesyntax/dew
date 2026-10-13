@@ -39,7 +39,11 @@ pub fn Onboarding() -> Element {
     let mut app = use_app();
     let mut step = use_signal(|| Step::Welcome);
     let current = step();
-    let mut finish = move || app.settings.write().onboarded = true;
+    let mut finish = move || {
+        let mut s = app.settings.write();
+        s.onboarded = true;
+        s.last_seen_version = crate::config::APP_VERSION.to_string();
+    };
 
     let primary = match current {
         Step::Welcome => "Continue",

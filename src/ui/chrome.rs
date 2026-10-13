@@ -42,7 +42,7 @@ pub fn BackBar(
                     span { class: "-ml-1", "{back_label}" }
                 }
                 if let Some(t) = title {
-                    span { class: "pointer-events-none absolute inset-x-24 truncate text-center text-[17px] font-semibold", "{t}" }
+                    span { class: "pointer-events-none absolute inset-x-28 truncate text-center text-[17px] font-semibold", "{t}" }
                 }
                 div { class: "flex items-center gap-1 pr-2", {trailing} }
             }

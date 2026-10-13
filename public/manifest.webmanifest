@@ -1,16 +1,23 @@
 {
+  "id": "./",
   "name": "Bible & Manual",
-  "short_name": "Bible",
-  "description": "Bible and Sunday School manual for our church.",
+  "short_name": "Bible & Manual",
+  "description": "The Bible and this week's Sunday School lesson, offline.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#f2f2f7",
   "theme_color": "#f2f2f7",
+  "categories": ["books", "education", "lifestyle"],
   "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml" },
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "This Sunday's Lesson", "url": "./manual", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Bible", "url": "./bible", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
   ]
 }

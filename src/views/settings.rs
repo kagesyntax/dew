@@ -3,19 +3,20 @@
 use crate::bible::translation;
 use crate::components::switch::Switch;
 use crate::components::toggle_group::{ToggleGroup, ToggleItem};
-use crate::config::{APP_VERSION, CHURCH_NAME, REPO_URL};
+use crate::config::{APP_NAME, APP_VERSION, BUILD_SHA, CHURCH_NAME, REPO_URL};
 use crate::manual::{self, use_manual, SyncStatus};
 use crate::platform::{js, storage};
+use crate::routes::Route;
 use crate::services::turso::Turso;
-use crate::services::updater::{self, UpdateStatus};
+use crate::services::updater::UpdateStatus;
 use crate::state::settings::{LinkMode, Settings, ThemeMode};
 use crate::state::{progress::Progress, use_app};
 use crate::ui::{GroupedList, LargeTitle, ListRow};
 use crate::views::bible::TranslationSheet;
 use dioxus::prelude::*;
 use dioxus_icons::lucide::{
-    ArrowDownToLine, BookOpen, CloudDownload, Compass, Database, Hash, Info, Lightbulb, Link2, NotebookPen, Palette,
-    RotateCcw, Type,
+    BookOpen, Church, CloudDownload, Compass, Database, Hash, Lightbulb, Link2, MessageSquare, NotebookPen, Palette,
+    RotateCcw, ScrollText, Share, ShieldCheck, Type,
 };
 use std::collections::HashSet;
 
@@ -25,28 +26,14 @@ pub fn SettingsView() -> Element {
     let store = use_manual();
     let s = app.settings.read().clone();
     let mut translation_open = use_signal(|| false);
-    let mut update = use_signal(|| UpdateStatus::Idle);
     let tr = translation(&s.translation);
     let theme_idx = ThemeMode::ALL.iter().position(|m| *m == s.theme).unwrap_or(0);
     let link_idx = LinkMode::ALL.iter().position(|m| *m == s.link_mode).unwrap_or(0);
     let turso_ready = Turso::from_config().is_ok();
 
-    let mut check_updates = move |_| {
-        update.set(UpdateStatus::Checking);
-        spawn(async move { update.set(updater::check().await) });
-    };
-
-    let (update_title, update_detail) = match update.read().clone() {
-        UpdateStatus::Idle => ("Check for Updates".to_string(), None),
-        UpdateStatus::Checking => ("Checking…".to_string(), None),
-        UpdateStatus::UpToDate => ("Check for Updates".to_string(), Some("Up to date".to_string())),
-        UpdateStatus::Available(m) => (format!("Update to {}", m.version), Some("New".to_string())),
-        UpdateStatus::Failed(_) => ("Check for Updates".to_string(), Some("Unavailable".to_string())),
-    };
-    let update_footer = match update.read().clone() {
-        UpdateStatus::Available(m) if !m.notes.is_empty() => format!("What's new: {}", m.notes),
-        UpdateStatus::Failed(e) => e,
-        _ => "Updates install from the church's release channel. The web app refreshes itself; phone and desktop builds open the download page.".into(),
+    let update_available = match &*app.update.read() {
+        UpdateStatus::Available(m) => Some(m.version.clone()),
+        _ => None,
     };
 
     let sync_detail = match store.sync.read().clone() {
@@ -135,28 +122,11 @@ pub fn SettingsView() -> Element {
             }
         }
 
-        GroupedList { header: "Updates", footer: update_footer,
-            ListRow {
-                title: update_title, detail: update_detail, tint: "#34c759",
-                icon: rsx! { CloudDownload { size: 17, stroke_width: "2.2" } },
-                onclick: move |e| match update.peek().clone() {
-                    UpdateStatus::Available(m) => updater::apply(&m),
-                    UpdateStatus::Checking => {}
-                    _ => check_updates(e),
-                },
-            }
-            ListRow {
-                title: "Check Automatically", tint: "#30b0c7",
-                icon: rsx! { ArrowDownToLine { size: 17, stroke_width: "2.2" } },
-                trailing: rsx! { Switch { checked: s.auto_update_check, on_checked_change: move |v| app.settings.write().auto_update_check = v } },
-            }
-        }
-
         GroupedList { header: "Help",
             ListRow {
                 title: "Feature Tour", chevron: true, tint: "#0a7aff",
                 icon: rsx! { Compass { size: 17, stroke_width: "2.2" } },
-                onclick: move |_| { navigator().push(crate::routes::Route::TourReplay {}); },
+                onclick: move |_| { navigator().push(Route::TourReplay {}); },
             }
             ListRow {
                 title: "Show Tips Again", tint: "#ffcc00",
@@ -166,9 +136,38 @@ pub fn SettingsView() -> Element {
         }
 
         GroupedList { header: "About",
-            ListRow { title: "Version", detail: APP_VERSION.to_string(), tint: "#8e8e93", icon: rsx! { Info { size: 17, stroke_width: "2.2" } } }
-            ListRow { title: "Church", detail: CHURCH_NAME.to_string(), tint: "#af52de", icon: rsx! { BookOpen { size: 17, stroke_width: "2.2" } } }
-            ListRow { title: "Source & Release Notes", chevron: true, tint: "#1c1c1e", icon: rsx! { Info { size: 17, stroke_width: "2.2" } }, onclick: move |_| js::open_url(REPO_URL) }
+            ListRow {
+                title: "Software Update", chevron: true, tint: "#8e8e93",
+                detail: if update_available.is_some() { None } else { Some(format!("Version {APP_VERSION}")) },
+                icon: rsx! { CloudDownload { size: 17, stroke_width: "2.2" } },
+                trailing: update_available.as_ref().map(|_| rsx! { span { class: "flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-[#ff3b30] px-1.5 text-[13px] font-semibold text-white", "1" } }),
+                onclick: move |_| { navigator().push(Route::SoftwareUpdate {}); },
+            }
+            ListRow { title: "Church", detail: CHURCH_NAME.to_string(), tint: "#af52de", icon: rsx! { Church { size: 17, stroke_width: "2.2" } } }
+            ListRow {
+                title: "Share App", tint: "#0a7aff", chevron: true,
+                icon: rsx! { Share { size: 17, stroke_width: "2.2" } },
+                onclick: move |_| js::share_text(APP_NAME, &format!("Read the Bible and this week's Sunday School lesson with {APP_NAME}: {}", crate::config::APP_URL)),
+            }
+            ListRow {
+                title: "Send Feedback", tint: "#34c759", chevron: true,
+                icon: rsx! { MessageSquare { size: 17, stroke_width: "2.2" } },
+                onclick: move |_| js::open_url(&format!("{REPO_URL}/issues/new?labels=feedback&title=Feedback%20(v{APP_VERSION})")),
+            }
+            ListRow {
+                title: "Credits", tint: "#ff9500", chevron: true,
+                icon: rsx! { ScrollText { size: 17, stroke_width: "2.2" } },
+                onclick: move |_| { navigator().push(Route::Acknowledgements {}); },
+            }
+        }
+
+        GroupedList {
+            footer: "No account, no tracking. Your highlights, bookmarks and settings stay on this device.".to_string(),
+            ListRow {
+                title: "Privacy", tint: "#0a7aff",
+                icon: rsx! { ShieldCheck { size: 17, stroke_width: "2.2" } },
+                detail: "On Device".to_string(),
+            }
         }
 
         GroupedList { footer: "Clears highlights, bookmarks, lesson progress and preferences on this device.".to_string(),
@@ -182,7 +181,7 @@ pub fn SettingsView() -> Element {
                 },
             }
         }
-        p { class: "pb-4 text-center text-[13px] text-label-3", "Made with Dioxus · v{APP_VERSION}" }
+        p { class: "pb-4 text-center text-[13px] text-label-3", "{APP_NAME} {APP_VERSION} ({BUILD_SHA})" }
 
         TranslationSheet { open: translation_open }
     }

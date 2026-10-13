@@ -25,7 +25,9 @@ pub fn App() -> Element {
         document::Meta { name: "apple-mobile-web-app-status-bar-style", content: "default" }
         document::Meta { name: "apple-mobile-web-app-title", content: "{APP_NAME}" }
         document::Meta { name: "description", content: "Bible and Sunday School manual for our church." }
-        document::Link { rel: "icon", href: FAVICON }
+        document::Link { rel: "icon", href: FAVICON, r#type: "image/svg+xml" }
+        document::Link { rel: "alternate icon", href: "/favicon.ico" }
+        document::Meta { name: "theme-color", content: "#f2f2f7" }
         document::Link { rel: "manifest", href: "/manifest.webmanifest" }
         document::Link { rel: "apple-touch-icon", href: "/icons/icon-180.png" }
         document::Stylesheet { href: COMPONENTS_THEME }

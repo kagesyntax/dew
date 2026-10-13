@@ -23,6 +23,8 @@ pub struct AppState {
     pub pending_scroll: Signal<Option<f64>>,
     /// True once persisted state has been read (the launch screen shows until then).
     pub ready: Signal<bool>,
+    /// Latest result of an update check (drives the Settings badge).
+    pub update: Signal<crate::services::updater::UpdateStatus>,
 }
 
 pub fn use_app() -> AppState {
@@ -37,6 +39,7 @@ pub fn use_app_state_provider() -> AppState {
         return_point: Signal::new(None),
         pending_scroll: Signal::new(None),
         ready: Signal::new(false),
+        update: Signal::new(crate::services::updater::UpdateStatus::Idle),
     });
 
     // Load once.
@@ -50,6 +53,13 @@ pub fn use_app_state_provider() -> AppState {
                 s.progress.set(saved);
             }
             s.ready.set(true);
+            // Quietly check for a new release on launch, like iOS automatic updates.
+            if s.settings.peek().auto_update_check && s.settings.peek().onboarded {
+                let status = crate::services::updater::check().await;
+                if matches!(status, crate::services::updater::UpdateStatus::Available(_)) {
+                    s.update.set(status);
+                }
+            }
         });
     });
 

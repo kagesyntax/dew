@@ -29,3 +29,22 @@ pub const REPO_URL: &str = match option_env!("REPO_URL") {
     Some(v) => v,
     None => "https://github.com/your-church/church-app",
 };
+
+/// Commit and date the build was made from (see build.rs).
+pub const BUILD_SHA: &str = env!("BUILD_SHA");
+pub const BUILD_DATE: &str = env!("BUILD_DATE");
+
+/// "Stable" for tagged releases, "Preview" for develop builds (set by CI).
+pub const RELEASE_CHANNEL: &str = match option_env!("RELEASE_CHANNEL") {
+    Some(v) => v,
+    None => "Development",
+};
+
+/// The bundled changelog, for the What's New sheet when no network is available.
+pub const CHANGELOG: &str = include_str!("../CHANGELOG.md");
+
+/// Public address of the web app, used by "Share App".
+pub const APP_URL: &str = match option_env!("APP_URL") {
+    Some(v) => v,
+    None => "https://your-church.github.io/church-app/",
+};

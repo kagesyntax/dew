@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1B2463"/>
+      <stop offset="0.62" stop-color="#3A3FB8"/>
+      <stop offset="1" stop-color="#6E5BE0"/>
+    </linearGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFE27A"/>
+      <stop offset="1" stop-color="#FFA21F"/>
+    </linearGradient>
+    <linearGradient id="page" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E9E7FF"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="512" cy="600" r="360" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFC94D" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#FFC94D" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="above"><rect x="0" y="0" width="1024" height="600"/></clipPath>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#sky)"/>
+  <circle cx="512" cy="600" r="360" fill="url(#glow)"/>
+  <!-- rays -->
+  <g stroke="#FFD25A" stroke-width="34" stroke-linecap="round">
+    <line x1="512" y1="268" x2="512" y2="320"/>
+    <line x1="512" y1="268" x2="512" y2="320" transform="rotate(-38 512 600)"/>
+    <line x1="512" y1="268" x2="512" y2="320" transform="rotate(38 512 600)"/>
+    <line x1="512" y1="268" x2="512" y2="320" transform="rotate(-72 512 600)"/>
+    <line x1="512" y1="268" x2="512" y2="320" transform="rotate(72 512 600)"/>
+  </g>
+  <!-- rising sun -->
+  <circle cx="512" cy="600" r="200" fill="url(#sun)" clip-path="url(#above)"/>
+  <!-- horizon: two pages meeting in the middle, like an open lesson -->
+  <path d="M196 600 C 330 560, 440 566, 512 610 C 584 566, 694 560, 828 600 L 828 676 C 694 638, 584 644, 512 688 C 440 644, 330 638, 196 676 Z" fill="url(#page)"/>
+</svg>

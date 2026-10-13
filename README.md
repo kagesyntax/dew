@@ -45,12 +45,29 @@ New or corrected lessons appear in the app on next launch (cached for offline us
 `python3 tools/import_bible.py <full-bible.json> <code>`, then add it to `src/bible/translation.rs`.
 Only bundle texts you are licensed to distribute (the LSB allows at most 1,000 verses in an app without written permission from The Lockman Foundation).
 
-## Branching & releases
-See [CONTRIBUTING.md](CONTRIBUTING.md). In short: `feature/*` → PR into `develop` → PR into `main` → tag `vX.Y.Z` to release.
+## Releases and in-app updates
+1. Write user-facing changes under `## [Unreleased]` in [CHANGELOG.md](CHANGELOG.md) as you go.
+2. **Actions → Prepare Release → Run workflow** (patch / minor / major). It bumps `Cargo.toml`,
+   dates the changelog section and opens a `release/vX.Y.Z` PR into `main`.
+3. Merge the PR. **Release** builds the web app (GitHub Pages), macOS `.dmg`, Windows `.msi`,
+   Linux `.AppImage` and an experimental Android `.apk`, publishes `version.json`, and creates the
+   GitHub Release. Then merge `main` back into `develop`.
+4. Every installed app sees it in **Settings → Software Update** (a red badge appears when
+   automatic checks are on). The web app updates in place; native builds download their installer.
+   After updating, users see a one-time **What's New** sheet built from the same changelog.
+   Run Release manually with `minimum_version` to force older builds to update.
+
+## App icon
+`design/icon.svg` (Inkscape) is the source: a morning dew drop holding a sunrise, for the
+manual's Daily Dew Drops and the light of the Word. `tools/make-icons.sh` regenerates every size
+(PWA, maskable, favicon, Apple touch, desktop `.ico`/`.png`).
+
+## Branching
+See [CONTRIBUTING.md](CONTRIBUTING.md). In short: `feature/*` → PR into `develop` → release PR into `main`.
 
 ## Screenshots
-| Today | Lesson | Verse preview | Back to lesson | Settings (dark) |
-| --- | --- | --- | --- | --- |
-| ![](docs/screenshots/05-today.png) | ![](docs/screenshots/07-lesson.png) | ![](docs/screenshots/09-verse-preview-sheet.png) | ![](docs/screenshots/10-reader-return-pill.png) | ![](docs/screenshots/13-settings-dark.png) |
+| Welcome | Tour | Today | Lesson | Verse preview | Software Update |
+| --- | --- | --- | --- | --- | --- |
+| ![](docs/screenshots/01-welcome.png) | ![](docs/screenshots/02-tour-links.png) | ![](docs/screenshots/11-today.png) | ![](docs/screenshots/13-lesson.png) | ![](docs/screenshots/15-verse-preview-sheet.png) | ![](docs/screenshots/25-software-update-available.png) |
 
-Regenerate: `dx build --platform web --release`, then `cd tools/screenshots && npm i && python3 serve.py <public dir> 8765 & OUT=../../docs/screenshots node shoot.js`.
+Regenerate: `dx build --platform web --release`, then `cd tools/screenshots && npm i && python3 serve.py <public dir> 8765 & OUT=../../docs/screenshots node shoot.js && PUB=<public dir> OUT=../../docs/screenshots node shoot-release.js`.
