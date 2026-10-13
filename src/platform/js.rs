@@ -70,3 +70,34 @@ pub fn register_service_worker() {
 pub fn haptic() {
     document::eval("navigator.vibrate && navigator.vibrate(8);");
 }
+
+/// Track scroll direction on `<html data-chrome="shown|hidden">` so reading toolbars can tuck
+/// away while you read down the page and return when you scroll up or reach the end.
+pub fn install_scroll_chrome() {
+    document::eval(
+        r#"
+        if (!window.__dewChrome) {
+            window.__dewChrome = true;
+            let last = window.scrollY, ticking = false;
+            const root = document.documentElement;
+            root.dataset.chrome = 'shown';
+            window.addEventListener('scroll', () => {
+                if (ticking) return; ticking = true;
+                requestAnimationFrame(() => {
+                    const y = window.scrollY, dy = y - last;
+                    const atEnd = window.innerHeight + y >= document.documentElement.scrollHeight - 48;
+                    if (y < 80 || atEnd || dy < -6) root.dataset.chrome = 'shown';
+                    else if (dy > 6) root.dataset.chrome = 'hidden';
+                    if (Math.abs(dy) > 6 || y < 80) last = y;
+                    ticking = false;
+                });
+            }, { passive: true });
+        }
+        "#,
+    );
+}
+
+/// Bring the reading toolbars back (after turning a chapter).
+pub fn show_chrome() {
+    document::eval("document.documentElement.dataset.chrome = 'shown';");
+}

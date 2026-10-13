@@ -15,8 +15,8 @@ use crate::ui::{GroupedList, LargeTitle, ListRow};
 use crate::views::bible::TranslationSheet;
 use dioxus::prelude::*;
 use dioxus_icons::lucide::{
-    BookOpen, Church, CloudDownload, Compass, Database, Hash, Lightbulb, Link2, MessageSquare, NotebookPen, Palette,
-    RotateCcw, ScrollText, Share, ShieldCheck, Type,
+    BookOpen, Church, CloudDownload, Compass, Database, Hash, History, Lightbulb, Link2, MessageSquare, NotebookPen,
+    Palette, RotateCcw, ScrollText, Share, ShieldCheck, Type,
 };
 use std::collections::HashSet;
 
@@ -43,6 +43,12 @@ pub fn SettingsView() -> Element {
         SyncStatus::Offline(_) => Some("Offline".to_string()),
     };
 
+    let bible_footer = if s.resume_reading {
+        "The Bible tab opens on the chapter you were reading, with any verse you searched for highlighted."
+    } else {
+        "The Bible tab opens on the list of books. Continue Reading on Today still remembers your place."
+    }
+    .to_string();
     rsx! {
         LargeTitle { title: "Settings" }
 
@@ -79,7 +85,7 @@ pub fn SettingsView() -> Element {
             }
         }
 
-        GroupedList { header: "Bible",
+        GroupedList { header: "Bible", footer: bible_footer,
             ListRow {
                 title: "Translation", detail: tr.abbreviation.to_string(), chevron: true, tint: "#0a7aff",
                 icon: rsx! { BookOpen { size: 17, stroke_width: "2.2" } },
@@ -89,6 +95,11 @@ pub fn SettingsView() -> Element {
                 title: "Verse Numbers", tint: "#8e8e93",
                 icon: rsx! { Hash { size: 17, stroke_width: "2.2" } },
                 trailing: rsx! { Switch { checked: s.verse_numbers, on_checked_change: move |v| app.settings.write().verse_numbers = v } },
+            }
+            ListRow {
+                title: "Open Where I Left Off", tint: "#ff9500",
+                icon: rsx! { History { size: 17, stroke_width: "2.2" } },
+                trailing: rsx! { Switch { checked: s.resume_reading, on_checked_change: move |v| app.settings.write().resume_reading = v } },
             }
         }
 
