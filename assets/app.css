@@ -59,7 +59,7 @@ html, body {
   text-rendering: optimizeLegibility;
 }
 
-button { font: inherit; color: inherit; }
+@layer base { button { font: inherit; color: inherit; } }
 
 .bar-blur {
   background: var(--app-bar);

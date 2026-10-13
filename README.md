@@ -47,3 +47,10 @@ Only bundle texts you are licensed to distribute (the LSB allows at most 1,000 v
 
 ## Branching & releases
 See [CONTRIBUTING.md](CONTRIBUTING.md). In short: `feature/*` → PR into `develop` → PR into `main` → tag `vX.Y.Z` to release.
+
+## Screenshots
+| Today | Lesson | Verse preview | Back to lesson | Settings (dark) |
+| --- | --- | --- | --- | --- |
+| ![](docs/screenshots/05-today.png) | ![](docs/screenshots/07-lesson.png) | ![](docs/screenshots/09-verse-preview-sheet.png) | ![](docs/screenshots/10-reader-return-pill.png) | ![](docs/screenshots/13-settings-dark.png) |
+
+Regenerate: `dx build --platform web --release`, then `cd tools/screenshots && npm i && python3 serve.py <public dir> 8765 & OUT=../../docs/screenshots node shoot.js`.
