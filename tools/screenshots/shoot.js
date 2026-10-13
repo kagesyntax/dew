@@ -39,49 +39,49 @@ async function clickText(p, text) {
 (async () => {
   const browser = await puppeteer.launch({ executablePath: '/usr/bin/chromium', args: ['--no-sandbox', '--disable-gpu'] });
   const done = { onboarded: true, theme: 'system', translation: 'kjv', text_size: 2, verse_numbers: true, link_mode: 'sheet', auto_update_check: false, leader_notes: true, display_name: '' };
-  const progress = { last_read: { book: 'HEB', chapter: 11 }, last_lesson: null, completed_lessons: ['2026-10-11'], highlights: { 'HEB.11.1': 'yellow', 'HEB.11.6': 'green' }, bookmarks: [] };
+  const progress = { last_read: { book: 'HEB', chapter: 11 }, last_lesson: null, completed_lessons: ['2026-10-11'], highlights: { 'HEB.11.1': 'yellow', 'HEB.11.6': 'green' }, bookmarks: [], seen_tips: ['today.week','lesson.links','reader.select','bible.goto'] };
 
-  // Onboarding (fresh install)
+  // Onboarding (fresh install): welcome, 3 tour pages, 3 setup pages
   let p = await page(browser, false);
   await seed(p, null, null);
-  await shot(p, '/', '01-onboarding-welcome');
-  await clickText(p, 'Get Started'); await sleep(700);
-  await p.screenshot({ path: `${OUT}/02-onboarding-translation.png` });
-  await clickText(p, 'Continue'); await sleep(700);
-  await p.screenshot({ path: `${OUT}/03-onboarding-appearance.png` });
-  await clickText(p, 'Continue'); await sleep(700);
-  await p.screenshot({ path: `${OUT}/04-onboarding-links.png` });
-  console.log('onboarding done');
+  await shot(p, '/', '01-welcome');
+  const names = ['02-tour-links', '03-tour-return', '04-tour-highlight', '05-setup-translation', '06-setup-appearance', '07-setup-links'];
+  for (const n of names) { await clickText(p, 'Continue'); await sleep(900); await p.screenshot({ path: `${OUT}/${n}.png` }); console.log('shot', n); }
+  // Tips (fresh progress, onboarded)
+  await seed(p, done, { last_read: null, completed_lessons: [], highlights: {}, bookmarks: [], seen_tips: [] });
+  await shot(p, '/', '08-tip-today');
+  await shot(p, '/manual/2026-10-18', '09-tip-lesson');
+  await shot(p, '/bible/JHN/3', '10-tip-reader');
 
   for (const dark of [false, true]) {
     const sfx = dark ? '-dark' : '';
     p = await page(browser, dark);
     await seed(p, done, progress);
-    await shot(p, '/', '05-today' + sfx);
-    await shot(p, '/manual', '06-manual' + sfx);
-    await shot(p, '/manual/2026-10-18', '07-lesson' + sfx);
+    await shot(p, '/', '11-today' + sfx);
+    await shot(p, '/manual', '12-manual' + sfx);
+    await shot(p, '/manual/2026-10-18', '13-lesson' + sfx);
     if (!dark) {
-      await shot(p, '/manual/2026-10-18', '08-lesson-discussion', async (pg) => {
+      await shot(p, '/manual/2026-10-18', '14-lesson-discussion', async (pg) => {
         await pg.evaluate(() => { const h = [...document.querySelectorAll('h2')].find((e) => e.textContent.includes('Discussion')); h && window.scrollTo(0, h.getBoundingClientRect().top + window.scrollY - 60); });
       });
       // tap a reference -> preview sheet
-      await shot(p, '/manual/2026-10-18', '09-verse-preview-sheet', async (pg) => {
+      await shot(p, '/manual/2026-10-18', '15-verse-preview-sheet', async (pg) => {
         await pg.evaluate(() => { const b = [...document.querySelectorAll('button')].find((e) => e.textContent.trim().startsWith('Heb 11:1-3,6')); b && b.scrollIntoView({ block: 'center' }); b && b.click(); });
         await sleep(800);
       });
       // Open in Bible -> reader with return pill
       await clickText(p, 'Open in Bible'); await sleep(1800);
-      await p.screenshot({ path: `${OUT}/10-reader-return-pill.png` });
+      await p.screenshot({ path: `${OUT}/16-reader-return-pill.png` });
       console.log('shot 10');
     }
-    await shot(p, '/bible/HEB/11', '11-reader' + sfx);
-    await shot(p, '/bible', '12-books' + sfx, async (pg) => { await pg.evaluate(() => window.scrollTo(0, 0)); });
-    await shot(p, '/settings', '13-settings' + sfx);
+    await shot(p, '/bible/HEB/11', '17-reader' + sfx);
+    await shot(p, '/bible', '18-books' + sfx, async (pg) => { await pg.evaluate(() => window.scrollTo(0, 0)); });
+    await shot(p, '/settings', '19-settings' + sfx);
   }
   // Inline drop-down mode
   p = await page(browser, false);
   await seed(p, { ...done, link_mode: 'inline' }, progress);
-  await shot(p, '/manual/2026-10-25', '14-inline-dropdown', async (pg) => {
+  await shot(p, '/manual/2026-10-25', '20-inline-dropdown', async (pg) => {
     await pg.evaluate(() => { const b = [...document.querySelectorAll('button')].find((e) => e.textContent.trim().startsWith('Php 1:3-6')); b && b.scrollIntoView({ block: 'start' }); window.scrollBy(0, -120); b && b.click(); });
   });
   await browser.close();

@@ -50,6 +50,8 @@ pub struct Progress {
     pub highlights: BTreeMap<String, Highlight>,
     /// verse keys, newest first
     pub bookmarks: Vec<String>,
+    /// TipKit-style tips the user has dismissed or acted on.
+    pub seen_tips: Vec<String>,
 }
 
 impl Progress {
@@ -62,6 +64,16 @@ impl Progress {
             self.completed_lessons.remove(i);
         } else {
             self.completed_lessons.push(lesson_id.to_string());
+        }
+    }
+
+    pub fn has_seen(&self, tip: &str) -> bool {
+        self.seen_tips.iter().any(|t| t == tip)
+    }
+
+    pub fn mark_seen(&mut self, tip: &str) {
+        if !self.has_seen(tip) {
+            self.seen_tips.push(tip.to_string());
         }
     }
 

@@ -4,6 +4,7 @@
 use crate::views::{
     bible::{BibleHome, Reader},
     manual::{LessonView, ManualHome},
+    onboarding::TourReplay,
     NotFound, SettingsView, Shell, TabLayout, Today,
 };
 use dioxus::prelude::*;
@@ -28,6 +29,9 @@ pub enum Route {
             #[route("/settings")]
             SettingsView {},
         #[end_layout]
+        /// Replay of the onboarding walkthrough (Settings → Feature Tour).
+        #[route("/tour")]
+        TourReplay {},
     #[end_layout]
     #[route("/:..segments")]
     NotFound { segments: Vec<String> },

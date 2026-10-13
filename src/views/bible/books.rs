@@ -4,7 +4,7 @@
 use super::translation_picker::TranslationPill;
 use crate::routes::Route;
 use crate::state::use_app;
-use crate::ui::LargeTitle;
+use crate::ui::{tips, LargeTitle, Tip};
 use church_core::scripture::{parse, parser::parse_book, Testament, BOOKS};
 use dioxus::prelude::*;
 use dioxus_icons::lucide::{ChevronDown, Search};
@@ -52,6 +52,13 @@ pub fn BibleHome() -> Element {
                     value: "{query}",
                     oninput: move |e| query.set(e.value()),
                 }
+            }
+            Tip {
+                id: tips::BIBLE_GOTO,
+                title: "Go straight to a verse",
+                message: "Type a reference like jn 3:16 or 1 cor 13 and tap Go.",
+                icon: rsx! { Search { size: 22, stroke_width: "2" } },
+                class: "mb-4",
             }
             if let Some(r) = jump {
                 button {

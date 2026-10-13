@@ -11,7 +11,7 @@ use crate::routes::Route;
 use crate::state::{navigation, settings::LinkMode, use_app, AppState};
 use church_core::scripture::{segment, Reference, Segment};
 use dioxus::prelude::*;
-use dioxus_icons::lucide::{BookOpen, ChevronDown, Copy, X};
+use dioxus_icons::lucide::{BookOpen, ChevronDown, ChevronRight, Copy, X};
 
 /// Present in a lesson so links know where "Back to …" should return.
 #[derive(Clone, PartialEq)]
@@ -104,18 +104,17 @@ fn InlinePassage(reference: Reference) -> Element {
     let app = use_app();
     let lesson = try_use_context::<LessonContext>();
     let r2 = reference.clone();
+    let label = reference.label();
     rsx! {
-        div { class: "fade-in my-3 rounded-xl border-l-[3px] border-accent bg-surface-2 py-3 pr-3 pl-4",
-            div { class: "mb-1.5 flex items-center justify-between gap-2",
-                span { class: "text-[13px] font-semibold uppercase tracking-wide text-label-2", "{reference.label()}" }
-                button {
-                    class: "press flex items-center gap-1 text-[13px] font-semibold text-accent",
-                    onclick: move |_| open_in_bible(app, lesson.clone(), &r2),
-                    BookOpen { size: 14, stroke_width: "2.3" }
-                    "Open"
-                }
-            }
+        div { class: "fade-in my-3 rounded-2xl bg-fill px-4 pt-3.5 pb-3",
+            p { class: "mb-1.5 text-[15px] font-semibold", "{label}" }
             PassageText { reference, compact: true }
+            button {
+                class: "press mt-2 flex items-center gap-1 text-[15px] font-medium text-accent",
+                onclick: move |_| open_in_bible(app, lesson.clone(), &r2),
+                "Open in Bible"
+                ChevronRight { size: 16, stroke_width: "2.4" }
+            }
         }
     }
 }
@@ -130,7 +129,7 @@ pub fn PassageText(reference: Reference, #[props(default)] compact: bool) -> Ele
         let r = reference_sig.read().clone();
         async move { passage_verses(&tr, &r).await }
     });
-    let size = if compact { "text-[16px] leading-relaxed" } else { "reader-text" };
+    let size = if compact { "text-[16px] leading-[1.7] text-label" } else { "reader-text" };
     let show_numbers = app.settings.read().verse_numbers;
 
     rsx! {
