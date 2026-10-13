@@ -34,7 +34,8 @@ mobile = ["dioxus/mobile"]
 opt-level = "z"
 lto = true
 codegen-units = 1
-strip = true
+# wasm-bindgen needs its custom sections; dx runs wasm-opt to shrink the output
+strip = false
 panic = "abort"
 
 [profile.wasm-dev]
