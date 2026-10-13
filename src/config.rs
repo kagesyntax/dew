@@ -52,5 +52,5 @@ pub const CHANGELOG: &str = include_str!("../CHANGELOG.md");
 /// Public address of the web app, used by "Share App".
 pub const APP_URL: &str = match option_env!("APP_URL") {
     Some(v) => v,
-    None => "https://agc-oshodi.github.io/dew/",
+    None => "https://agc-oshodi.github.io/dew/app/",
 };
