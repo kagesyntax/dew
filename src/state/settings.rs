@@ -57,6 +57,35 @@ impl LinkMode {
     }
 }
 
+/// How the reader helps you find a verse in a long chapter. One at a time.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "lowercase")]
+pub enum VerseNav {
+    /// A "Verse" button in the reader toolbar listing every verse, searchable.
+    #[default]
+    List,
+    /// A fast-scroll handle on the right edge of long chapters.
+    Scrubber,
+}
+
+impl VerseNav {
+    pub const ALL: [VerseNav; 2] = [VerseNav::List, VerseNav::Scrubber];
+
+    pub fn label(self) -> &'static str {
+        match self {
+            VerseNav::List => "Verse List",
+            VerseNav::Scrubber => "Scrubber",
+        }
+    }
+
+    pub fn description(self) -> &'static str {
+        match self {
+            VerseNav::List => "Tap Verse in the reader toolbar to see every verse in the chapter and jump to one.",
+            VerseNav::Scrubber => "In long chapters, drag the handle on the right edge to glide to any verse.",
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Settings {
@@ -69,6 +98,7 @@ pub struct Settings {
     pub verse_numbers: bool,
     /// The Bible tab reopens the chapter (and searched verse) you were reading; off = book list.
     pub resume_reading: bool,
+    pub verse_nav: VerseNav,
     pub link_mode: LinkMode,
     pub auto_update_check: bool,
     /// Teacher mode: show the manual's bracketed [Note:]/[Hint:] guidance.
@@ -87,6 +117,7 @@ impl Default for Settings {
             text_size: 2,
             verse_numbers: true,
             resume_reading: true,
+            verse_nav: VerseNav::List,
             link_mode: LinkMode::Sheet,
             auto_update_check: true,
             leader_notes: false,

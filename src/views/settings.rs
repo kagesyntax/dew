@@ -9,14 +9,14 @@ use crate::platform::{js, storage};
 use crate::routes::Route;
 use crate::services::turso::Turso;
 use crate::services::updater::UpdateStatus;
-use crate::state::settings::{LinkMode, Settings, ThemeMode};
+use crate::state::settings::{LinkMode, Settings, ThemeMode, VerseNav};
 use crate::state::{progress::Progress, use_app};
 use crate::ui::{GroupedList, LargeTitle, ListRow};
 use crate::views::bible::TranslationSheet;
 use dioxus::prelude::*;
 use dioxus_icons::lucide::{
-    BookOpen, Church, CloudDownload, Compass, Database, Hash, History, Lightbulb, Link2, MessageSquare, NotebookPen,
-    Palette, RotateCcw, ScrollText, Share, ShieldCheck, Type,
+    BookOpen, Church, CloudDownload, Compass, Database, Hash, History, Lightbulb, Link2, ListOrdered, MessageSquare,
+    NotebookPen, Palette, RotateCcw, ScrollText, Share, ShieldCheck, Type,
 };
 use std::collections::HashSet;
 
@@ -28,6 +28,7 @@ pub fn SettingsView() -> Element {
     let mut translation_open = use_signal(|| false);
     let tr = translation(&s.translation);
     let theme_idx = ThemeMode::ALL.iter().position(|m| *m == s.theme).unwrap_or(0);
+    let nav_idx = VerseNav::ALL.iter().position(|m| *m == s.verse_nav).unwrap_or(0);
     let link_idx = LinkMode::ALL.iter().position(|m| *m == s.link_mode).unwrap_or(0);
     let turso_ready = Turso::from_config().is_ok();
 
@@ -100,6 +101,23 @@ pub fn SettingsView() -> Element {
                 title: "Open Where I Left Off", tint: "#ff9500",
                 icon: rsx! { History { size: 17, stroke_width: "2.2" } },
                 trailing: rsx! { Switch { checked: s.resume_reading, on_checked_change: move |v| app.settings.write().resume_reading = v } },
+            }
+        }
+
+        GroupedList { header: "Find a Verse", footer: s.verse_nav.description().to_string(),
+            div { class: "px-4 py-3",
+                div { class: "mb-2.5 flex items-center gap-3",
+                    div { class: "flex h-[29px] w-[29px] items-center justify-center rounded-[7px] bg-[#34c759] text-white", ListOrdered { size: 17, stroke_width: "2.2" } }
+                    span { class: "text-[17px]", "Verse Navigation" }
+                }
+                ToggleGroup {
+                    horizontal: true,
+                    pressed: HashSet::from([nav_idx]),
+                    on_pressed_change: move |set: HashSet<usize>| if let Some(i) = set.into_iter().next() { app.settings.write().verse_nav = VerseNav::ALL[i] },
+                    for (i, m) in VerseNav::ALL.iter().enumerate() {
+                        ToggleItem { key: "{i}", index: i, "{m.label()}" }
+                    }
+                }
             }
         }
 

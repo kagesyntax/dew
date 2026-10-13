@@ -4,11 +4,13 @@
 
 use super::reader_bar::ReaderBar;
 use super::selection_bar::SelectionBar;
+use super::translation_picker::TranslationPill;
 use super::verse_scrubber::{VerseScrubber, MIN_VERSES};
 use crate::bible::load_book;
 use crate::platform::js;
 use crate::routes::Route;
 use crate::state::progress::ReadingPosition;
+use crate::state::settings::VerseNav;
 use crate::state::use_app;
 use crate::ui::{tips, BackBar, Spinner, Tip};
 use church_core::scripture::{books, verse_key, BOOKS};
@@ -64,7 +66,6 @@ pub fn Reader(book: String, chapter: u16, focus: String) -> Element {
     use_effect(use_reactive!(|book, chapter, focus| {
         app.progress.write().last_read = Some(ReadingPosition { book: book.clone(), chapter, focus: focus.clone() });
         selected.write().clear();
-        js::show_chrome();
     }));
 
     let mut book_sig = use_reactive!(|book| book);
@@ -88,15 +89,22 @@ pub fn Reader(book: String, chapter: u16, focus: String) -> Element {
     let show_numbers = app.settings.read().verse_numbers;
     let highlights = app.progress.read().highlights.clone();
     let nav = navigator();
+    let verse_nav = app.settings.read().verse_nav;
+    let verses: Vec<String> = match &*text.read() {
+        Some(Ok(data)) => data.get(chapter as usize - 1).cloned().unwrap_or_default(),
+        _ => Vec::new(),
+    };
+    let start_verse = focus_range.map(|(s, _)| s).unwrap_or(1);
 
     rsx! {
         BackBar {
             back_label: "Books",
             onback: move |_| { nav.push(Route::BibleHome {}); },
             title: format!("{} {}", meta.name, chapter),
+            trailing: rsx! { TranslationPill {} },
         }
 
-        article { class: "mx-auto max-w-2xl bg-bg px-6 pt-6 pb-24 sm:rounded-b-card",
+        article { class: "mx-auto max-w-2xl bg-bg px-6 pt-6 pb-36 sm:rounded-b-card",
             header { class: "mb-6 text-center",
                 p { class: "text-[15px] font-semibold uppercase tracking-[0.18em] text-label-2", "{meta.name}" }
                 p { class: "font-serif text-[64px] leading-none font-light", "{chapter}" }
@@ -114,7 +122,7 @@ pub fn Reader(book: String, chapter: u16, focus: String) -> Element {
                 Some(Ok(data)) => match data.get(chapter as usize - 1) {
                     None => rsx! { p { class: "py-10 text-center text-label-2", "This chapter isn't available." } },
                     Some(verses) => rsx! {
-                        if verses.len() >= MIN_VERSES {
+                        if verse_nav == VerseNav::Scrubber && verses.len() >= MIN_VERSES {
                             VerseScrubber { key: "{meta.id}-{chapter}", label: format!("{} {}", meta.name, chapter), count: verses.len() }
                         }
                         p { class: "reader-text",
@@ -165,7 +173,7 @@ pub fn Reader(book: String, chapter: u16, focus: String) -> Element {
         if !selected.read().is_empty() {
             SelectionBar { book: meta.id.to_string(), chapter, selected }
         } else {
-            ReaderBar { book: meta.id.to_string(), book_name: meta.name.to_string(), chapter, prev: prev.clone(), next: next.clone() }
+            ReaderBar { book: meta.id.to_string(), book_name: meta.name.to_string(), chapter, prev: prev.clone(), next: next.clone(), verses, start_verse, show_verse: verse_nav == VerseNav::List }
         }
     }
 }
