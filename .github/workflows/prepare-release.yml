@@ -27,7 +27,7 @@ jobs:
       - id: bump
         run: echo "version=$(python3 tools/release_notes.py bump ${{ inputs.level }})" >> "$GITHUB_OUTPUT"
       - uses: dtolnay/rust-toolchain@stable
-      - run: cargo update -p church-app --offline || cargo generate-lockfile
+      - run: cargo update -p dew --offline || cargo generate-lockfile
       - name: Commit and open PR
         env:
           GH_TOKEN: ${{ github.token }}

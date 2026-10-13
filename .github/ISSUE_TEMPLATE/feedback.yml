@@ -1,0 +1,20 @@
+name: Feedback
+description: Ideas, requests or something that felt wrong in Dew (opened from Settings → Send Feedback)
+labels: [feedback]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What would you like to tell us?
+    validations:
+      required: true
+  - type: dropdown
+    id: who
+    attributes:
+      label: I am a…
+      options: [Student, Teacher, Parent, Other]
+  - type: input
+    id: device
+    attributes:
+      label: Phone or computer
+      placeholder: e.g. Tecno Spark 10, Android 13

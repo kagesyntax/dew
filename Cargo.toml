@@ -1,9 +1,9 @@
 [package]
-name = "church-app"
+name = "dew"
 version = "0.1.0"
 authors = ["Hark <syntaxkage@gmail.com>"]
 edition = "2021"
-description = "Bible & Sunday School Manual app for the church, built with Dioxus."
+description = "Dew: the Bible and the teens' Sunday School manual for AGC Oshodi, built with Dioxus."
 license = "MIT"
 rust-version = "1.85"
 

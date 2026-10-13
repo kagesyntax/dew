@@ -3,7 +3,7 @@ const fs = require('fs');
 const BASE = 'http://127.0.0.1:8765';
 const OUT = process.env.OUT || '.';
 const PUB = process.env.PUB;
-const NS = 'church-app.v1.';
+const NS = 'dew.v1.';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const done = (v) => ({ onboarded: true, theme: 'system', translation: 'kjv', text_size: 2, verse_numbers: true, link_mode: 'sheet', auto_update_check: true, leader_notes: true, display_name: '', last_seen_version: v });
 const progress = { seen_tips: ['today.week','lesson.links','reader.select','bible.goto'] };

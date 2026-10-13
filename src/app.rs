@@ -24,7 +24,7 @@ pub fn App() -> Element {
         document::Meta { name: "apple-mobile-web-app-capable", content: "yes" }
         document::Meta { name: "apple-mobile-web-app-status-bar-style", content: "default" }
         document::Meta { name: "apple-mobile-web-app-title", content: "{APP_NAME}" }
-        document::Meta { name: "description", content: "Bible and Sunday School manual for our church." }
+        document::Meta { name: "description", content: "Dew: the Bible and the teens' Sunday School lesson for AGC Oshodi." }
         document::Link { rel: "icon", href: FAVICON, r#type: "image/svg+xml" }
         document::Link { rel: "alternate icon", href: "/favicon.ico" }
         document::Meta { name: "theme-color", content: "#f2f2f7" }

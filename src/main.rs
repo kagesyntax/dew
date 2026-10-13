@@ -1,4 +1,4 @@
-//! Bible & Manual: a church Bible reader and Sunday School manual in one app.
+//! Dew: the Bible and the teens' Sunday School manual for AGC Oshodi, in one app.
 //!
 //! Module map (see docs/ARCHITECTURE.md):
 //! * `app`        root component, global styles, providers, router

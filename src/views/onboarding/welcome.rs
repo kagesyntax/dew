@@ -1,4 +1,4 @@
-use crate::config::APP_NAME;
+use crate::config::{APP_NAME, APP_TAGLINE};
 use dioxus::prelude::*;
 use dioxus_icons::lucide::{BookOpen, GraduationCap, Link2};
 
@@ -7,12 +7,14 @@ use dioxus_icons::lucide::{BookOpen, GraduationCap, Link2};
 pub fn WelcomeStep() -> Element {
     rsx! {
         div { class: "flex flex-1 flex-col justify-center pb-4",
+            img { src: crate::views::APP_ICON, class: "fade-in mb-6 h-[72px] w-[72px] rounded-[16px]", alt: "" }
             h1 { class: "text-[40px] font-bold leading-[1.08] tracking-tight",
                 "Welcome to"
                 br {}
                 span { class: "text-accent", "{APP_NAME}" }
             }
-            div { class: "mt-12 space-y-8",
+            p { class: "mt-3 text-[19px] text-label-2", "{APP_TAGLINE}" }
+            div { class: "mt-10 space-y-8",
                 Feature { title: "The Bible, offline", text: "King James, World English, Berean and American Standard, ready without a connection.",
                     BookOpen { size: 30, stroke_width: "1.8" }
                 }

@@ -1,0 +1,47 @@
+# Continuous Monitoring: every 6 hours, check the live app and its update channel.
+# If the site, version.json or the latest release's installers go missing, open (or update)
+# a "monitoring" issue so it is fixed before the teens notice on Sunday morning.
+name: Monitor
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check web app, update manifest and installers
+        id: check
+        env:
+          SITE: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+        run: |
+          set +e; FAIL=""
+          code=$(curl -s -o /dev/null -w '%{http_code}' "$SITE/"); [ "$code" = 200 ] || FAIL="$FAIL\n- Web app returned $code"
+          curl -sf "$SITE/version.json" -o v.json || FAIL="$FAIL\n- version.json unreachable"
+          if [ -f v.json ]; then
+            V=$(python3 -c 'import json;print(json.load(open("v.json"))["version"])') || FAIL="$FAIL\n- version.json is invalid"
+            echo "Live version: $V" >> "$GITHUB_STEP_SUMMARY"
+            for url in $(python3 -c 'import json;[print(u) for u in json.load(open("v.json")).get("downloads",{}).values()]'); do
+              c=$(curl -sIL -o /dev/null -w '%{http_code}' "$url"); [ "$c" = 200 ] || FAIL="$FAIL\n- $(basename "$url") returned $c"
+            done
+          fi
+          printf "%b" "$FAIL" > failures.md
+          [ -z "$FAIL" ] && echo "All healthy" >> "$GITHUB_STEP_SUMMARY"
+          echo "failed=$([ -n "$FAIL" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+      - name: Open or update the monitoring issue
+        if: steps.check.outputs.failed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          N=$(gh issue list --label monitoring --state open --json number -q '.[0].number')
+          BODY="$(date -u '+%Y-%m-%d %H:%M UTC') health check failed:$(cat failures.md)"
+          if [ -n "$N" ]; then gh issue comment "$N" --body "$BODY"
+          else gh label create monitoring --color d73a4a 2>/dev/null; gh issue create --title "Dew is unhealthy" --label monitoring --body "$BODY"; fi
+          exit 1

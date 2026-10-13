@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "Bible & Manual",
-  "short_name": "Bible & Manual",
-  "description": "The Bible and this week's Sunday School lesson, offline.",
+  "name": "Dew",
+  "short_name": "Dew",
+  "description": "Fresh Word every morning. The Bible and this week's Sunday School lesson for AGC Oshodi teens, offline.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

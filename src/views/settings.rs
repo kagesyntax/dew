@@ -147,12 +147,12 @@ pub fn SettingsView() -> Element {
             ListRow {
                 title: "Share App", tint: "#0a7aff", chevron: true,
                 icon: rsx! { Share { size: 17, stroke_width: "2.2" } },
-                onclick: move |_| js::share_text(APP_NAME, &format!("Read the Bible and this week's Sunday School lesson with {APP_NAME}: {}", crate::config::APP_URL)),
+                onclick: move |_| js::share_text(APP_NAME, &format!("{APP_NAME}: the Bible and this week's Sunday School lesson. {}", crate::config::APP_URL)),
             }
             ListRow {
                 title: "Send Feedback", tint: "#34c759", chevron: true,
                 icon: rsx! { MessageSquare { size: 17, stroke_width: "2.2" } },
-                onclick: move |_| js::open_url(&format!("{REPO_URL}/issues/new?labels=feedback&title=Feedback%20(v{APP_VERSION})")),
+                onclick: move |_| js::open_url(&format!("{REPO_URL}/issues/new?template=feedback.yml&title=Feedback%20(v{APP_VERSION})")),
             }
             ListRow {
                 title: "Credits", tint: "#ff9500", chevron: true,

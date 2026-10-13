@@ -10,3 +10,7 @@
 /dist
 .env
 node_modules
+
+# Android signing keys never go in git
+*.jks
+*.keystore
