@@ -1,188 +1,198 @@
 {
-  "title": "Sunday School Manual",
-  "edition": "2026/2027 · Sample lessons (replace with your church's manual)",
+  "title": "Radiant Life",
+  "edition": "Sunday School Manual · 2026",
   "lessons": [
     {
-      "id": "2026-41",
-      "number": 6,
-      "date": "2026-10-11",
-      "title": "The Power of Prayer",
-      "memory_verse": {
-        "text": "Pray without ceasing.",
-        "reference": "1 Thessalonians 5:17"
-      },
-      "bible_passage": "Luke 18:1-8",
-      "introduction": [
-        "Prayer is the believer's lifeline to God. Jesus taught that men ought always to pray and not to faint (Luke 18:1). In this lesson we look at why prayer matters, how to pray, and what hinders our prayers."
-      ],
-      "sections": [
-        {
-          "heading": "Why we must pray",
-          "points": [
-            "God commands it: we are told to pray always with all prayer and supplication (Ephesians 6:18).",
-            "Prayer brings God's peace that passes understanding (Philippians 4:6-7).",
-            "Jesus Himself set the example by praying early and alone (Mark 1:35; Luke 5:16)."
-          ]
-        },
-        {
-          "heading": "How to pray effectively",
-          "points": [
-            "Pray in faith, believing that you receive (Mark 11:24; James 1:6-7).",
-            "Pray according to His will (1 John 5:14-15).",
-            "Persevere like the widow before the unjust judge (Luke 18:3-5)."
-          ]
-        },
-        {
-          "heading": "Hindrances to prayer",
-          "points": [
-            "Unconfessed sin separates us from God (Isaiah 59:1-2; Psalm 66:18).",
-            "Unforgiveness blocks answered prayer (Mark 11:25-26).",
-            "Wrong motives: asking amiss to spend it on our lusts (James 4:3)."
-          ]
-        }
-      ],
-      "conclusion": [
-        "The effectual fervent prayer of a righteous man availeth much (James 5:16). Make prayer a daily habit, not an emergency exit."
-      ],
-      "questions": [
-        "What does Luke 18:1 teach about persistence in prayer?",
-        "Name three hindrances to answered prayer from this lesson.",
-        "How can you build a consistent prayer life this week?"
-      ],
-      "prayer": "Lord, teach me to pray without ceasing and to trust You for every answer.",
-      "assignment": "Keep a prayer journal for seven days. Read Daniel 6:10 and note Daniel's habit."
-    },
-    {
-      "id": "2026-42",
-      "number": 7,
+      "id": "2026-10-18",
       "date": "2026-10-18",
-      "title": "Living Sacrifices",
+      "unit_number": 4,
+      "unit_title": "Ancient Faith/Future Faith",
+      "study_number": 4,
+      "title": "Applying Your Confidence",
+      "text": "Romans 10:17; Heb 11:1-8,29-30,32-40",
       "memory_verse": {
-        "text": "I beseech you therefore, brethren, by the mercies of God, that ye present your bodies a living sacrifice, holy, acceptable unto God, which is your reasonable service.",
-        "reference": "Romans 12:1"
+        "reference": "Hebrews 11:1",
+        "text": "Now faith is the substance of things hoped for, the evidence of things not seen.",
+        "version": "KJV"
       },
-      "bible_passage": "Romans 12:1-8",
-      "introduction": [
-        "After eleven chapters on what God has done for us, Paul turns to how we should live in response. Romans 12:1-2 calls every believer to total surrender and a renewed mind."
+      "getting_started": [
+        "The topic of faith can stir quite a debate among Christians. While some define faith as absolute assurance in a particular outcome, others see it strictly as a reverent submission to the inevitable. This study attempts to balance these views, focusing on faith as it is described and defined in Hebrews 11. While it does explore supernatural forms of confidence, this \"faith chapter\" also examines what Christians are to do when things don't work out as expected."
       ],
-      "sections": [
+      "option": {
+        "label": "Activity Option",
+        "text": "See Teacher Guide",
+        "note": "Genuine faith should have visible effects on our lives."
+      },
+      "overview": [
+        "What the Book of Hebrews says about faith.",
+        "How you can have more faith in your life.",
+        "How you can use faith to help others."
+      ],
+      "discussion": [
         {
-          "heading": "Total surrender",
-          "body": [
-            "Under the Old Testament, sacrifices were slain (Leviticus 1:3-9). God now asks for living sacrifices: our whole lives offered daily."
+          "letter": "a",
+          "heading": "God is worthy of our faith.",
+          "questions": [
+            {
+              "text": "Read Heb 11:1-3,6. Describe some ways people exercise faith.",
+              "leader_note": "Note: People often believe others love them. Though people can't \"see\" love, they have faith that it exists because of how those people have treated them."
+            },
+            {
+              "text": "What determines the quality of someone's faith? That is, what makes the faith turn out good or bad?",
+              "leader_note": "Note: A person's faith is only as good as the person or the object in which it's placed."
+            }
+          ]
+        },
+        {
+          "letter": "b",
+          "heading": "Faith impacts our personal lives.",
+          "questions": [
+            {
+              "text": "Read Heb 11:4-5, 7-8, 29-30. Using the accompanying questions as a guide, what can you learn from the examples of each of the following people in a way that demonstrate faith in God:",
+              "bullets": [
+                { "title": "Abel", "text": "What are some sincere ways a teen could honour God that would require faith? What could a teen offer God that would cause Him to speak well of him or her as He did of Abel?" },
+                { "title": "Enoch", "text": "In what ways do you think Enoch pleased God so much that God took him without his seeing death? How could we strive to please God in that way?" },
+                { "title": "Noah", "text": "Considering Noah's example, how does your faith affect those around you?" },
+                { "title": "Abraham", "text": "How do you know what actions to take when trusting God?" }
+              ]
+            },
+            {
+              "text": "What do you think most people mean when they say that faith is, or should be, a personal thing?",
+              "leader_note": "Hint: People often use this as an argument or excuse that people should keep their faith to themselves and not try to impose their beliefs on others."
+            }
+          ]
+        },
+        {
+          "letter": "c",
+          "heading": "Faith brings power.",
+          "questions": [
+            {
+              "text": "Read Heb 11:32-35. Why might some of the miracles mentioned in this passage seem to require more faith or be more miraculous than the others?"
+            },
+            {
+              "text": "Read Heb 11:35-40. What normally happens when people trust God and He doesn't do what they expect?",
+              "leader_note": "Note: We must not allow our circumstances to dictate our levels of faith; for God calls us to trust Him – not in a particular outcome."
+            },
+            {
+              "text": "What should you do when you have faith in God and He allows something terrible to occur?"
+            }
           ],
-          "points": [
-            "Surrender is a response to mercy, not a way to earn it (Romans 12:1; Ephesians 2:8-10).",
-            "Our bodies are the temple of the Holy Spirit (1 Corinthians 6:19-20).",
-            "Surrender is daily: take up your cross daily (Luke 9:23)."
-          ]
-        },
-        {
-          "heading": "A renewed mind",
-          "points": [
-            "Do not be conformed to this world (Romans 12:2; 1 John 2:15-17).",
-            "Renewal comes through the Word (Psalm 119:9-11; John 17:17).",
-            "Think on whatever things are true, honest and pure (Philippians 4:8)."
-          ]
-        },
-        {
-          "heading": "Serving with our gifts",
-          "points": [
-            "Think soberly about yourself (Romans 12:3).",
-            "One body, many members (Romans 12:4-5; 1 Corinthians 12:12-27).",
-            "Use your gift faithfully: prophecy, ministry, teaching, exhorting, giving, leading, mercy (Romans 12:6-8; 1 Peter 4:10)."
-          ]
+          "note": "Having true faith does not mean knowing what's going to happen. Instead, it means trusting a situation to God and acting confidently on what He has told you – regardless of your situation. Therefore, one of the first step toward gaining more faith is taking the time and effort to listen to Him."
         }
       ],
-      "conclusion": [
-        "A surrendered life is a transformed life. Present yourself to God afresh this week and look for one way to serve the body of Christ."
+      "act": "Read Romans 10:17. If faith comes by hearing, then what and whom we listen to does matter. If we want to increase our faith, we must honestly evaluate the sources of information and opinions we allow into our lives, no matter how harmless some of them might seem. So, we must determine by the Word of God to take control of our own outlook and refuse to let the world or circumstance decide how we should think and act.",
+      "daily_dew_drops": [
+        { "day": "Mon", "title": "Unfathomable", "reference": "Romans 11:33-36" },
+        { "day": "Tue", "title": "The Reason for the Season", "reference": "Dan 2:20-23" },
+        { "day": "Wed", "title": "Though Chastened", "reference": "Psalms 118:16-18" },
+        { "day": "Thur", "title": "It's All In Love", "reference": "Heb 12:5-11" },
+        { "day": "Fri", "title": "Be Courageous in Hope", "reference": "Psalm 31:24; Romans 12:12" },
+        { "day": "Sat", "title": "Be Thankful in Hope", "reference": "2 Chron 20:14-21" }
       ],
-      "questions": [
-        "What is the difference between Old Testament sacrifices and a living sacrifice?",
-        "According to Romans 12:2, how is the mind renewed?",
-        "Which of the gifts in Romans 12:6-8 do you see in your life?"
-      ],
-      "prayer": "Father, I present my body to You as a living sacrifice. Renew my mind by Your Word.",
-      "assignment": "Memorise Romans 12:1-2 and read 1 Corinthians 12 in full."
+      "pages": "39–40"
     },
     {
-      "id": "2026-43",
-      "number": 8,
+      "id": "2026-10-25",
       "date": "2026-10-25",
-      "title": "Faith That Works",
+      "unit_number": 5,
+      "unit_title": "Try This for a Change",
+      "study_number": 1,
+      "title": "Change Your Perspective",
+      "text": "Philippians 1:3-6, 12-30",
       "memory_verse": {
-        "text": "Even so faith, if it hath not works, is dead, being alone.",
-        "reference": "James 2:17"
+        "reference": "Philippians 1:21",
+        "text": "For to me to live is Christ, and to die is gain.",
+        "version": "KJV"
       },
-      "bible_passage": "James 2:14-26",
-      "introduction": [
-        "James challenges a faith that only talks. True saving faith (Ephesians 2:8-9) always shows itself in a changed life (James 2:18)."
+      "getting_started": [
+        "Not everything is exactly as it seems on the surface – especially in spiritual matters. Some things that may seem harmless can be destructive, while things that seem disastrous can make a positive turnaround when left in God's hands. Sometimes, it's simply a matter of perspective. As you go into this study, pray that God will help you see your life from His eternal perspective."
       ],
-      "sections": [
+      "option": {
+        "label": "Illustration Option",
+        "text": "See Teacher Guide"
+      },
+      "overview": [
+        "How God is faithful to finish what HE starts in your life.",
+        "How our attitudes through difficult time can attract unbelievers to Christ.",
+        "How God will fulfil His plans in spite of the motives and intentions of people.",
+        "The responsibility and privilege of Christians to stand for, as well as suffer for, their faith and identification with Christ."
+      ],
+      "discussion": [
         {
-          "heading": "Faith without works",
-          "points": [
-            "Words without deeds help no one (James 2:15-16; 1 John 3:17-18).",
-            "Even the devils believe and tremble (James 2:19)."
+          "letter": "a",
+          "heading": "People in Process",
+          "intro": "Read Php 1:3-6. Note that while appreciating the Philippian church for their support to his ministry, Paul was confident not only in what God has done for the people in saving them, but also what He will continue to do for them as they remain faithful to God and His work.",
+          "questions": [
+            { "text": "Why do people sometimes start things that they don't finish?" },
+            {
+              "text": "If God has the ability to finish everything, why are people \"incomplete\" in so many ways? Why does He take people through a process?",
+              "leader_note": "Note: People develop stronger character, faith, and understanding through various life experiences."
+            },
+            {
+              "text": "How should God's promise and ability to finish affect our attitude toward ourselves and others?",
+              "leader_note": "Hint: It should make us more patient and keep us from passing premature judgment on people's ability, character, or motives. God's promise should also make us more hopeful."
+            }
           ]
         },
         {
-          "heading": "Examples of living faith",
-          "points": [
-            "Abraham offered Isaac (James 2:21-23; Genesis 22:1-12; Hebrews 11:17-19).",
-            "Rahab hid the messengers (James 2:25; Joshua 2:1-21)."
-          ]
-        }
-      ],
-      "conclusion": [
-        "We are saved by faith alone, but saving faith is never alone. Let your light so shine (Matthew 5:16)."
-      ],
-      "questions": [
-        "How do Ephesians 2:8-10 and James 2:17 agree?",
-        "What did Abraham's obedience reveal about his faith?"
-      ],
-      "prayer": "Lord, let my faith be seen in my works of love.",
-      "assignment": "Do one practical act of kindness for someone in need this week."
-    },
-    {
-      "id": "2026-44",
-      "number": 9,
-      "date": "2026-11-01",
-      "title": "The Fruit of the Spirit",
-      "memory_verse": {
-        "text": "But the fruit of the Spirit is love, joy, peace, longsuffering, gentleness, goodness, faith, meekness, temperance: against such there is no law.",
-        "reference": "Galatians 5:22-23"
-      },
-      "bible_passage": "Galatians 5:16-26",
-      "introduction": [
-        "The Christian life is a contest between the flesh and the Spirit (Galatians 5:17). Victory comes by walking in the Spirit."
-      ],
-      "sections": [
-        {
-          "heading": "Works of the flesh",
-          "points": [
-            "The works of the flesh are manifest (Galatians 5:19-21).",
-            "The carnal mind is enmity against God (Romans 8:6-8)."
+          "letter": "b",
+          "heading": "Tough Time Testimony",
+          "questions": [
+            {
+              "text": "Read Php 1:12-14. Often, when people suffer or are persecuted for a cause, others are emboldened to take up the cause as well. Why is this, when it might seem more logical that fear would drive people away or cause them to keep quiet?"
+            },
+            {
+              "text": "Describe forms of persecution that you or other Christians might experience and how God's kingdom can advance as a result."
+            }
           ]
         },
         {
-          "heading": "The fruit of the Spirit",
-          "points": [
-            "Fruit grows by abiding in Christ (John 15:4-5).",
-            "Love is the first and greatest (1 Corinthians 13:4-7; 1 John 4:7-8).",
-            "Walk in the Spirit (Galatians 5:16, 25)."
+          "letter": "c",
+          "heading": "Rejoicing, Not Rivalry",
+          "questions": [
+            {
+              "text": "Read Php 1:15-19. Why is it so easy to be envious of another Christian's successes or opportunities? How is that attitude destructive and immature?"
+            },
+            {
+              "text": "How can we maintain good attitude toward those who seem to be more \"blessed\"? How can we become better at promoting the gifts and ministries of others?",
+              "leader_note": "Note: God doesn't respect one person's faith or productivity more than another's, as long as each is being and doing what God intended."
+            }
           ]
+        },
+        {
+          "letter": "d",
+          "heading": "A Win-Win Situation",
+          "questions": [
+            {
+              "text": "Read Php 1:19-26. Why does the prospect of death frighten most people? Why should it be different for a Christian?"
+            },
+            {
+              "text": "How should the inevitability of death affect our lives currently?",
+              "leader_note": "Hint: We should live life to the fullest, not worrying about things that will eventually be meaningless. We should be more deliberate in influencing others toward Christ since they could die without Christ at any time."
+            }
+          ]
+        },
+        {
+          "letter": "e",
+          "heading": "Purposeful Pain",
+          "questions": [
+            {
+              "text": "Read Php 1:27-30. Describe some of the positive results of Christians suffering for their faith."
+            }
+          ],
+          "note": "Suffering for our faith doesn't mean we have done something wrong. The opposite is often true – it may verify that we have been faithful."
         }
       ],
-      "conclusion": [
-        "Fruit is not manufactured; it grows. Abide in Christ and the fruit will follow."
+      "act": "Spend a few moments in prayer, asking God to work things out in your life for His own glory and help you keep a good attitude in the meantime.",
+      "daily_dew_drops": [
+        { "day": "Mon", "title": "He Is Everywhere", "reference": "Psalms 139:7-12" },
+        { "day": "Tue", "title": "Both Far and Near", "reference": "Jer 23:23-24" },
+        { "day": "Wed", "title": "He Can Hear You", "reference": "Psalm 145:8" },
+        { "day": "Thur", "title": "Sin Creates Gap", "reference": "Isa 59:1-2" },
+        { "day": "Fri", "title": "He Can Dwell With You", "reference": "Isa 57:15" },
+        { "day": "Sat", "title": "Close the Gap", "reference": "James 4:8" }
       ],
-      "questions": [
-        "List the nine qualities of the fruit of the Spirit.",
-        "What does John 15:5 teach about fruitfulness?"
-      ],
-      "prayer": "Holy Spirit, produce Your fruit in my life.",
-      "assignment": "Choose one quality of the fruit of the Spirit to focus on each day this week."
+      "pages": "41–42"
     }
   ]
 }
