@@ -38,6 +38,10 @@ impl Highlight {
 pub struct ReadingPosition {
     pub book: String,
     pub chapter: u16,
+    /// Verses you went to by reference ("16" for John 3:16), highlighted when you come back.
+    /// Empty when you opened the chapter itself.
+    #[serde(default)]
+    pub focus: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]

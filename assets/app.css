@@ -104,3 +104,17 @@ html, body {
 /* Bottom sheet rise */
 @keyframes sheet-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 .sheet-up { animation: sheet-up 360ms cubic-bezier(.2,.8,.2,1) both; }
+
+/* Reader toolbar: tucks away while reading down, returns on scroll up */
+.reader-bar { transition: transform 280ms cubic-bezier(.2,.8,.2,1), opacity 200ms ease; }
+html[data-chrome="hidden"] .reader-bar { transform: translateY(24px); opacity: 0; }
+html[data-chrome="hidden"] .reader-bar > * { pointer-events: none; }
+/* The "Back to Study" pill rides above the reader toolbar */
+body:has(.reader-bar) .return-pill { bottom: calc(env(safe-area-inset-bottom) + 132px) !important; }
+/* Passage picker: a tall sheet */
+.dx-sheet.passage-sheet { height: 88vh; }
+.reader-capsule {
+  background: color-mix(in srgb, var(--app-surface) 94%, transparent);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+}

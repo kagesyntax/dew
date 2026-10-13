@@ -67,6 +67,8 @@ pub struct Settings {
     /// 0..=4, maps to html[data-text].
     pub text_size: u8,
     pub verse_numbers: bool,
+    /// The Bible tab reopens the chapter (and searched verse) you were reading; off = book list.
+    pub resume_reading: bool,
     pub link_mode: LinkMode,
     pub auto_update_check: bool,
     /// Teacher mode: show the manual's bracketed [Note:]/[Hint:] guidance.
@@ -84,6 +86,7 @@ impl Default for Settings {
             translation: "kjv".into(),
             text_size: 2,
             verse_numbers: true,
+            resume_reading: true,
             link_mode: LinkMode::Sheet,
             auto_update_check: true,
             leader_notes: false,

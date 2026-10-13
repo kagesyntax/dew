@@ -74,9 +74,9 @@ fn LessonPage(id: String) -> Element {
             p { class: "text-[13px] font-semibold uppercase tracking-wide text-accent", "{clock::pretty_date(&lesson.date)}" }
             h1 { class: "mt-1.5 font-serif text-[32px] font-bold leading-[1.15] tracking-tight", "{lesson.title}" }
             p { class: "mt-1.5 text-[15px] text-label-2", "Unit {lesson.unit_number} · Study {lesson.study_number} — {lesson.unit_title}" }
-            div { class: "mt-4 flex items-baseline gap-2 border-y border-separator py-3 text-[16px]",
-                span { class: "text-label-2", "Text" }
-                ScriptureText { text: lesson.text.clone(), class: "inline" }
+            div { class: "mt-4 border-y border-separator py-3",
+                p { class: "text-[13px] font-semibold uppercase tracking-wide text-label-2", "Bible Text" }
+                ScriptureText { text: lesson.text.clone(), class: "mt-0.5 text-[17px] leading-relaxed" }
             }
 
             Tip {
@@ -94,11 +94,10 @@ fn LessonPage(id: String) -> Element {
                     "Memory Verse"
                 }
                 p { class: "mt-2 font-serif text-[21px] leading-snug italic", "“{lesson.memory_verse.text}”" }
-                div { class: "mt-2 flex items-center gap-1 text-[15px]",
-                    ScriptureText { text: lesson.memory_verse.reference.clone(), class: "inline" }
-                    if let Some(v) = &lesson.memory_verse.version {
-                        span { class: "text-label-2", "({v})" }
-                    }
+                ScriptureText {
+                    text: lesson.memory_verse.reference.clone(),
+                    suffix: lesson.memory_verse.version.as_ref().map(|v| format!("({v})")),
+                    class: "mt-2 text-[15px]",
                 }
             }
 
@@ -131,7 +130,7 @@ fn LessonPage(id: String) -> Element {
                     for (i, o) in lesson.overview.iter().enumerate() {
                         li { key: "{i}", class: "flex gap-3 text-[17px] leading-snug",
                             span { class: "mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" }
-                            ScriptureText { text: o.clone() }
+                            ScriptureText { text: o.clone(), class: "flex-1" }
                         }
                     }
                 }

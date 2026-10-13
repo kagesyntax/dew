@@ -27,9 +27,11 @@ pub fn TabBar() -> Element {
     let active = active_tab(&route);
     let app = use_app();
     // The Bible tab reopens the chapter you were reading, like YouVersion.
+    // Settings → Bible → Open Where I Left Off decides whether the tab resumes reading.
+    let resume = app.settings.read().resume_reading;
     let bible_target = match app.progress.read().last_read.clone() {
-        Some(pos) => Route::reader(&pos.book, pos.chapter),
-        None => Route::BibleHome {},
+        Some(pos) if resume => Route::Reader { book: pos.book, chapter: pos.chapter, focus: pos.focus },
+        _ => Route::BibleHome {},
     };
 
     let update_ready = matches!(*app.update.read(), crate::services::updater::UpdateStatus::Available(_));

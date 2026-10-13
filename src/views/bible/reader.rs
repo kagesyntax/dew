@@ -1,7 +1,8 @@
 //! Chapter reader in the style of YouVersion / Apple Books: serif text, verse numbers,
-//! tap-to-select with a highlight/copy/bookmark bar, previous/next chapter buttons, and the
-//! "Back to lesson" pill when you arrived from the manual.
+//! tap-to-select with a highlight/copy/bookmark bar, a floating reader toolbar (previous, passage
+//! picker, translation, next), and the "Back to lesson" pill when you arrived from the manual.
 
+use super::reader_bar::ReaderBar;
 use super::selection_bar::SelectionBar;
 use super::translation_picker::TranslationPill;
 use crate::bible::load_book;
@@ -12,7 +13,7 @@ use crate::state::use_app;
 use crate::ui::{tips, BackBar, Spinner, Tip};
 use church_core::scripture::{books, verse_key, BOOKS};
 use dioxus::prelude::*;
-use dioxus_icons::lucide::{ChevronLeft, ChevronRight, Highlighter};
+use dioxus_icons::lucide::{ChevronRight, Highlighter};
 use std::collections::BTreeSet;
 
 fn parse_focus(focus: &str) -> Option<(u16, u16)> {
@@ -40,6 +41,15 @@ fn neighbour(book_id: &str, chapter: u16, forward: bool) -> Option<Route> {
     }
 }
 
+fn route_label(r: &Route) -> String {
+    match r {
+        Route::Reader { book, chapter, .. } => {
+            format!("{} {}", books::by_id(book).map(|b| b.name).unwrap_or(book), chapter)
+        }
+        _ => String::new(),
+    }
+}
+
 #[component]
 pub fn Reader(book: String, chapter: u16, focus: String) -> Element {
     let mut app = use_app();
@@ -51,9 +61,10 @@ pub fn Reader(book: String, chapter: u16, focus: String) -> Element {
     let mut selected: Signal<BTreeSet<u16>> = use_signal(BTreeSet::new);
 
     // Remember position for the Bible tab and "Continue reading".
-    use_effect(use_reactive!(|book, chapter| {
-        app.progress.write().last_read = Some(ReadingPosition { book: book.clone(), chapter });
+    use_effect(use_reactive!(|book, chapter, focus| {
+        app.progress.write().last_read = Some(ReadingPosition { book: book.clone(), chapter, focus: focus.clone() });
         selected.write().clear();
+        js::show_chrome();
     }));
 
     let mut book_sig = use_reactive!(|book| book);
@@ -86,7 +97,7 @@ pub fn Reader(book: String, chapter: u16, focus: String) -> Element {
             trailing: rsx! { TranslationPill {} },
         }
 
-        article { class: "mx-auto max-w-2xl bg-bg px-6 pt-6 pb-10 sm:rounded-b-card",
+        article { class: "mx-auto max-w-2xl bg-bg px-6 pt-6 pb-24 sm:rounded-b-card",
             header { class: "mb-6 text-center",
                 p { class: "text-[15px] font-semibold uppercase tracking-[0.18em] text-label-2", "{meta.name}" }
                 p { class: "font-serif text-[64px] leading-none font-light", "{chapter}" }
@@ -137,22 +148,22 @@ pub fn Reader(book: String, chapter: u16, focus: String) -> Element {
                 },
             }
 
-            nav { class: "mt-10 flex items-center justify-between",
-                if let Some(p) = prev {
-                    Link { to: p, class: "press flex h-11 w-11 items-center justify-center rounded-full bg-surface shadow-md shadow-black/10", aria_label: "Previous chapter",
-                        ChevronLeft { size: 24, stroke_width: "2.3" }
+            // End of chapter: carry straight on, Apple Books style.
+            if let Some(n) = next.clone() {
+                Link { to: n.clone(), class: "press mt-10 flex items-center justify-between rounded-card bg-surface px-4 py-3.5 font-sans",
+                    span {
+                        span { class: "block text-[13px] text-label-2", "Next Chapter" }
+                        span { class: "text-[17px] font-semibold", "{route_label(&n)}" }
                     }
-                } else { span {} }
-                if let Some(n) = next {
-                    Link { to: n, class: "press flex h-11 w-11 items-center justify-center rounded-full bg-surface shadow-md shadow-black/10", aria_label: "Next chapter",
-                        ChevronRight { size: 24, stroke_width: "2.3" }
-                    }
-                } else { span {} }
+                    ChevronRight { size: 22, class: "text-label-3", stroke_width: "2.4" }
+                }
             }
         }
 
         if !selected.read().is_empty() {
             SelectionBar { book: meta.id.to_string(), chapter, selected }
+        } else {
+            ReaderBar { book: meta.id.to_string(), book_name: meta.name.to_string(), chapter, prev: prev.clone(), next: next.clone() }
         }
     }
 }
