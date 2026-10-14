@@ -1,6 +1,6 @@
 [package]
 name = "dew"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Kage Syntax <em2009manu2010el@gmail.com>"]
 edition = "2021"
 description = "Dew: the Bible and the teens' Sunday School manual for AGC Oshodi, built with Dioxus."
