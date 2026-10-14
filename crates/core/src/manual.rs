@@ -10,7 +10,9 @@
 //! >>Activity Option            (see Teacher Guide + note)
 //! >>Study Overview             (bullets)
 //! >>Discussion Questions       a. b. c. sections -> numbered questions [Note:/Hint: for leaders]
+//! >>Invitation Option          (closing call to action, after the questions)
 //! >>Act                        (application)
+//! >>Reach Out                   (a service to someone else)
 //! >>Daily Dew Drops            Mon..Sat devotional readings
 //! ```
 //!
@@ -104,6 +106,19 @@ pub struct Lesson {
     pub getting_started: Vec<String>,
     #[serde(default)]
     pub option: Option<LessonOption>,
+    /// The second call-to-action box, printed after the discussion questions
+    /// (">>Invitation Option: ... See pg2 (AC.CONFIRMATION) for guidance"). Lessons that have no
+    /// closing invitation leave this unset.
+    #[serde(default)]
+    pub invitation_option: Option<LessonOption>,
+    /// A second ">>Illustration Option" box. A few lessons print both an Activity Option and an
+    /// Illustration Option; the Activity Option stays in `option`.
+    #[serde(default)]
+    pub illustration_option: Option<LessonOption>,
+    /// The closing service box, printed after the Act (">>Reach Out: Is the example you set
+    /// every day pleasing to God...").
+    #[serde(default)]
+    pub reach_out: Option<LessonOption>,
     #[serde(default)]
     pub overview: Vec<String>,
     #[serde(default)]
