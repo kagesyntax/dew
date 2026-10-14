@@ -51,7 +51,7 @@ The full pipeline (the 7 C's of DevOps) and the website are described in [docs/D
 1. Write user-facing changes under `## [Unreleased]` in [CHANGELOG.md](CHANGELOG.md) as you go.
 2. **Actions → Prepare Release → Run workflow** (patch / minor / major). It bumps `Cargo.toml`,
    dates the changelog section and opens a `release/vX.Y.Z` PR into `main`.
-3. Merge the PR. **Release** builds the web app (GitHub Pages), macOS `.dmg`, Windows `.msi`,
+3. Merge the PR. **Release** builds the web app (GitHub Pages), macOS `.dmg`, Windows `.exe` installer,
    Linux `.AppImage` and a signed Android `.apk`, publishes `version.json`, and creates the
    GitHub Release. Then merge `main` back into `develop`.
 4. Every installed app sees it in **Settings → Software Update** (a red badge appears when

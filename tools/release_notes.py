@@ -41,7 +41,7 @@ def manifest(version, repo, minimum=None):
         "published_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "downloads": {
             "macos": f"{base}/Dew-macos.dmg",
-            "windows": f"{base}/Dew-windows.msi",
+            "windows": f"{base}/Dew-windows.exe",
             "linux": f"{base}/Dew-linux.AppImage",
             "android": f"{base}/Dew-android.apk",
         },
