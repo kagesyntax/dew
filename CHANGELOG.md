@@ -5,6 +5,8 @@ All notable changes to this app. The release workflow copies the section for eac
 Format: [Keep a Changelog](https://keepachangelog.com), versions follow [SemVer](https://semver.org).
 
 ## [Unreleased]
+
+## [0.2.0] - 2026-10-14
 ### Added
 - The full Sunday School manual is now in Dew: 24 lessons from 5 July to 27 December 2026, covering Units 1-6 plus the Christmas and Special Edition studies
 - Unit 1 "Unsung Heroes": Unselfish Heroes, Desperate Heroes, A Truthful Hero, A Courageous Hero
