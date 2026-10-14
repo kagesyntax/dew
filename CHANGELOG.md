@@ -5,6 +5,8 @@ All notable changes to this app. The release workflow copies the section for eac
 Format: [Keep a Changelog](https://keepachangelog.com), versions follow [SemVer](https://semver.org).
 
 ## [Unreleased]
+
+## [0.1.1] - 2026-10-14
 ### Added
 - Reader toolbar above the tab bar: previous and next chapter, tap the passage to jump to any book and chapter, switch translation. It tucks away while you read and returns when you scroll up
 - Arrow keys turn chapters on a keyboard
