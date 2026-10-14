@@ -64,8 +64,8 @@ jobs:
       matrix:
         include:
           - { os: macos-latest, key: macos, pattern: "*.dmg", ext: dmg }
-          - { os: windows-latest, key: windows, pattern: "*.msi", ext: msi }
-          - { os: ubuntu-22.04, key: linux, pattern: "*.AppImage", ext: AppImage }
+          - { os: windows-latest, key: windows, pattern: "*-setup.exe", ext: exe }
+          - { os: ubuntu-24.04, key: linux, pattern: "*.AppImage", ext: AppImage }
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -147,7 +147,7 @@ jobs:
 
   publish:
     needs: [prepare, desktop, android, web]
-    if: always() && needs.prepare.outputs.ship == 'true' && needs.web.result == 'success' && needs.android.result == 'success'
+    if: always() && needs.prepare.outputs.ship == 'true' && needs.web.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

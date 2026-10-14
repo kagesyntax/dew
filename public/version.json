@@ -16,7 +16,7 @@
   "published_at": "2026-10-13T21:42:22Z",
   "downloads": {
     "macos": "https://github.com/agc-oshodi/dew/releases/download/v0.1.0/Dew-macos.dmg",
-    "windows": "https://github.com/agc-oshodi/dew/releases/download/v0.1.0/Dew-windows.msi",
+    "windows": "https://github.com/agc-oshodi/dew/releases/download/v0.1.0/Dew-windows.exe",
     "linux": "https://github.com/agc-oshodi/dew/releases/download/v0.1.0/Dew-linux.AppImage",
     "android": "https://github.com/agc-oshodi/dew/releases/download/v0.1.0/Dew-android.apk"
   }
