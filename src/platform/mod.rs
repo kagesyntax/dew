@@ -6,3 +6,6 @@ pub mod clock;
 pub mod js;
 pub mod storage;
 pub mod theme;
+
+#[cfg(target_os = "android")]
+pub mod android_chrome;

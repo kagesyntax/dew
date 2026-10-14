@@ -6,6 +6,10 @@ Format: [Keep a Changelog](https://keepachangelog.com), versions follow [SemVer]
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-10-14
+### Changed
+- Dew now fills the whole screen on Android and iPhone: the status bar and navigation area match your theme.
+
 ## [0.1.2] - 2026-10-14
 ### Fixed
 - The Android app now installs on real phones, including older 32-bit ones, and shows the Dew icon

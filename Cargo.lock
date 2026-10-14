@@ -954,13 +954,14 @@ dependencies = [
 
 [[package]]
 name = "dew"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "chrono",
  "church-core",
  "dioxus",
  "dioxus-icons",
  "dioxus-primitives",
+ "jni 0.21.1",
  "reqwest",
  "serde",
  "serde_json",

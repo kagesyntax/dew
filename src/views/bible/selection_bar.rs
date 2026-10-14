@@ -77,7 +77,7 @@ pub fn SelectionBar(book: String, chapter: u16, selected: Signal<BTreeSet<u16>>)
     rsx! {
         div {
             class: "fade-in fixed inset-x-0 z-40 mx-auto max-w-md px-3",
-            style: "bottom: calc(max(env(safe-area-inset-bottom), 8px) + 60px);",
+            style: "bottom: calc(max(var(--safe-bottom), 8px) + 60px);",
             div { class: "bar-blur rounded-2xl border border-separator p-3 shadow-xl shadow-black/15",
                 div { class: "mb-2 flex items-center justify-between",
                     span { class: "text-[15px] font-semibold", "{title}" }

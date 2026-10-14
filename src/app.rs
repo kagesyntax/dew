@@ -17,6 +17,10 @@ pub fn App() -> Element {
     use_app_state_provider();
     use_manual_provider();
     use_hook(js::register_service_worker);
+    // Android reports no usable CSS safe-area insets, so the bars are measured natively and
+    // re-measured on rotation. Compiled out everywhere else.
+    #[cfg(target_os = "android")]
+    use_hook(crate::platform::android_chrome::watch_insets);
 
     rsx! {
         document::Title { "{APP_NAME}" }

@@ -76,7 +76,7 @@ pub fn ReturnPill() -> Element {
         if let Some(p) = point {
             button {
                 class: "return-pill press fade-in fixed left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-full bg-accent px-4 py-2.5 text-[15px] font-semibold text-white shadow-lg shadow-black/20",
-                style: "bottom: calc(env(safe-area-inset-bottom) + 76px);",
+                style: "bottom: calc(max(var(--safe-bottom), 8px) + 76px);",
                 onclick: move |_| navigation::go_back(app),
                 CornerUpLeft { size: 18, stroke_width: "2.4" }
                 "Back to {p.label}"

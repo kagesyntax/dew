@@ -41,6 +41,25 @@ html[data-theme="dark"] {
   color-scheme: dark;
 }
 
+/* Safe areas.
+ *
+ * iOS and modern browsers report real values through env(); the Android WebView reports 0px
+ * until Chrome WebView 144, so android_chrome.rs pushes the native insets into the --dew-inset-*
+ * variables instead. max() keeps whichever source knows the answer. Every platform that knows
+ * nothing leaves all four at 0px, so desktop and web are unchanged.
+ *
+ * Only the edge-most element in a stack carries these: the tab bar owns the bottom inset (the
+ * docked reader bar offsets itself by the same value rather than padding again), and the top bar
+ * owns the top one. body is deliberately never padded, or the strips would go blank instead of
+ * showing the blurred bar behind them.
+ */
+:root {
+  --safe-top: max(env(safe-area-inset-top, 0px), var(--dew-inset-top, 0px));
+  --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--dew-inset-bottom, 0px));
+  --safe-left: max(env(safe-area-inset-left, 0px), var(--dew-inset-left, 0px));
+  --safe-right: max(env(safe-area-inset-right, 0px), var(--dew-inset-right, 0px));
+}
+
 /* Reader text size: settings write html[data-text="0..4"]. */
 html { --reader-size: 19px; }
 html[data-text="0"] { --reader-size: 16px; }
@@ -67,8 +86,8 @@ html, body {
   backdrop-filter: saturate(180%) blur(20px);
 }
 
-.safe-bottom { padding-bottom: max(env(safe-area-inset-bottom), 8px); }
-.safe-top { padding-top: env(safe-area-inset-top); }
+.safe-bottom { padding-bottom: max(var(--safe-bottom), 8px); }
+.safe-top { padding-top: var(--safe-top); }
 
 .reader-text {
   font-family: "New York", "Iowan Old Style", "Charter", "Source Serif 4", Georgia, serif;
@@ -105,22 +124,23 @@ html, body {
 @keyframes sheet-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 .sheet-up { animation: sheet-up 360ms cubic-bezier(.2,.8,.2,1) both; }
 
-/* Reader toolbar: docked on the tab bar, one piece of bottom chrome */
+/* Reader toolbar: docked on the tab bar, one piece of bottom chrome.
+ * It offsets itself rather than padding, so it must read the same resolved inset as the tab bar. */
 .reader-bar {
-  bottom: calc(max(env(safe-area-inset-bottom), 8px) + var(--tabbar-h, 51px));
+  bottom: calc(max(var(--safe-bottom), 8px) + var(--tabbar-h, 51px));
   box-shadow: inset 0 0.5px 0 var(--app-separator);
 }
 body:has(.reader-bar) nav.tab-bar { border-top-color: transparent; }
 /* The "Back to Study" pill rides above the reader toolbar */
-body:has(.reader-bar) .return-pill { bottom: calc(env(safe-area-inset-bottom) + 124px) !important; }
+body:has(.reader-bar) .return-pill { bottom: calc(max(var(--safe-bottom), 8px) + 124px) !important; }
 /* Passage picker: a tall sheet */
 .dx-sheet.passage-sheet { height: 88vh; }
 
 /* Verse scrubber (long chapters): iOS-style fast-scroll handle on the right edge */
 .verse-scrubber {
   position: fixed; right: 0; z-index: 35; width: 40px;
-  top: calc(env(safe-area-inset-top) + 64px);
-  bottom: calc(max(env(safe-area-inset-bottom), 8px) + 116px);
+  top: calc(var(--safe-top) + 64px);
+  bottom: calc(max(var(--safe-bottom), 8px) + 116px);
   touch-action: none; user-select: none; -webkit-user-select: none;
   opacity: 0; pointer-events: none; transition: opacity 220ms ease;
   --vs-y: 22px;
