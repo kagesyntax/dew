@@ -5,6 +5,16 @@ All notable changes to this app. The release workflow copies the section for eac
 Format: [Keep a Changelog](https://keepachangelog.com), versions follow [SemVer](https://semver.org).
 
 ## [Unreleased]
+### Added
+- The full Sunday School manual is now in Dew: 24 lessons from 5 July to 27 December 2026, covering Units 1-6 plus the Christmas and Special Edition studies
+- Unit 1 "Unsung Heroes": Unselfish Heroes, Desperate Heroes, A Truthful Hero, A Courageous Hero
+- Unit 2 "Miracles of Jesus": The Reality of Miracles, The Reasons For Miracles, The Responses To Miracles
+- Unit 3 "Countering the Culture": A Different World, Getting The Message, When People Give In To Peer Pressure
+- Unit 4 "Ancient Faith/Future Faith": Finding Your Centre, Understanding Your Saviour, Keeping Your Faith
+- Lesson content corrected against the printed manual: the 1 November discussion, Act and Daily Dew Drops had been carried over from a different study
+### Fixed
+- The 1 November lesson now shows its own questions (No Profit, No Comparison, No Turning Back) instead of the wrong study's material
+- The 1 November Daily Dew Drops, Act, memory verse and page numbers now match the printed manual
 
 ## [0.1.3] - 2026-10-14
 ### Changed

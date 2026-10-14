@@ -15,6 +15,25 @@ use dioxus_icons::lucide::{
 
 /// Route entry: keyed so each lesson mounts fresh (its own LessonContext and scroll restore).
 #[component]
+fn OptionBox(opt: church_core::manual::LessonOption, icon_class: String) -> Element {
+    rsx! {
+        div { class: "mt-4 rounded-card border border-dashed border-separator p-4",
+            div { class: "flex items-center gap-2 text-[15px] font-semibold",
+                Lightbulb { size: 18, class: "{icon_class}", stroke_width: "2.3" }
+                "{opt.label}"
+                if let Some(t) = &opt.text {
+                    span { class: "font-normal text-label-2", "· {t}" }
+                }
+            }
+            if let Some(n) = &opt.note {
+                p { class: "mt-1.5 text-[15px] leading-snug text-label-2", strong { class: "text-label", "Note: " } "{n}" }
+            }
+        }
+    }
+}
+
+/// Route entry: keyed so each lesson mounts fresh (its own LessonContext and scroll restore).
+#[component]
 pub fn LessonView(id: String) -> Element {
     rsx! { LessonPage { key: "{id}", id } }
 }
@@ -108,18 +127,9 @@ fn LessonPage(id: String) -> Element {
                 }
             }
 
-            if let Some(opt) = &lesson.option {
-                div { class: "mt-4 rounded-card border border-dashed border-separator p-4",
-                    div { class: "flex items-center gap-2 text-[15px] font-semibold",
-                        Lightbulb { size: 18, class: "text-amber-500", stroke_width: "2.3" }
-                        "{opt.label}"
-                        if let Some(t) = &opt.text {
-                            span { class: "font-normal text-label-2", "· {t}" }
-                        }
-                    }
-                    if let Some(n) = &opt.note {
-                        p { class: "mt-1.5 text-[15px] leading-snug text-label-2", strong { class: "text-label", "Note: " } "{n}" }
-                    }
+            for box_ in [&lesson.option, &lesson.illustration_option] {
+                if let Some(opt) = box_ {
+                    OptionBox { opt: opt.clone(), icon_class: "text-amber-500", }
                 }
             }
 
@@ -146,6 +156,14 @@ fn LessonPage(id: String) -> Element {
                     }
                     ScriptureText { text: act.clone(), class: "mt-2 text-[17px] leading-relaxed" }
                 }
+            }
+
+            if let Some(inv) = &lesson.invitation_option {
+                OptionBox { opt: inv.clone(), icon_class: "text-accent" }
+            }
+
+            if let Some(ro) = &lesson.reach_out {
+                OptionBox { opt: ro.clone(), icon_class: "text-teal-600 dark:text-teal-400" }
             }
 
             DewDrops { drops: lesson.daily_dew_drops.clone(), lesson_date: lesson.date.clone() }
