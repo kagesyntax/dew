@@ -24,6 +24,11 @@ chrono = { version = "0.4", default-features = false, features = ["clock", "wasm
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
 thiserror = "2"
 
+# Android edge-to-edge system bars (src/platform/android_chrome.rs) talk to the activity through
+# JNI. Pinned to the version wry already pulls in, so the crate is shared rather than duplicated.
+[target.'cfg(target_os = "android")'.dependencies]
+jni = "0.21.1"
+
 [features]
 default = ["web"]
 web = ["dioxus/web"]

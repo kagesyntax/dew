@@ -961,6 +961,7 @@ dependencies = [
  "dioxus",
  "dioxus-icons",
  "dioxus-primitives",
+ "jni 0.21.1",
  "reqwest",
  "serde",
  "serde_json",

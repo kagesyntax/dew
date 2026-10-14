@@ -5,6 +5,8 @@ All notable changes to this app. The release workflow copies the section for eac
 Format: [Keep a Changelog](https://keepachangelog.com), versions follow [SemVer](https://semver.org).
 
 ## [Unreleased]
+### Changed
+- Dew now fills the whole screen on Android and iPhone: the status bar and navigation area match your theme.
 
 ## [0.1.2] - 2026-10-14
 ### Fixed
