@@ -25,9 +25,19 @@ use std::convert::TryInto;
 /// unpadded for the rest of the session.
 const INSET_RETRIES: u32 = 5;
 const RETRY_DELAY_MS: u64 = 100;
-
-/// Clears a pending exception so the next JNI call is safe. Returns true if one was pending, which
-/// means the call that raised it failed and its result must not be trusted.
+/// Drains any pending Java exception so the next JNI call is safe.
+///
+/// Returns true if one was pending, meaning the call that raised it failed and its result must
+/// not be trusted.
+///
+/// # Why every helper clears *before* propagating an error
+///
+/// The JNI spec forbids calling most JNI functions with an exception still pending. Android's ART
+/// runtime detects the violation and aborts the whole process ("JNI DETECTED ERROR IN
+/// APPLICATION: JNI ... called with pending exception"), which is a hard kill, not a catchable
+/// panic. The failure is silent: a lookup for something absent returns `Err`, and propagating that
+/// `Err` before clearing leaves the exception pending for the *next*, unrelated JNI call to
+/// detonate. So the clear runs on every exit path, success or failure.
 fn take_exception(env: &mut JNIEnv) -> bool {
     match env.exception_check() {
         Ok(true) => {
@@ -41,28 +51,29 @@ fn take_exception(env: &mut JNIEnv) -> bool {
 
 /// Calls a method returning `int`, e.g. `getSystemWindowInsetTop()I`.
 fn call_i32<'a, 'b>(env: &mut JNIEnv<'a>, obj: &JObject<'b>, name: &str, sig: &str) -> Option<i32> {
-    let res = env.call_method(obj, name, sig, &[]).ok()?;
-    if take_exception(env) {
+    let res = env.call_method(obj, name, sig, &[]).ok();
+    let pending = take_exception(env);
+    if pending {
         return None;
     }
-    res.i().ok()
+    res?.i().ok()
 }
 
 /// Calls a `void` method, e.g. `setStatusBarColor(I)V`.
 fn call_void<'a, 'b>(env: &mut JNIEnv<'a>, obj: &JObject<'b>, name: &str, sig: &str, args: &[JValue<'a, '_>]) -> bool {
-    match env.call_method(obj, name, sig, args) {
-        Ok(_) => !take_exception(env),
-        Err(_) => false,
-    }
+    let ok = env.call_method(obj, name, sig, args).is_ok();
+    // Clear on both the Err path and the Ok-with-a-pending-exception path.
+    let pending = take_exception(env);
+    ok && !pending
 }
 
 /// Calls a method returning an object, e.g. `getWindow()Landroid/view/Window;`.
 fn call_obj<'a, 'b>(env: &mut JNIEnv<'a>, obj: &JObject<'b>, name: &str, sig: &str) -> Option<JObject<'a>> {
-    let res = env.call_method(obj, name, sig, &[]).ok()?;
+    let res = env.call_method(obj, name, sig, &[]).ok();
     if take_exception(env) {
         return None;
     }
-    res.try_into().ok()
+    res?.try_into().ok()
 }
 
 /// Calls a method taking arguments and returning an object,
@@ -74,55 +85,73 @@ fn call_obj_args<'a, 'b>(
     sig: &str,
     args: &[JValue<'a, '_>],
 ) -> Option<JObject<'a>> {
-    let res = env.call_method(obj, name, sig, args).ok()?;
+    let res = env.call_method(obj, name, sig, args).ok();
     if take_exception(env) {
         return None;
     }
-    res.try_into().ok()
+    res?.try_into().ok()
 }
 
-/// Reads a public `int` field, e.g. `android.graphics.Insets.top`.
+/// Reads a public **instance** `int` field, e.g. `android.graphics.Insets.top`.
 fn field_i32<'a, 'b>(env: &mut JNIEnv<'a>, obj: &JObject<'b>, name: &str) -> Option<i32> {
-    let res = env.get_field(obj, name, "I").ok()?;
+    let res = env.get_field(obj, name, "I").ok();
     if take_exception(env) {
         return None;
     }
-    res.i().ok()
+    res?.i().ok()
 }
 
-/// Reads a public `float` field, e.g. `DisplayMetrics.density`.
+/// Reads a public **instance** `float` field, e.g. `DisplayMetrics.density`.
 fn field_f32<'a, 'b>(env: &mut JNIEnv<'a>, obj: &JObject<'b>, name: &str) -> Option<f32> {
-    let res = env.get_field(obj, name, "F").ok()?;
+    let res = env.get_field(obj, name, "F").ok();
     if take_exception(env) {
         return None;
     }
-    res.f().ok()
+    res?.f().ok()
+}
+
+/// Reads a public **static** `int` field, e.g. `Build.VERSION.SDK_INT`.
+///
+/// `class` is the JNI class name (`android/os/Build$VERSION`), not a `JClass`: `jni` deliberately
+/// does not implement `Desc<JClass>` for `&JObject`, so the class is resolved internally via
+/// `find_class`. That lookup can also raise, which is why the exception is cleared before the
+/// error is propagated.
+///
+/// This has to be `get_static_field`. `get_field` looks up an *instance* field id, so asking for
+/// one on a static field raises `NoSuchFieldError`; combined with a leaked exception, that was
+/// aborting the app on every launch.
+fn static_field_i32(env: &mut JNIEnv<'_>, class: &str, name: &str) -> Option<i32> {
+    let res = env.get_static_field(class, name, "I").ok();
+    if take_exception(env) {
+        return None;
+    }
+    res?.i().ok()
 }
 
 /// `android.os.Build.VERSION.SDK_INT`, or 0 when it cannot be read.
+///
+/// `SDK_INT` is a `static final` field, so this reads it with `get_static_field`.
 fn sdk_int(env: &mut JNIEnv<'_>) -> i32 {
-    let Ok(version) = env.find_class("android/os/Build$VERSION") else {
-        let _ = take_exception(env);
-        return 0;
-    };
-    field_i32(env, &version, "SDK_INT").unwrap_or(0)
+    static_field_i32(env, "android/os/Build$VERSION", "SDK_INT").unwrap_or(0)
 }
 
 /// `android.view.WindowInsets.Type.systemBars() | ...displayCutout()`.
 ///
 /// This is the API 30 replacement for the old `getSystemWindowInset*` getters.
 fn system_bar_mask<'a>(env: &mut JNIEnv<'a>) -> Option<i32> {
-    let cls = env.find_class("android/view/WindowInsets$Type").ok()?;
+    // `ok()` first, clear second: `?` must never run while an exception is pending.
+    let cls = env.find_class("android/view/WindowInsets$Type").ok();
     if take_exception(env) {
         return None;
     }
+    let cls = cls?;
     let mut mask: jint = 0;
     for name in ["systemBars", "displayCutout"] {
-        let res = env.call_static_method(&cls, name, "()I", &[]).ok()?;
+        let res = env.call_static_method(&cls, name, "()I", &[]).ok();
         if take_exception(env) {
             return None;
         }
-        mask |= res.i().ok()?;
+        mask |= res?.i().ok()?;
     }
     Some(mask)
 }
