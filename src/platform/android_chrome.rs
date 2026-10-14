@@ -110,12 +110,17 @@ fn field_f32<'a, 'b>(env: &mut JNIEnv<'a>, obj: &JObject<'b>, name: &str) -> Opt
     res?.f().ok()
 }
 
-/// Reads a public **static** `int` field on a class, e.g. `Build.VERSION.SDK_INT`.
+/// Reads a public **static** `int` field, e.g. `Build.VERSION.SDK_INT`.
 ///
-/// This has to use `get_static_field`. `get_field` looks up an *instance* field id, so asking for
+/// `class` is the JNI class name (`android/os/Build$VERSION`), not a `JClass`: `jni` deliberately
+/// does not implement `Desc<JClass>` for `&JObject`, so the class is resolved internally via
+/// `find_class`. That lookup can also raise, which is why the exception is cleared before the
+/// error is propagated.
+///
+/// This has to be `get_static_field`. `get_field` looks up an *instance* field id, so asking for
 /// one on a static field raises `NoSuchFieldError`; combined with a leaked exception, that was
 /// aborting the app on every launch.
-fn static_field_i32<'a>(env: &mut JNIEnv<'a>, class: &JObject<'a>, name: &str) -> Option<i32> {
+fn static_field_i32(env: &mut JNIEnv<'_>, class: &str, name: &str) -> Option<i32> {
     let res = env.get_static_field(class, name, "I").ok();
     if take_exception(env) {
         return None;
@@ -127,11 +132,7 @@ fn static_field_i32<'a>(env: &mut JNIEnv<'a>, class: &JObject<'a>, name: &str) -
 ///
 /// `SDK_INT` is a `static final` field, so this reads it with `get_static_field`.
 fn sdk_int(env: &mut JNIEnv<'_>) -> i32 {
-    let Ok(version) = env.find_class("android/os/Build$VERSION") else {
-        let _ = take_exception(env);
-        return 0;
-    };
-    static_field_i32(env, &version, "SDK_INT").unwrap_or(0)
+    static_field_i32(env, "android/os/Build$VERSION", "SDK_INT").unwrap_or(0)
 }
 
 /// `android.view.WindowInsets.Type.systemBars() | ...displayCutout()`.
