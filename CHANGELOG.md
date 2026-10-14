@@ -5,6 +5,8 @@ All notable changes to this app. The release workflow copies the section for eac
 Format: [Keep a Changelog](https://keepachangelog.com), versions follow [SemVer](https://semver.org).
 
 ## [Unreleased]
+
+## [0.1.2] - 2026-10-14
 ### Fixed
 - The Android app now installs on real phones, including older 32-bit ones, and shows the Dew icon
 - A separate download for Intel Macs (2020 and older), running macOS 10.15 or newer
