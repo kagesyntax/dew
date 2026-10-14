@@ -63,14 +63,19 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: macos-latest, key: macos, pattern: "*.dmg", ext: dmg }
+          - { os: macos-latest, key: macos, pattern: "*.dmg", ext: dmg, target: aarch64-apple-darwin }
+          - { os: macos-latest, key: macos-intel, pattern: "*.dmg", ext: dmg, target: x86_64-apple-darwin }
           - { os: windows-latest, key: windows, pattern: "*-setup.exe", ext: exe }
           - { os: ubuntu-24.04, key: linux, pattern: "*.AppImage", ext: AppImage }
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
       - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.key }}
       - uses: cargo-bins/cargo-binstall@main
       - run: cargo binstall -y dioxus-cli@${{ env.DX_VERSION }}
       - if: runner.os == 'Linux'
@@ -84,8 +89,10 @@ jobs:
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_READONLY_TOKEN }}
           UPDATE_MANIFEST_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/version.json
           REPO_URL: https://github.com/${{ github.repository }}
+          MACOSX_DEPLOYMENT_TARGET: "10.15"
+          TARGET: ${{ matrix.target }}
         run: |
-          dx bundle --platform desktop --release --no-default-features --features desktop
+          dx bundle --platform desktop --release --no-default-features --features desktop ${TARGET:+--target $TARGET}
           f=$(find target/dx -name "${{ matrix.pattern }}" | head -1)
           test -n "$f" || { echo "::error::no ${{ matrix.pattern }} produced"; exit 1; }
           cp "$f" "Dew-${{ matrix.key }}.${{ matrix.ext }}"

@@ -19,6 +19,8 @@ pub enum UpdateStatus {
 pub fn platform_key() -> &'static str {
     if cfg!(feature = "web") {
         "web"
+    } else if cfg!(all(target_os = "macos", target_arch = "x86_64")) {
+        "macos-intel"
     } else if cfg!(target_os = "macos") {
         "macos"
     } else if cfg!(target_os = "windows") {

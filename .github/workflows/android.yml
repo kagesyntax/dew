@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android
+          targets: aarch64-linux-android,armv7-linux-androideabi
       - uses: Swatinem/rust-cache@v2
         with:
           key: android
@@ -66,11 +66,43 @@ jobs:
           REPO_URL: https://github.com/${{ github.repository }}
           APP_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/app/
         run: |
-          dx bundle --platform android --release --no-default-features --features mobile
-          APK=$(find target/dx -name '*.apk' | grep -i release | head -1)
-          [ -n "$APK" ] || APK=$(find target/dx -name '*.apk' | head -1)
-          test -n "$APK" || { echo "::error::dx produced no APK"; exit 1; }
-          cp "$APK" unsigned.apk
+          ARGS="--platform android --release --no-default-features --features mobile"
+          V7=""
+          if dx bundle $ARGS --target armv7-linux-androideabi; then
+            V7APK=$(find target/dx -name '*.apk' | head -1)
+            mkdir -p v7 && (cd v7 && unzip -q -o "$GITHUB_WORKSPACE/$V7APK" 'lib/armeabi-v7a/*') && V7=v7/lib/armeabi-v7a/libmain.so
+            find target/dx -name '*.apk' -delete
+          else
+            echo "::warning::armv7 build failed: this APK only runs on 64-bit phones"
+          fi
+          dx bundle $ARGS --target aarch64-linux-android
+          DXAPK=$(find target/dx -name '*.apk' | head -1)
+          test -n "$DXAPK" || { echo "::error::dx produced no APK"; exit 1; }
+          cp "$DXAPK" unsigned.apk
+          GW=$(find target/dx -name gradlew -path '*android*' | head -1)
+          if [ -n "$GW" ]; then
+            PROJ=$(dirname "$GW")
+            RES=$(find "$PROJ" -type d -path '*src/main/res' | head -1)
+            JNI=$(dirname "$(find "$PROJ" -name libmain.so -path '*arm64-v8a*' -not -path '*/build/*' | head -1)")
+            if [ -n "$RES" ]; then
+              find "$RES" \( -name 'ic_launcher*' -o -name 'ic_launcher_background*' \) -delete
+              cp -R android/res/. "$RES/"
+            fi
+            if [ -n "$V7" ] && [ "$JNI" != "." ]; then
+              mkdir -p "$JNI/../armeabi-v7a" && cp "$V7" "$JNI/../armeabi-v7a/"
+            fi
+            if (cd "$PROJ" && chmod +x gradlew && ./gradlew --no-daemon -q assembleRelease); then
+              OUT=$(find "$PROJ" -path '*outputs/apk/release/*.apk' | head -1)
+              [ -n "$OUT" ] && cp "$OUT" unsigned.apk
+            else
+              echo "::warning::Gradle rebuild failed: shipping dx's APK with the default icon"
+            fi
+          fi
+          if [ -n "$V7" ] && ! unzip -l unsigned.apk | grep -q 'lib/armeabi-v7a/'; then
+            (cd v7 && zip -q -0 -r "$GITHUB_WORKSPACE/unsigned.apk" lib)
+          fi
+          unzip -l unsigned.apk | grep -E 'lib/|ic_launcher' || true
+          unzip -l unsigned.apk | grep -q 'lib/arm64-v8a/' || { echo "::error::APK has no arm64 library"; exit 1; }
 
       - name: Sign
         env:
