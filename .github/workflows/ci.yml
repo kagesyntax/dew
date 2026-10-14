@@ -47,6 +47,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: cargo-deny (advisories, licenses, banned/duplicate crates, sources)
         uses: EmbarkStudios/cargo-deny-action@v2
         with:
