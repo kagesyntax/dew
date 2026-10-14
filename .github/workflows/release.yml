@@ -113,7 +113,9 @@ jobs:
             stage=$(mktemp -d)
             cp -R "$app" "$stage/"
             ln -s /Applications "$stage/Applications"
-            out="Dew-${{ matrix.key }}.dmg"
+            # Build in a scratch dir: the shared step below copies onto
+            # Dew-<key>.<ext>, so writing there directly would make cp a no-op self-copy.
+            out="$RUNNER_TEMP/Dew-${{ matrix.key }}.dmg"
             hdiutil create -volname "Dew" -srcfolder "$stage" -ov -format UDZO "$out" >/dev/null
             rm -rf "$stage"
 
