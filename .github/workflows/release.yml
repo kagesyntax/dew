@@ -92,9 +92,44 @@ jobs:
           MACOSX_DEPLOYMENT_TARGET: "10.15"
           TARGET: ${{ matrix.target }}
         run: |
-          dx bundle --platform desktop --release --no-default-features --features desktop ${TARGET:+--target $TARGET}
-          f=$(find target/dx -name "${{ matrix.pattern }}" | head -1)
-          test -n "$f" || { echo "::error::no ${{ matrix.pattern }} produced"; exit 1; }
+          if [[ "${{ matrix.key }}" == macos* ]]; then
+            # v0.2.1 fix: dx 0.7.10 stamps an ad-hoc signature into the Mach-O but never writes
+            # Contents/_CodeSignature/CodeResources. macOS rejects that as a damaged bundle
+            # ("Dew is damaged and can't be opened"), not as a normal unsigned-app warning.
+            # Build the bare .app, re-seal it, verify it, and only then wrap it in the DMG that
+            # actually ships -- sealing after dx packaged the DMG would be a no-op.
+            dx bundle --platform desktop --release --package-types macos \
+              --no-default-features --features desktop ${TARGET:+--target $TARGET}
+            app=$(find target/dx -name "*.app" -type d -maxdepth 4 | head -1)
+            test -n "$app" || { echo "::error::no .app bundle produced"; exit 1; }
+
+            echo "::group::Re-sealing $app"
+            codesign --force --deep --sign - "$app"
+            codesign --verify --verbose=2 "$app"
+            test -f "$app/Contents/_CodeSignature/CodeResources" \
+              || { echo "::error::bundle still missing CodeResources after re-seal"; exit 1; }
+            echo "::endgroup::"
+
+            stage=$(mktemp -d)
+            cp -R "$app" "$stage/"
+            ln -s /Applications "$stage/Applications"
+            out="Dew-${{ matrix.key }}.dmg"
+            hdiutil create -volname "Dew" -srcfolder "$stage" -ov -format UDZO "$out" >/dev/null
+            rm -rf "$stage"
+
+            # Prove the shipped image contains the sealed bundle before publishing it.
+            verify=$(mktemp -d)
+            hdiutil attach "$out" -nobrowse -readonly -quiet -mountpoint "$verify"
+            shipped=$(find "$verify" -maxdepth 2 -name "*.app" -type d | head -1)
+            codesign --verify --verbose=2 "$shipped"
+            hdiutil detach "$verify" -quiet
+            rm -rf "$verify"
+            f="$out"
+          else
+            dx bundle --platform desktop --release --no-default-features --features desktop ${TARGET:+--target $TARGET}
+            f=$(find target/dx -name "${{ matrix.pattern }}" | head -1)
+            test -n "$f" || { echo "::error::no ${{ matrix.pattern }} produced"; exit 1; }
+          fi
           cp "$f" "Dew-${{ matrix.key }}.${{ matrix.ext }}"
       - uses: actions/upload-artifact@v4
         with:

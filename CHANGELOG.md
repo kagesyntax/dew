@@ -6,6 +6,13 @@ Format: [Keep a Changelog](https://keepachangelog.com), versions follow [SemVer]
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-10-14
+### Fixed
+- **The Android app no longer closes the instant it opens.** Dew read the device's API level with the wrong kind of JNI field lookup, which raised a Java error that was never cleared. Android's runtime treats a leftover error as fatal and killed the process on launch. Dew now reads the field correctly and clears any pending error on every code path, so a missing Android API degrades gracefully instead of crashing.
+- **The Mac app now opens.** The download shipped a bundle whose code signature was incomplete, so macOS reported Dew as "damaged" rather than as an app from an unknown developer. Every Mac build is now signed, checked, and only then packed into the disk image, so the file you download is verified before it is published.
+
+Both problems were packaging and platform-integration faults, not content faults: the lessons, questions and manual pages are unchanged from 0.2.0, and the web app was never affected.
+
 ## [0.2.0] - 2026-10-14
 ### Added
 - The full Sunday School manual is now in Dew: 24 lessons from 5 July to 27 December 2026, covering Units 1-6 plus the Christmas and Special Edition studies
