@@ -3,6 +3,7 @@
 (() => {
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => document.querySelectorAll(s);
+  document.documentElement.classList.add("js");
   const SPARK = '<svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2z"/></svg>';
 
   // Which device is this? Android, iOS, Windows, Mac or Linux.
@@ -47,6 +48,15 @@
   fetch("version.json", { cache: "no-cache" }).then((r) => r.json()).then(render).catch(() => {
     $$("[data-primary]").forEach((b, i) => { if (i > 0) b.textContent = label; });
   });
+
+  // Gentle rise-in as sections scroll into view (skipped for prefers-reduced-motion in CSS).
+  const reveals = $$(".reveal");
+  if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const io = new IntersectionObserver((es) => es.forEach((e) => {
+      if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+    }), { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+    reveals.forEach((el) => io.observe(el));
+  } else reveals.forEach((el) => el.classList.add("in"));
 
   // "Start over": wipe only the demo's sandbox (the real web app keeps its own data) and reload.
   $("#restart").addEventListener("click", () => {
