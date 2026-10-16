@@ -17,6 +17,11 @@ on:
       minimum_version:
         description: "Force older builds to update (optional, e.g. 0.2.0)"
         required: false
+      site_only:
+        description: "Redeploy only the website (landing page + web app + version.json) for the current, already-released version. No installers, no new release."
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -149,7 +154,9 @@ jobs:
 
   web:
     needs: prepare
-    if: needs.prepare.outputs.ship == 'true'
+    # Also runs on a manual "site only" dispatch, which redeploys the site for the version that is
+    # already released (desktop, android and publish stay skipped because ship is false).
+    if: needs.prepare.outputs.ship == 'true' || inputs.site_only == true
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -163,7 +170,13 @@ jobs:
       - uses: cargo-bins/cargo-binstall@main
       - run: cargo binstall -y dioxus-cli@${{ env.DX_VERSION }}
       - name: Write version.json
-        run: python3 tools/release_notes.py manifest "${{ needs.prepare.outputs.version }}" "${{ github.repository }}" ${{ inputs.minimum_version }} > public/version.json
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # On a site-only redeploy the release already exists: keep its real publish date so
+        # What's New doesn't show the redeploy day. On a normal release this is empty -> now.
+        run: |
+          export PUBLISHED_AT=$(gh release view "v${{ needs.prepare.outputs.version }}" --json publishedAt -q .publishedAt 2>/dev/null || true)
+          python3 tools/release_notes.py manifest "${{ needs.prepare.outputs.version }}" "${{ github.repository }}" ${{ inputs.minimum_version }} > public/version.json
       - name: Build website + web app
         # Landing page at /<repo>/ (download buttons + What's New read version.json), the real app at
         # /<repo>/app/, embedded live on the landing page. Rebuilt on every release, so the site
