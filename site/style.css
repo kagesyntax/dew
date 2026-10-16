@@ -9,7 +9,8 @@
   --separator: rgb(60 60 67 / 0.18);
   --fill: rgb(120 120 128 / 0.12);
   --bar: rgb(242 242 247 / 0.8);
-  --device: #1c1c1e;
+  --app-bg-grouped: #f2f2f7;
+  --app-bar: rgb(248 248 249);
   color-scheme: light dark;
 }
 @media (prefers-color-scheme: dark) {
@@ -23,7 +24,8 @@
     --separator: rgb(84 84 88 / 0.65);
     --fill: rgb(118 118 128 / 0.24);
     --bar: rgb(0 0 0 / 0.72);
-    --device: #3a3a3c;
+    --app-bg-grouped: #000000;
+    --app-bar: rgb(18 18 18);
   }
 }
 
@@ -81,15 +83,32 @@ h1 { font-size: clamp(44px, 6vw, 72px); line-height: 1.04; letter-spacing: -0.03
 .cta { display: flex; gap: 12px; flex-wrap: wrap; }
 .meta { margin-top: 18px; font-size: 14px; color: var(--label-2); }
 
-/* The live app */
+/* The live app, inside Apple's iPhone 18 Pro product bezel (Apple Design Resources).
+   Bezel PNG is 1350x2760; its screen opening is x 72-1277, y 69-2690 (1206x2622),
+   corner radius ~190px. Every value below is a percentage of that, so it scales cleanly. */
 .demo { margin: 0; }
 .device {
-  height: min(800px, calc(100vh - 96px)); aspect-ratio: 390 / 800; min-height: 640px;
-  border-radius: 54px; padding: 12px;
-  background: var(--device);
-  box-shadow: 0 30px 60px -20px rgb(0 0 0 / .35);
+  --h: clamp(560px, calc(100vh - 120px), 820px);
+  position: relative; height: var(--h); aspect-ratio: 1350 / 2760; margin-inline: auto;
+  filter: drop-shadow(0 30px 40px rgb(0 0 0 / .22));
 }
-.device iframe { width: 100%; height: 100%; border: 0; border-radius: 42px; background: var(--bg); display: block; }
+.device .screen {
+  position: absolute; left: 5.333%; top: 2.5%; width: 89.333%; height: 95%;
+  border-radius: 15.75% / 7.25%; overflow: hidden;
+  background: var(--app-bg-grouped); display: flex; flex-direction: column;
+  isolation: isolate; /* keeps the rounded clip on the iframe in Safari */
+}
+.device iframe { flex: 1; width: 100%; border: 0; display: block; background: var(--app-bg-grouped); }
+.device .bezel { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; }
+/* iOS status bar, so the Dynamic Island never sits on top of the app's own nav bar */
+.statusbar {
+  flex: none; height: 7.1%; display: flex; align-items: center; justify-content: space-between;
+  padding: 2% 9% 0 11%; background: var(--app-bar); color: var(--label);
+  font-size: calc(var(--h) * 0.0205); font-weight: 600; letter-spacing: -0.01em;
+}
+.sb-icons { display: flex; gap: 6%; align-items: center; justify-content: flex-end; width: 30%; }
+.sb-icons svg { height: calc(var(--h) * 0.014); width: auto; fill: currentColor; }
+.sb-icons svg:last-child { height: calc(var(--h) * 0.0155); }
 .demo figcaption {
   display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center;
   margin-top: 16px; font-size: 14px; color: var(--label-2); max-width: 390px; margin-inline: auto;
@@ -148,8 +167,7 @@ h2 { font-size: clamp(32px, 4vw, 48px); letter-spacing: -0.03em; line-height: 1.
   .cta { flex-direction: column; }
   .cta .btn { width: 100%; white-space: nowrap; }
   h1 { font-size: 46px; }
-  .device { width: 100%; aspect-ratio: auto; min-height: 0; height: min(80vh, 760px); padding: 0; border-radius: 22px; background: none; box-shadow: none; border: 0.5px solid var(--separator); overflow: hidden; }
-  .device iframe { border-radius: 22px; }
+  .device { --h: min(640px, calc(100svh - 140px), calc((100vw - 40px) * 2760 / 1350)); }
   .demo figcaption { max-width: none; }
   .features, .shots { grid-template-columns: 1fr; }
   .shots { grid-auto-flow: column; grid-auto-columns: 72%; grid-template-columns: none; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; }
