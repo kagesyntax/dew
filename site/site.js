@@ -23,6 +23,8 @@
       if (href) row.href = href;
       else if (!["ios", "web"].includes(row.dataset.os)) row.href = v.url || row.href;
       if (row.dataset.os === os) row.classList.add("suggested");
+      const ver = row.querySelector("[data-ver]");
+      if (ver && href) ver.textContent = `${ver.dataset.ver} · ${v.version}`;
     });
     const mine = $(`[data-os="${os}"]`);
     $$("[data-primary]").forEach((b, i) => {
@@ -32,10 +34,13 @@
     });
     $$("[data-version]").forEach((e) => (e.textContent = `Version ${v.version}`));
     $$("[data-version-short]").forEach((e) => (e.textContent = `Dew ${v.version}`));
-    const d = new Date(v.published_at);
+    // published_at looks like "Wed 2026-10-14 8:11 PM WAT (UTC+01:00)", which Date() cannot parse,
+    // so read the calendar date out of it and show that.
+    const ymd = /(\d{4})-(\d{2})-(\d{2})/.exec(v.published_at || "");
+    const d = ymd ? new Date(+ymd[1], ymd[2] - 1, +ymd[3]) : new Date(v.published_at);
     const when = isNaN(d) ? "" : d.toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
     $("[data-release-line]").textContent = `Version ${v.version}${when ? `, released ${when}` : ""}. Updates arrive inside the app.`;
-    $("[data-date]").textContent = when ? `Released ${when}` : "";
+    if (when) $("[data-date]").textContent = `Released ${when}`;
     $("#highlights").innerHTML = (v.highlights || [v.notes]).filter(Boolean)
       .map((h) => `<li>${SPARK}<span>${h.replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" })[c])}</span></li>`).join("");
     if (repo) {
