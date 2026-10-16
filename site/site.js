@@ -3,6 +3,7 @@
 (() => {
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => document.querySelectorAll(s);
+  document.documentElement.classList.add("js");
   const SPARK = '<svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2z"/></svg>';
 
   // Which device is this? Android, iOS, Windows, Mac or Linux.
@@ -22,6 +23,8 @@
       if (href) row.href = href;
       else if (!["ios", "web"].includes(row.dataset.os)) row.href = v.url || row.href;
       if (row.dataset.os === os) row.classList.add("suggested");
+      const ver = row.querySelector("[data-ver]");
+      if (ver && href) ver.textContent = `${ver.dataset.ver} · ${v.version}`;
     });
     const mine = $(`[data-os="${os}"]`);
     $$("[data-primary]").forEach((b, i) => {
@@ -31,10 +34,13 @@
     });
     $$("[data-version]").forEach((e) => (e.textContent = `Version ${v.version}`));
     $$("[data-version-short]").forEach((e) => (e.textContent = `Dew ${v.version}`));
-    const d = new Date(v.published_at);
+    // published_at looks like "Wed 2026-10-14 8:11 PM WAT (UTC+01:00)", which Date() cannot parse,
+    // so read the calendar date out of it and show that.
+    const ymd = /(\d{4})-(\d{2})-(\d{2})/.exec(v.published_at || "");
+    const d = ymd ? new Date(+ymd[1], ymd[2] - 1, +ymd[3]) : new Date(v.published_at);
     const when = isNaN(d) ? "" : d.toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
     $("[data-release-line]").textContent = `Version ${v.version}${when ? `, released ${when}` : ""}. Updates arrive inside the app.`;
-    $("[data-date]").textContent = when ? `Released ${when}` : "";
+    if (when) $("[data-date]").textContent = `Released ${when}`;
     $("#highlights").innerHTML = (v.highlights || [v.notes]).filter(Boolean)
       .map((h) => `<li>${SPARK}<span>${h.replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" })[c])}</span></li>`).join("");
     if (repo) {
@@ -47,6 +53,15 @@
   fetch("version.json", { cache: "no-cache" }).then((r) => r.json()).then(render).catch(() => {
     $$("[data-primary]").forEach((b, i) => { if (i > 0) b.textContent = label; });
   });
+
+  // Gentle rise-in as sections scroll into view (skipped for prefers-reduced-motion in CSS).
+  const reveals = $$(".reveal");
+  if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const io = new IntersectionObserver((es) => es.forEach((e) => {
+      if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+    }), { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+    reveals.forEach((el) => io.observe(el));
+  } else reveals.forEach((el) => el.classList.add("in"));
 
   // "Start over": wipe only the demo's sandbox (the real web app keeps its own data) and reload.
   $("#restart").addEventListener("click", () => {
