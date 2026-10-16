@@ -53,4 +53,18 @@
     Object.keys(localStorage).filter((k) => k.startsWith("dew.demo.v1.")).forEach((k) => localStorage.removeItem(k));
     $("#demo").src = "app/";
   });
+
+  // Show the demo at a real iPhone width (402pt, iPhone 18 Pro) and scale it to the bezel's opening.
+  const vp = $(".device .viewport");
+  if (vp && "ResizeObserver" in window) {
+    const PHONE_W = 402;
+    new ResizeObserver(() => {
+      const w = vp.clientWidth;
+      if (!w) return;
+      const logical = Math.max(PHONE_W, w);
+      vp.style.setProperty("--w", logical + "px");
+      vp.style.setProperty("--s", String(w / logical));
+      vp.classList.add("scaled");
+    }).observe(vp);
+  }
 })();
