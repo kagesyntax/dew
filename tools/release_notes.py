@@ -38,7 +38,8 @@ def manifest(version, repo, minimum=None):
         "notes": notes[0] if notes else "Bug fixes and improvements.",
         "highlights": notes,
         "url": f"https://github.com/{repo}/releases/tag/{tag}",
-        "published_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "published_at": os.environ.get("PUBLISHED_AT")
+        or datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "downloads": {
             "macos": f"{base}/Dew-macos.dmg",
             "macos-intel": f"{base}/Dew-macos-intel.dmg",
