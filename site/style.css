@@ -91,6 +91,7 @@ h1 { font-size: clamp(44px, 6vw, 72px); line-height: 1.04; letter-spacing: -0.03
   --h: clamp(560px, calc(100vh - 120px), 820px);
   position: relative; height: var(--h); aspect-ratio: 1350 / 2760; margin-inline: auto;
   filter: drop-shadow(0 30px 40px rgb(0 0 0 / .22));
+  container-type: size;
 }
 .device .screen {
   position: absolute; left: 5.333%; top: 2.5%; width: 89.333%; height: 95%;
@@ -104,11 +105,11 @@ h1 { font-size: clamp(44px, 6vw, 72px); line-height: 1.04; letter-spacing: -0.03
 .statusbar {
   flex: none; height: 7.1%; display: flex; align-items: center; justify-content: space-between;
   padding: 2% 9% 0 11%; background: var(--app-bar); color: var(--label);
-  font-size: calc(var(--h) * 0.0205); font-weight: 600; letter-spacing: -0.01em;
+  font-size: 2.05cqh; font-weight: 600; letter-spacing: -0.01em;
 }
 .sb-icons { display: flex; gap: 6%; align-items: center; justify-content: flex-end; width: 30%; }
-.sb-icons svg { height: calc(var(--h) * 0.014); width: auto; fill: currentColor; }
-.sb-icons svg:last-child { height: calc(var(--h) * 0.0155); }
+.sb-icons svg { height: 1.4cqh; width: auto; fill: currentColor; }
+.sb-icons svg:last-child { height: 1.55cqh; }
 .demo figcaption {
   display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center;
   margin-top: 16px; font-size: 14px; color: var(--label-2); max-width: 390px; margin-inline: auto;
@@ -129,9 +130,12 @@ h2 { font-size: clamp(32px, 4vw, 48px); letter-spacing: -0.03em; line-height: 1.
 .features p { margin: 0; color: var(--label-2); font-size: 16px; }
 
 .shots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; }
-.shots figure { margin: 0; background: var(--surface); border-radius: 18px; padding: 22px 22px 16px; }
-.shots img { border-radius: 14px; border: 0.5px solid var(--separator); aspect-ratio: 390/844; object-fit: cover; object-position: top; width: 100%; }
-.shots figcaption { text-align: center; color: var(--label-2); font-size: 14px; margin-top: 12px; }
+.shots figure { margin: 0; background: var(--surface); border-radius: 22px; padding: 32px 22px 20px; }
+.device-sm { --h: auto; height: auto; width: min(100%, 280px); filter: drop-shadow(0 16px 22px rgb(0 0 0 / .18)); }
+.sb-light .statusbar { background: rgb(248 248 249); color: #000; }
+.sb-dark .statusbar { background: rgb(18 18 18); color: #fff; }
+.device-sm .screen img { flex: 1; min-height: 0; width: 100%; object-fit: cover; object-position: top; }
+.shots figcaption { text-align: center; color: var(--label-2); font-size: 14px; margin-top: 16px; }
 
 /* Grouped list, like Settings */
 .group { background: var(--surface); border-radius: 14px; overflow: hidden; margin: 0; padding: 0; max-width: 720px; }
@@ -142,7 +146,9 @@ h2 { font-size: clamp(32px, 4vw, 48px); letter-spacing: -0.03em; line-height: 1.
 .row .ico svg { width: 26px; height: 26px; }
 .row .txt { display: flex; flex-direction: column; flex: 1; }
 .row small { color: var(--label-2); font-size: 14px; }
-.row .chev { color: var(--accent); font-size: 15px; font-weight: 500; }
+.row .chev { color: var(--accent); font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+.row .chev::before { content: none; }
+.row::after { content: ""; width: 8px; height: 8px; flex: none; border: solid var(--label-3); border-width: 2px 2px 0 0; transform: rotate(45deg); margin-left: 2px; }
 .row.suggested { background: color-mix(in srgb, var(--accent) 9%, var(--surface)); }
 .row.suggested .chev::after { content: " · for this device"; color: var(--label-2); font-weight: 400; }
 
@@ -157,7 +163,7 @@ h2 { font-size: clamp(32px, 4vw, 48px); letter-spacing: -0.03em; line-height: 1.
 .footer-links { gap: 20px !important; }
 .footer-links a:hover { color: var(--label); }
 
-/* Phones: the app takes the screen width, no device frame */
+/* Phones: the same iPhone, scaled to fit the viewport */
 @media (max-width: 900px) {
   .links { display: none; }
   .nav-inner { justify-content: space-between; }
