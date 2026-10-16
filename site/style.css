@@ -99,7 +99,16 @@ h1 { font-size: clamp(44px, 6vw, 72px); line-height: 1.04; letter-spacing: -0.03
   background: var(--app-bg-grouped); display: flex; flex-direction: column;
   isolation: isolate; /* keeps the rounded clip on the iframe in Safari */
 }
-.device iframe { flex: 1; width: 100%; border: 0; display: block; background: var(--app-bg-grouped); }
+.device iframe { width: 100%; height: 100%; border: 0; display: block; background: var(--app-bg-grouped); }
+/* The app gets a real iPhone 18 Pro viewport (402pt wide, the bezel's 1206px opening at 3x) and is
+   scaled down to fit the opening, so it lays out exactly as on a phone instead of reflowing into a
+   cramped 280px column. site.js measures the opening and sets --w (logical width) and --s (scale);
+   without JS the iframe simply fills the opening at its own size. */
+.device .viewport { flex: 1; min-height: 0; position: relative; overflow: hidden; }
+.device .viewport.scaled iframe {
+  position: absolute; top: 0; left: 0;
+  width: var(--w); height: calc(100% / var(--s)); transform: scale(var(--s)); transform-origin: 0 0;
+}
 .device .bezel { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; }
 /* iOS status bar, so the Dynamic Island never sits on top of the app's own nav bar */
 .statusbar {
