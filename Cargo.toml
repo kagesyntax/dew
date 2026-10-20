@@ -27,7 +27,7 @@ thiserror = "2"
 # Android edge-to-edge system bars (src/platform/android_chrome.rs) talk to the activity through
 # JNI. Pinned to the version wry already pulls in, so the crate is shared rather than duplicated.
 [target.'cfg(target_os = "android")'.dependencies]
-jni = "0.21.1"
+jni = "0.22.4"
 
 [features]
 default = ["web"]
