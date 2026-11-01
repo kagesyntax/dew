@@ -138,7 +138,7 @@ jobs:
             test -n "$f" || { echo "::error::no ${{ matrix.pattern }} produced"; exit 1; }
           fi
           cp "$f" "Dew-${{ matrix.key }}.${{ matrix.ext }}"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: installer-${{ matrix.key }}
           path: Dew-${{ matrix.key }}.*
@@ -192,7 +192,7 @@ jobs:
         run: |
           tools/build-site.sh "${{ github.event.repository.name }}"
           (cd target/dx/dew/release/web/public && zip -qr "$GITHUB_WORKSPACE/Dew-web.zip" .)
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: installer-web
           path: Dew-web.zip

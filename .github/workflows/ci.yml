@@ -73,7 +73,7 @@ jobs:
         run: cargo binstall -y dioxus-cli@0.7.10
       - name: Build release bundle
         run: dx bundle --platform web --release
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: web-${{ github.sha }}
           path: target/dx/dew/release/web/public
