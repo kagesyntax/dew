@@ -196,7 +196,7 @@ jobs:
         with:
           name: installer-web
           path: Dew-web.zip
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: target/site
       - id: deploy
