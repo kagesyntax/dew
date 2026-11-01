@@ -42,7 +42,7 @@ jobs:
       version: ${{ steps.v.outputs.version }}
       ship: ${{ steps.v.outputs.ship }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - id: v
         env:
           GH_TOKEN: ${{ github.token }}
@@ -74,7 +74,7 @@ jobs:
           - { os: ubuntu-24.04, key: linux, pattern: "*.AppImage", ext: AppImage }
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
@@ -162,7 +162,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
@@ -207,7 +207,7 @@ jobs:
     if: always() && needs.prepare.outputs.ship == 'true' && needs.web.result == 'success'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/download-artifact@v4
         with:
           pattern: installer-*
