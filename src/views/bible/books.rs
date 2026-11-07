@@ -1,11 +1,11 @@
 //! Book and chapter chooser, used by the Bible tab and by the reader's passage picker sheet.
 //! A search field filters books and understands references like "jn 3:16" or "1 cor 13";
-//! tapping a book reveals its chapter grid in place, with the chapter you're on filled in.
+//! tapping a book reveals its chapter chips in place, with the chapter you're on filled in.
 
 use super::translation_picker::TranslationPill;
 use crate::routes::Route;
 use crate::state::use_app;
-use crate::ui::{tips, LargeTitle, Tip};
+use crate::ui::{tips, Floaters, LargeTitle, Tip};
 use church_core::scripture::{parse, parser::parse_book, Testament, BOOKS};
 use dioxus::prelude::*;
 use dioxus_icons::lucide::{ChevronDown, CircleX, Search};
@@ -20,15 +20,33 @@ pub fn BibleHome() -> Element {
         None
     };
     let nav = navigator();
+    let reading =
+        current.as_ref().and_then(|(b, c)| church_core::scripture::books::by_id(b).map(|m| (m.id, m.name, *c)));
     rsx! {
-        LargeTitle { title: "Bible", trailing: rsx! { TranslationPill {} } }
-        div { class: "mx-auto max-w-2xl px-4",
+        div { class: "hero-block",
+            Floaters {}
+            LargeTitle {
+                title: "Bible".to_string(),
+                subtitle: "Read".to_string(),
+                lead: Some("Four public-domain translations, offline.".to_string()),
+                trailing: rsx! { TranslationPill {} },
+            }
+        }
+        div { class: "wrap stack pb-10",
+            if let Some((id, name, chapter)) = reading {
+                Link { to: Route::reader(id, chapter), class: "tile ink link press block rv",
+                    div { class: "flex items-center justify-between",
+                        p { class: "eyebrow", "Continue reading" }
+                        span { class: "lnk", "Open" }
+                    }
+                    p { class: "mt-2 text-[22px] font-semibold tracking-tight", "{name} {chapter}" }
+                }
+            }
             Tip {
                 id: tips::BIBLE_GOTO,
                 title: "Go straight to a verse",
                 message: "Type a reference like jn 3:16 or 1 cor 13 and tap Go.",
-                icon: rsx! { Search { size: 22, stroke_width: "2" } },
-                class: "mb-4",
+                icon: rsx! { Search { size: 20, stroke_width: "1.9" } },
             }
             BookChooser { current, on_pick: move |r: Route| { nav.push(r); } }
         }
@@ -84,29 +102,38 @@ pub fn BookChooser(
 
     rsx! {
         form {
-            class: if sticky_search { "sticky top-0 z-10 mb-4 flex items-center gap-2 rounded-[10px] bg-surface-2 px-2.5 py-2 shadow-[0_-10px_0_10px_var(--app-surface)]" } else { "mb-4 flex items-center gap-2 rounded-[10px] bg-fill px-2.5 py-2" },
+            class: if sticky_search {
+                "searchbar sticky top-0 z-10 mb-4"
+            } else {
+                "searchbar mb-1"
+            },
             onsubmit: go,
-            Search { size: 18, class: "shrink-0 text-label-2" }
+            Search { size: 17, stroke_width: "2.2" }
             input {
-                class: "min-w-0 flex-1 bg-transparent text-[17px] outline-none placeholder:text-label-2",
                 r#type: "search",
                 enterkeyhint: "go",
                 autofocus,
                 placeholder: "Book or reference, like John 3:16",
                 value: "{query}",
+                "aria-label": "Search books or type a reference",
                 oninput: move |e| query.set(e.value()),
             }
             if !q.is_empty() {
-                button { r#type: "button", class: "press text-label-3", aria_label: "Clear", onclick: move |_| query.set(String::new()),
-                    CircleX { size: 18, stroke_width: "2.2" }
+                button {
+                    r#type: "button",
+                    class: "press absolute top-1/2 right-3 -translate-y-1/2 text-label-3",
+                    aria_label: "Clear",
+                    onclick: move |_| query.set(String::new()),
+                    CircleX { size: 17, stroke_width: "2.2" }
                 }
             }
         }
         if let Some(r) = jump {
             button {
-                class: "press mb-4 w-full rounded-card bg-accent px-4 py-3 text-left text-[17px] font-semibold text-white",
+                class: "tile tint press mb-3 flex w-full items-center justify-between text-left",
                 onclick: move |_| on_pick.call(Route::reader_focus(r.first())),
-                "Go to {r.label()}"
+                span { class: "text-[16px] font-semibold", "Go to {r.label()}" }
+                span { class: "lnk", "Open" }
             }
         }
         if filtered.is_empty() {
@@ -114,10 +141,10 @@ pub fn BookChooser(
         }
         for testament in [Testament::Old, Testament::New] {
             if filtered.iter().any(|b| b.testament == testament) {
-                h2 { class: "mt-2 mb-1.5 px-4 text-[13px] uppercase tracking-wide text-label-2",
+                h2 { class: "eyebrow mt-5 mb-2 px-1",
                     if testament == Testament::Old { "Old Testament" } else { "New Testament" }
                 }
-                div { class: "mb-6 overflow-hidden rounded-card bg-surface [&>*:not(:last-child)]:border-b [&>*:not(:last-child)]:border-separator",
+                div { class: "tile flush rows",
                     for book in filtered.iter().copied().filter(|b| b.testament == testament) {
                         {
                             let open = expanded() == Some(book.id) || only == Some(book.id);
@@ -125,25 +152,26 @@ pub fn BookChooser(
                             rsx! {
                                 div { key: "{book.id}", id: "book-{book.id}",
                                     button {
-                                        class: "press flex w-full items-center justify-between px-4 py-3 text-left",
+                                        class: "row press",
                                         "aria-expanded": if open { "true" } else { "false" },
                                         onclick: move |_| {
                                             let next = if *expanded.peek() == Some(book.id) { None } else { Some(book.id) };
                                             expanded.set(next);
                                         },
-                                        span { class: if is_cur { "text-[17px] font-semibold text-accent" } else { "text-[17px]" }, "{book.name}" }
+                                        span { class: if is_cur { "flex-1 truncate text-[16px] font-semibold text-accent" } else { "flex-1 truncate text-[16px]" }, "{book.name}" }
+                                        span { class: "micro text-label-3", "{book.chapters}" }
                                         ChevronDown {
-                                            size: 18,
-                                            stroke_width: "2.5",
+                                            size: 16,
+                                            stroke_width: "2.2",
                                             class: if open { "rotate-180 text-label-3 transition-transform" } else { "text-label-3 transition-transform" },
                                         }
                                     }
                                     if open {
-                                        div { class: "fade-in grid grid-cols-6 gap-2 px-4 pb-4 sm:grid-cols-8",
+                                        div { class: "fade-in grid grid-cols-6 gap-2 px-[18px] pb-4 sm:grid-cols-8",
                                             for ch in 1..=book.chapters {
                                                 button {
                                                     key: "{ch}",
-                                                    class: if is_cur && ch == cur_ch { "press flex aspect-square items-center justify-center rounded-lg bg-accent text-[16px] font-semibold text-white" } else { "press flex aspect-square items-center justify-center rounded-lg bg-fill text-[16px] font-medium" },
+                                                    class: if is_cur && ch == cur_ch { "chip on mini justify-center" } else { "chip mini justify-center" },
                                                     "aria-current": if is_cur && ch == cur_ch { "true" } else { "false" },
                                                     onclick: move |_| on_pick.call(Route::reader(book.id, ch)),
                                                     "{ch}"
@@ -158,5 +186,6 @@ pub fn BookChooser(
                 }
             }
         }
+        div { class: "h-2" }
     }
 }

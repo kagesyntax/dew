@@ -29,8 +29,8 @@ pub fn TourPage(index: usize) -> Element {
                 1 => rsx! { ReturnArt {} },
                 _ => rsx! { HighlightArt {} },
             }
-            h2 { class: "mt-10 text-center text-[28px] font-bold leading-tight tracking-tight", "{title}" }
-            p { class: "mx-auto mt-2.5 max-w-[22rem] text-center text-[17px] leading-snug text-label-2", "{body}" }
+            h2 { class: "h2 mt-10 text-center", "{title}" }
+            p { class: "lead mx-auto mt-2 max-w-[34ch] text-center", "{body}" }
         }
     }
 }
@@ -38,15 +38,18 @@ pub fn TourPage(index: usize) -> Element {
 #[component]
 pub fn PageDots(count: usize, current: usize) -> Element {
     rsx! {
-        div { class: "flex justify-center gap-2", role: "tablist",
+        div { class: "flex justify-center gap-1.5", role: "tablist",
             for i in 0..count {
-                span { key: "{i}", class: if i == current { "h-2 w-2 rounded-full bg-label" } else { "h-2 w-2 rounded-full bg-label-3/50" } }
+                span {
+                    key: "{i}",
+                    class: if i == current { "h-1.5 w-5 rounded-full bg-label" } else { "h-1.5 w-1.5 rounded-full bg-[var(--app-separator)]" },
+                }
             }
         }
     }
 }
 
-/// Settings → Feature Tour.
+/// Settings → Feature tour.
 #[component]
 pub fn TourReplay() -> Element {
     let mut page = use_signal(|| 0usize);
@@ -54,14 +57,18 @@ pub fn TourReplay() -> Element {
     let p = page();
     rsx! {
         div { class: "flex min-h-screen flex-col bg-bg",
-            div { class: "safe-top mx-auto flex w-full max-w-md justify-end px-5 pt-4",
-                button { class: "press text-[17px] text-accent", onclick: move |_| { nav.push(Route::SettingsView {}); }, "Done" }
+            div { class: "safe-top mx-auto flex w-full max-w-[780px] justify-end px-5 pt-3",
+                button {
+                    class: "press text-[16px] font-medium text-label-2",
+                    onclick: move |_| { nav.push(Route::SettingsView {}); },
+                    "Done"
+                }
             }
-            div { class: "mx-auto flex w-full max-w-md flex-1 flex-col px-6", TourPage { index: p } }
-            div { class: "safe-bottom mx-auto w-full max-w-md space-y-5 px-6 pt-3 pb-4",
+            div { class: "mx-auto flex w-full max-w-[780px] flex-1 flex-col px-6", TourPage { index: p } }
+            div { class: "safe-bottom mx-auto w-full max-w-[780px] space-y-5 px-6 pt-3 pb-5",
                 PageDots { count: TOUR_PAGES, current: p }
                 button {
-                    class: "press h-[52px] w-full rounded-[14px] bg-accent text-[17px] font-semibold text-white",
+                    class: "btn btn-primary btn-block",
                     onclick: move |_| if p + 1 < TOUR_PAGES { page.set(p + 1) } else { nav.push(Route::SettingsView {}); },
                     if p + 1 < TOUR_PAGES { "Continue" } else { "Done" }
                 }

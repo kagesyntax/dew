@@ -7,7 +7,7 @@ use dioxus_icons::lucide::{BookOpen, Copy, CornerUpLeft, Share};
 #[component]
 fn Frame(children: Element) -> Element {
     rsx! {
-        div { class: "relative mx-auto h-[300px] w-full max-w-[320px] overflow-hidden rounded-[28px] bg-surface shadow-[0_8px_30px_rgba(0,0,0,0.08)] ring-1 ring-separator",
+        div { class: "frame relative mx-auto h-[300px] w-full max-w-[320px]",
             {children}
         }
     }
@@ -22,11 +22,11 @@ pub fn LinksArt() -> Element {
                 p { class: "text-[11px] font-semibold uppercase tracking-wide text-label-2", "Discussion · a" }
                 p { class: "mt-2 text-[15px] leading-relaxed",
                     "Read "
-                    span { class: "rounded bg-accent/12 px-0.5 font-semibold text-accent", "Heb 11:1-3,6" }
+                    span { class: "rounded bg-[var(--app-accent-soft)] px-0.5 font-semibold text-accent", "Heb 11:1-3,6" }
                     ". Describe some ways people exercise faith."
                 }
             }
-            div { class: "absolute inset-x-0 bottom-0 rounded-t-[22px] bg-surface-2 px-5 pt-2.5 pb-5 shadow-[0_-6px_24px_rgba(0,0,0,0.10)]",
+            div { class: "absolute inset-x-0 bottom-0 rounded-t-[24px] border-t border-separator bg-surface px-5 pt-2.5 pb-5",
                 div { class: "mx-auto mb-3 h-1 w-9 rounded-full bg-label-3/50" }
                 p { class: "text-[17px] font-bold", "Hebrews 11:1–3, 6" }
                 p { class: "mt-1.5 font-serif text-[14px] leading-relaxed text-label-2",

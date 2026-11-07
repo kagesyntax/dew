@@ -1,5 +1,6 @@
-//! Today tab: greeting, Verse of the Day, this week's lesson, today's Daily Dew Drop and
-//! "continue reading".
+//! Today tab: greeting, Verse of the Day, this week's lesson, today's Daily Dew Drop,
+//! "continue reading" and a quiet progress strip. Laid out in the district site's language:
+//! an eyebrow, a display greeting, and a stack of tiles.
 
 use crate::bible::votd::verse_of_the_day;
 use crate::bible::{passage_verses, translation};
@@ -9,10 +10,10 @@ use crate::platform::{clock, js};
 use crate::routes::Route;
 use crate::services::updater::{self, UpdateStatus};
 use crate::state::use_app;
-use crate::ui::{tips, Card, LargeTitle, PassageText, ScriptureText, Tip};
+use crate::ui::{tips, Floaters, LargeTitle, PassageText, ScriptureText, Tip};
 use church_core::scripture::{books, parse};
 use dioxus::prelude::*;
-use dioxus_icons::lucide::{BookOpen, CalendarDays, ChevronRight, Droplets, Share, Sparkles};
+use dioxus_icons::lucide::{BookOpen, CalendarDays, ChevronRight, Share, Sparkles};
 
 #[component]
 pub fn Today() -> Element {
@@ -26,6 +27,9 @@ pub fn Today() -> Element {
     let dew = devotional.as_ref().and_then(|l| l.dew_drop_for(weekday).cloned().map(|d| (l.id.clone(), d)));
     let last_read = app.progress.read().last_read.clone();
     let initial = CHURCH_NAME.chars().next().unwrap_or('C');
+    let done = app.progress.read().completed_lessons.len();
+    let highlights = app.progress.read().highlights.len();
+    let bookmarks = app.progress.read().bookmarks.len();
 
     // Background update check (Settings → Updates → Check Automatically).
     let update = use_resource(move || async move {
@@ -37,22 +41,31 @@ pub fn Today() -> Element {
     });
 
     rsx! {
-        LargeTitle {
-            title: clock::greeting().to_string(),
-            subtitle: clock::header_date(),
-            trailing: rsx! {
-                Link { to: Route::SettingsView {}, class: "press flex h-9 w-9 items-center justify-center rounded-full bg-fill text-[15px] font-semibold text-label-2", "{initial}" }
-            },
+        div { class: "hero-block",
+            Floaters {}
+            LargeTitle {
+                title: clock::greeting().to_string(),
+                subtitle: clock::header_date(),
+                lead: Some("Fresh Word every morning, from AGC Oshodi.".to_string()),
+                trailing: rsx! {
+                    Link {
+                        to: Route::SettingsView {},
+                        class: "press flex h-10 w-10 items-center justify-center rounded-full border border-separator bg-surface text-[14px] font-semibold text-label-2",
+                        aria_label: "Settings",
+                        "{initial}"
+                    }
+                },
+            }
         }
 
-        div { class: "mx-auto max-w-2xl space-y-4 px-4",
+        div { class: "wrap stack pb-10 pt-3",
             if let Some(UpdateStatus::Available(m)) = update.read().clone() {
                 button {
-                    class: "press fade-in flex w-full items-center gap-3 rounded-card bg-accent/10 p-3.5 text-left",
+                    class: "tile tint press flex w-full items-center gap-3 text-left",
                     onclick: move |_| updater::apply(&m),
-                    Sparkles { size: 20, class: "text-accent" }
+                    Sparkles { size: 19, class: "shrink-0 text-accent" }
                     span { class: "flex-1 text-[15px]", "Version {m.version} is available." }
-                    span { class: "text-[15px] font-semibold text-accent", "Update" }
+                    span { class: "text-[14px] font-semibold text-accent", "Update" }
                 }
             }
 
@@ -62,54 +75,75 @@ pub fn Today() -> Element {
                 id: tips::TODAY,
                 title: "Your week at a glance",
                 message: "This Sunday's lesson and today's Daily Dew Drop always live here.",
-                icon: rsx! { CalendarDays { size: 22, stroke_width: "2" } },
+                icon: rsx! { CalendarDays { size: 20, stroke_width: "1.9" } },
             }
 
             if let Some(l) = lesson {
-                Link { to: Route::LessonView { id: l.id.clone() }, class: "press block",
-                    Card { class: "p-5",
-                        p { class: "text-[13px] font-semibold uppercase tracking-wide text-accent", "This Sunday · {clock::short_date(&l.date)}" }
-                        p { class: "mt-1 text-[22px] font-bold leading-tight", "{l.title}" }
-                        p { class: "mt-0.5 text-[15px] text-label-2", "{l.kicker()}" }
-                        div { class: "my-4 h-px bg-separator" }
-                        p { class: "font-serif text-[17px] leading-snug", "{l.memory_verse.text}" }
-                        p { class: "mt-1.5 text-[14px] text-label-2", "{l.memory_verse.reference}" }
-                        div { class: "mt-4 flex items-center gap-0.5 text-[15px] font-medium text-accent",
-                            "Open Lesson"
-                            ChevronRight { size: 17, stroke_width: "2.4" }
-                        }
+                Link { to: Route::LessonView { id: l.id.clone() }, class: "tile ink link press block rv",
+                    div { class: "flex items-start justify-between gap-3",
+                        p { class: "eyebrow", "This Sunday" }
+                        span { class: "micro tabular-nums opacity-60", "{clock::short_date(&l.date)}" }
+                    }
+                    h2 { class: "h2 mt-2", "{l.title}" }
+                    p { class: "caption mt-1 opacity-70", "{l.kicker()}" }
+                    blockquote { class: "serif mt-5 text-[18px] leading-[1.5]", "“{l.memory_verse.text}”" }
+                    p { class: "micro mt-2 opacity-60", "{l.memory_verse.reference}" }
+                    div { class: "mt-5 flex items-center justify-between",
+                        span { class: "lnk", "Open lesson" }
+                        ChevronRight { size: 18, stroke_width: "2.4", class: "opacity-60" }
                     }
                 }
             }
 
             if let Some((lesson_id, d)) = dew {
-                Card {
-                    div { class: "flex items-center gap-2 text-[13px] font-semibold uppercase tracking-wide text-teal-600 dark:text-teal-400",
-                        Droplets { size: 16, stroke_width: "2.4" }
-                        "Daily Dew Drop · {d.day}"
+                div { class: "tile rv",
+                    div { class: "flex items-center justify-between gap-3",
+                        p { class: "eyebrow", "Daily Dew Drop" }
+                        span { class: "badge", "{d.day}" }
                     }
-                    p { class: "mt-1.5 text-[20px] font-bold", "{d.title}" }
-                    ScriptureText { text: d.reference.clone(), class: "text-[17px]" }
-                    Link { to: Route::LessonView { id: lesson_id }, class: "mt-2 inline-block text-[15px] text-label-2", "From this week's lesson ›" }
+                    h3 { class: "h3 mt-2", "{d.title}" }
+                    ScriptureText { text: d.reference.clone(), class: "mt-1 text-[15px]" }
+                    Link {
+                        to: Route::LessonView { id: lesson_id },
+                        class: "lnk mt-3 inline-flex",
+                        "From this week's lesson"
+                    }
                 }
             }
 
             if let Some(pos) = last_read {
                 if let Some(book) = books::by_id(&pos.book) {
-                    Link { to: Route::reader(&pos.book, pos.chapter), class: "press block",
-                        Card { class: "flex items-center gap-3",
-                            div { class: "flex h-11 w-11 items-center justify-center rounded-xl bg-accent/10 text-accent",
-                                BookOpen { size: 22, stroke_width: "2.2" }
+                    Link { to: Route::reader(&pos.book, pos.chapter), class: "tile link press block rv",
+                        div { class: "flex items-center gap-3",
+                            div { class: "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-separator text-label-2",
+                                BookOpen { size: 19, stroke_width: "1.9" }
                             }
-                            div { class: "flex-1",
-                                p { class: "text-[13px] text-label-2", "Continue reading" }
-                                p { class: "text-[17px] font-semibold", "{book.name} {pos.chapter}" }
+                            div { class: "min-w-0 flex-1",
+                                p { class: "eyebrow", "Continue reading" }
+                                p { class: "mt-1 truncate text-[17px] font-semibold tracking-tight", "{book.name} {pos.chapter}" }
                             }
-                            ChevronRight { size: 20, class: "text-label-3", stroke_width: "2.5" }
+                            ChevronRight { size: 18, class: "shrink-0 text-label-3", stroke_width: "2.2" }
                         }
                     }
                 }
             }
+
+            div { class: "stats rv",
+                div { class: "st",
+                    div { class: "num", span { "data-count": "{done}", "{done}" } }
+                    p { class: "lbl", "Lessons finished" }
+                }
+                div { class: "st",
+                    div { class: "num", span { "data-count": "{highlights}", "{highlights}" } }
+                    p { class: "lbl", "Verses highlighted" }
+                }
+                div { class: "st",
+                    div { class: "num", span { "data-count": "{bookmarks}", "{bookmarks}" } }
+                    p { class: "lbl", "Bookmarks kept" }
+                }
+            }
+
+            p { class: "micro text-center text-label-3", "{manual.title}" }
         }
     }
 }
@@ -122,15 +156,20 @@ fn VerseOfTheDay() -> Element {
     let label = reference.label();
     let first = reference.first().clone();
     let share_ref = reference.clone();
+    let abbr = translation(&tr).abbreviation.to_string();
 
     rsx! {
-        Card { class: "p-5",
-            p { class: "text-[13px] font-semibold uppercase tracking-wide text-label-2", "Verse of the Day" }
+        div { class: "tile rv",
+            div { class: "flex items-center justify-between",
+                p { class: "eyebrow", "Verse of the Day" }
+                span { class: "badge", "{abbr}" }
+            }
             div { class: "mt-3", PassageText { key: "{label}-{tr}", reference: reference.clone() } }
-            div { class: "mt-3 flex items-center justify-between",
-                Link { to: Route::reader_focus(&first), class: "text-[15px] font-semibold text-accent", "{label} · {translation(&tr).abbreviation}" }
+            hr { class: "hr my-4" }
+            div { class: "flex items-center justify-between gap-3",
+                Link { to: Route::reader_focus(&first), class: "lnk", "{label}" }
                 button {
-                    class: "press rounded-full p-2 text-accent",
+                    class: "press flex h-9 w-9 items-center justify-center rounded-full border border-separator text-label-2",
                     aria_label: "Share verse",
                     onclick: move |_| {
                         let r = share_ref.clone();
@@ -142,7 +181,7 @@ fn VerseOfTheDay() -> Element {
                             }
                         });
                     },
-                    Share { size: 20, stroke_width: "2.2" }
+                    Share { size: 17, stroke_width: "2" }
                 }
             }
         }

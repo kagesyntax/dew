@@ -77,7 +77,7 @@ pub fn ScriptureText(
                         rsx! {
                             button {
                                 key: "{i}",
-                                class: if is_open { "press inline whitespace-nowrap rounded-[6px] bg-accent/12 px-1 font-semibold text-accent" } else { "press inline whitespace-nowrap rounded-[6px] px-0.5 font-semibold text-accent decoration-accent/40 underline-offset-[3px] hover:underline" },
+                                class: if is_open { "press inline whitespace-nowrap rounded-[6px] bg-[var(--app-accent-soft)] px-1 font-semibold text-accent" } else { "press inline whitespace-nowrap rounded-[6px] px-0.5 font-semibold text-accent decoration-accent/40 underline-offset-[3px] hover:underline" },
                                 "aria-expanded": if mode == LinkMode::Inline { if is_open { "true" } else { "false" } } else { "" },
                                 onclick: move |_| {
                                     js::haptic();
@@ -126,7 +126,7 @@ fn InlinePassage(reference: Reference, on_close: EventHandler<()>) -> Element {
     let label = reference.label();
     let abbr = translation(&app.settings.read().translation).abbreviation;
     rsx! {
-        div { class: "inline-passage fade-in mt-2.5 mb-3 rounded-2xl bg-fill px-4 pt-3 pb-1 text-left font-normal not-italic text-label",
+        div { class: "tile soft snug fade-in mt-3 mb-1 text-left font-normal not-italic text-label",
             div { class: "mb-1 flex items-baseline justify-between gap-3",
                 p { class: "text-[15px] font-semibold", "{label}" }
                 span { class: "text-[12px] font-bold tracking-wide text-label-2", "{abbr}" }
@@ -223,11 +223,11 @@ fn PassageSheet(target: Signal<Option<Reference>>, origin: Signal<Option<LessonC
             if let Some(r) = current {
                 div { class: "flex items-start justify-between gap-3 px-5 pt-1",
                     div {
-                        SheetTitle { class: "text-[22px] font-bold tracking-tight", "{r.label()}" }
-                        p { class: "text-[13px] font-medium text-label-2", "{translation(&tr).name}" }
+                        SheetTitle { class: "text-[24px] font-bold tracking-tight", "{r.label()}" }
+                        p { class: "caption font-medium text-label-2", "{translation(&tr).name}" }
                     }
                     button {
-                        class: "press rounded-full bg-fill p-1.5 text-label-2",
+                        class: "press rounded-full bg-surface-2 p-2 text-label-2",
                         aria_label: "Close",
                         onclick: move |_| target.set(None),
                         X { size: 18, stroke_width: "2.6" }
@@ -236,7 +236,7 @@ fn PassageSheet(target: Signal<Option<Reference>>, origin: Signal<Option<LessonC
                 div { class: "px-5", PassageText { key: "{r.label()}-{tr}", reference: r.clone() } }
                 div { class: "grid grid-cols-[1fr_auto] gap-2 px-5 pt-1",
                     button {
-                        class: "press flex h-12 items-center justify-center gap-2 rounded-xl bg-accent text-[17px] font-semibold text-white",
+                        class: "btn btn-primary flex h-12 gap-2",
                         onclick: {
                             let r = r.clone();
                             move |_| {
@@ -248,7 +248,7 @@ fn PassageSheet(target: Signal<Option<Reference>>, origin: Signal<Option<LessonC
                         "Open in Bible"
                     }
                     button {
-                        class: "press flex h-12 w-12 items-center justify-center rounded-xl bg-fill text-accent",
+                        class: "press flex h-12 w-12 items-center justify-center rounded-full border border-separator text-label-2",
                         aria_label: "Copy {abbr}",
                         onclick: {
                             let r = r.clone();

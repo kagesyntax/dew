@@ -98,12 +98,12 @@ pub fn ReaderBar(
 
     let here = Some((book.clone(), chapter));
     let arrow =
-        "press flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-accent disabled:text-label-3";
-    let seg = "press flex h-full min-w-0 items-center justify-center gap-1 px-3.5";
+        "press flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-label-2 disabled:text-label-3";
+    let seg = "press flex h-full min-w-0 items-center justify-center gap-1 px-4";
 
     rsx! {
         div { class: "reader-bar bar-blur fixed inset-x-0 z-30",
-            div { class: "mx-auto flex h-[50px] max-w-2xl items-center gap-2 px-2",
+            div { class: "mx-auto flex h-[54px] max-w-[780px] items-center gap-2 px-2",
                 button {
                     class: arrow,
                     aria_label: "Previous chapter",
@@ -111,8 +111,8 @@ pub fn ReaderBar(
                     onclick: move |_| { if let Some(r) = prev.clone() { js::haptic(); nav.push(r); } },
                     ChevronLeft { size: 26, stroke_width: "2.4" }
                 }
-                div { class: "flex h-9 min-w-0 flex-1 items-stretch justify-center",
-                    div { class: "flex min-w-0 max-w-full items-stretch overflow-hidden rounded-full bg-fill",
+                div { class: "flex h-10 min-w-0 flex-1 items-stretch justify-center",
+                    div { class: "flex min-w-0 max-w-full items-stretch overflow-hidden rounded-full border border-separator bg-surface",
                         button {
                             class: "{seg} text-[15px] font-semibold",
                             aria_label: "Go to book and chapter",
@@ -185,13 +185,13 @@ fn SheetHeader(title: String, subtitle: Option<String>, onclose: EventHandler<()
     rsx! {
         div { class: "flex items-start justify-between px-5 pt-1 pb-3",
             div {
-                SheetTitle { class: "text-[22px] font-bold tracking-tight", "{title}" }
+                SheetTitle { class: "text-[24px] font-bold tracking-tight", "{title}" }
                 if let Some(s) = subtitle {
                     p { class: "text-[15px] text-label-2", "{s}" }
                 }
             }
             button {
-                class: "press mt-0.5 rounded-full bg-fill p-1.5 text-label-2",
+                class: "press mt-0.5 rounded-full bg-surface-2 p-2 text-label-2",
                 aria_label: "Close",
                 onclick: move |_| onclose.call(()),
                 X { size: 18, stroke_width: "2.6" }
@@ -246,7 +246,7 @@ fn VerseList(
                 onclose: move |_| onclose.call(()),
             }
             form {
-                class: "mx-4 flex items-center gap-2 rounded-[10px] bg-surface-2 px-2.5 py-2",
+                class: "searchbar mx-4",
                 onsubmit: move |e| { e.prevent_default(); if let Some(n) = first { on_pick.call(n); } },
                 Search { size: 18, class: "shrink-0 text-label-2" }
                 input {
@@ -264,18 +264,18 @@ fn VerseList(
             if matches.is_empty() {
                 p { class: "py-10 text-center text-[15px] text-label-2", "No verse in this chapter says “{query}”." }
             }
-            div { class: "overflow-hidden rounded-card bg-surface-2",
+            div { class: "tile flush rows",
                 for (n, v) in matches {
                     Fragment { key: "{n}",
                         if let (true, Some((letter, name, _))) = (q.is_empty(), stanza(v)) {
-                            div { class: "flex items-baseline gap-2 bg-surface px-4 pt-4 pb-1.5 text-[13px] font-semibold uppercase tracking-wide text-label-2",
+                            div { class: "flex items-baseline gap-2 bg-surface px-[18px] pt-4 pb-1.5 text-[11px] font-semibold tracking-[0.06em] uppercase text-label-3",
                                 span { class: "text-[17px] font-normal normal-case text-label", "{letter}" }
                                 "{name}"
                             }
                         }
                         button {
                             id: "vl-{n}",
-                            class: if n == current { "verse-row press flex w-full items-baseline gap-3 bg-fill px-4 py-3 text-left" } else { "verse-row press flex w-full items-baseline gap-3 px-4 py-3 text-left" },
+                            class: if n == current { "press flex w-full items-baseline gap-3 bg-[var(--app-accent-soft)] px-[18px] py-3 text-left" } else { "verse-row press flex w-full items-baseline gap-3 px-[18px] py-3 text-left" },
                             onclick: move |_| on_pick.call(n),
                             span { class: if n == current { "w-8 shrink-0 text-right text-[15px] font-bold tabular-nums text-accent" } else { "w-8 shrink-0 text-right text-[15px] font-semibold tabular-nums text-label-2" }, "{n}" }
                             span { class: "line-clamp-2 min-w-0 font-serif text-[16px] leading-snug", "{stanza(v).map(|(_, _, rest)| rest).unwrap_or(v)}" }

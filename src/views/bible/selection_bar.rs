@@ -78,10 +78,10 @@ pub fn SelectionBar(book: String, chapter: u16, selected: Signal<BTreeSet<u16>>)
         div {
             class: "fade-in fixed inset-x-0 z-40 mx-auto max-w-md px-3",
             style: "bottom: calc(max(var(--safe-bottom), 8px) + 60px);",
-            div { class: "bar-blur rounded-2xl border border-separator p-3 shadow-xl shadow-black/15",
+            div { class: "rounded-[24px] border border-separator bg-surface p-3", style: "box-shadow: var(--app-shadow);",
                 div { class: "mb-2 flex items-center justify-between",
                     span { class: "text-[15px] font-semibold", "{title}" }
-                    button { class: "press rounded-full bg-fill p-1 text-label-2", aria_label: "Clear selection", onclick: move |_| selected.write().clear(), X { size: 16, stroke_width: "2.6" } }
+                    button { class: "press flex h-7 w-7 items-center justify-center rounded-full bg-surface-2 text-label-2", aria_label: "Clear selection", onclick: move |_| selected.write().clear(), X { size: 15, stroke_width: "2.4" } }
                 }
                 div { class: "flex items-center gap-2",
                     for h in Highlight::ALL {
@@ -93,14 +93,14 @@ pub fn SelectionBar(book: String, chapter: u16, selected: Signal<BTreeSet<u16>>)
                             onclick: { let f = set_hl.clone(); move |_| { let mut f = f.clone(); f(Some(h)) } },
                         }
                     }
-                    button { class: "press flex h-8 w-8 items-center justify-center rounded-full bg-fill text-label-2", aria_label: "Remove highlight", onclick: { let f = erase.clone(); move |_| { let mut f = f.clone(); f(None) } }, Eraser { size: 16 } }
+                    button { class: "press flex h-8 w-8 items-center justify-center rounded-full bg-surface-2 text-label-2", aria_label: "Remove highlight", onclick: { let f = erase.clone(); move |_| { let mut f = f.clone(); f(None) } }, Eraser { size: 15 } }
                     div { class: "flex-1" }
                     button { class: "press p-1.5 text-accent", aria_label: "Bookmark",
                         onclick: move |_| app.progress.write().toggle_bookmark(&first_key),
-                        Bookmark { size: 21, stroke_width: "2.2", fill: if is_bookmarked { "currentColor" } else { "none" } }
+                        Bookmark { size: 20, stroke_width: "2", fill: if is_bookmarked { "currentColor" } else { "none" } }
                     }
-                    button { class: "press p-1.5 text-accent", aria_label: "Copy", onclick: { let c = copy.clone(); move |_| { let c = c.clone(); c(false) } }, Copy { size: 21, stroke_width: "2.2" } }
-                    button { class: "press p-1.5 text-accent", aria_label: "Share", onclick: { let s = share.clone(); move |_| { let s = s.clone(); s(true) } }, Share { size: 21, stroke_width: "2.2" } }
+                    button { class: "press p-1.5 text-accent", aria_label: "Copy", onclick: { let c = copy.clone(); move |_| { let c = c.clone(); c(false) } }, Copy { size: 20, stroke_width: "2" } }
+                    button { class: "press p-1.5 text-accent", aria_label: "Share", onclick: { let s = share.clone(); move |_| { let s = s.clone(); s(true) } }, Share { size: 20, stroke_width: "2" } }
                 }
             }
         }

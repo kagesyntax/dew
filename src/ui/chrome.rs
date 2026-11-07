@@ -1,30 +1,42 @@
-//! Navigation chrome: large titles, back bars, cards, the "Back to lesson" pill.
+//! Navigation chrome in the district design language: display titles, the sticky local bar,
+//! tiles, and the "Back to lesson" pill.
 
 use crate::state::{navigation, use_app};
 use dioxus::prelude::*;
 use dioxus_icons::lucide::{ChevronLeft, CornerUpLeft};
 
-/// iOS large title header (34pt bold) with optional subtitle and trailing accessory.
+/// Page header: a small uppercase eyebrow over a bold, tight display title.
+/// Mirrors `.route-head` on the district site (`HeaderIntro` in agn-lagos).
 #[component]
-pub fn LargeTitle(title: String, subtitle: Option<String>, trailing: Option<Element>) -> Element {
+pub fn LargeTitle(
+    title: String,
+    subtitle: Option<String>,
+    trailing: Option<Element>,
+    /// Optional one-line lead under the title.
+    lead: Option<String>,
+) -> Element {
     rsx! {
-        header { class: "safe-top px-5 pt-12 pb-3",
-            div { class: "flex items-end justify-between gap-3",
+        header { class: "wrap pt-10 pb-2",
+            div { class: "flex items-start justify-between gap-4",
                 div { class: "min-w-0",
                     if let Some(sub) = subtitle {
-                        p { class: "text-[13px] font-semibold uppercase tracking-wide text-label-2", "{sub}" }
+                        p { class: "eyebrow rv", "{sub}" }
                     }
-                    h1 { class: "truncate text-[34px] font-bold leading-tight tracking-tight", "{title}" }
+                    h1 { class: "display grad rv d1", "{title}" }
                 }
                 if let Some(t) = trailing {
-                    div { class: "pb-1.5", {t} }
+                    div { class: "shrink-0 pt-1", {t} }
                 }
+            }
+            if let Some(l) = lead {
+                p { class: "lead mt-2 max-w-[34ch] rv d2", "{l}" }
             }
         }
     }
 }
 
-/// Compact sticky bar for pushed screens: back chevron, centered title, trailing slot.
+/// Compact sticky bar for pushed screens: a back control, a centred title, a trailing slot.
+/// The district site's `.lnav`, with the title centred like an app bar.
 #[component]
 pub fn BackBar(
     back_label: String,
@@ -33,27 +45,20 @@ pub fn BackBar(
     trailing: Option<Element>,
 ) -> Element {
     rsx! {
-        div { class: "bar-blur safe-top sticky top-0 z-30 border-b border-separator",
-            div { class: "relative mx-auto flex h-11 max-w-2xl items-center justify-between px-2",
+        div { class: "lnav safe-top",
+            div { class: "wrap in relative",
                 button {
-                    class: "press flex items-center text-[17px] text-accent",
+                    class: "press flex shrink-0 items-center gap-0.5 text-[16px] font-medium text-accent",
                     onclick: move |_| onback.call(()),
-                    ChevronLeft { size: 28, stroke_width: "2.2" }
-                    span { class: "-ml-1", "{back_label}" }
+                    ChevronLeft { size: 22, stroke_width: "2.4" }
+                    span { class: "-ml-0.5", "{back_label}" }
                 }
                 if let Some(t) = title {
-                    span { class: "pointer-events-none absolute inset-x-28 truncate text-center text-[17px] font-semibold", "{t}" }
+                    span { class: "pointer-events-none absolute inset-x-24 truncate text-center text-[15px] font-semibold tracking-tight", "{t}" }
                 }
-                div { class: "flex items-center gap-1 pr-2", {trailing} }
+                div { class: "flex shrink-0 items-center gap-1", {trailing} }
             }
         }
-    }
-}
-
-#[component]
-pub fn Card(children: Element, #[props(default)] class: String) -> Element {
-    rsx! {
-        div { class: "rounded-card bg-surface p-4 shadow-[0_1px_2px_rgb(0_0_0/0.04)] {class}", {children} }
     }
 }
 
@@ -61,7 +66,7 @@ pub fn Card(children: Element, #[props(default)] class: String) -> Element {
 pub fn Spinner() -> Element {
     rsx! {
         div { class: "flex justify-center py-16",
-            div { class: "h-7 w-7 animate-spin rounded-full border-[3px] border-fill border-t-label-2" }
+            div { class: "h-6 w-6 animate-spin rounded-full border-2 border-separator border-t-label-2" }
         }
     }
 }
@@ -75,10 +80,10 @@ pub fn ReturnPill() -> Element {
     rsx! {
         if let Some(p) = point {
             button {
-                class: "return-pill press fade-in fixed left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-full bg-accent px-4 py-2.5 text-[15px] font-semibold text-white shadow-lg shadow-black/20",
-                style: "bottom: calc(max(var(--safe-bottom), 8px) + 76px);",
+                class: "return-pill press fade-in fixed left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-full bg-[var(--app-accent-solid)] px-5 py-3 text-[15px] font-medium text-white",
+                style: "bottom: calc(max(var(--safe-bottom), 8px) + 76px); box-shadow: 0 12px 30px -12px rgb(0 0 0 / .45);",
                 onclick: move |_| navigation::go_back(app),
-                CornerUpLeft { size: 18, stroke_width: "2.4" }
+                CornerUpLeft { size: 17, stroke_width: "2.4" }
                 "Back to {p.label}"
             }
         }

@@ -1,4 +1,4 @@
-//! Apple-style "What's New" sheet, shown once after the app updates to a new version.
+//! "What's New" sheet, shown once after the app updates to a new version.
 
 use crate::config::{APP_NAME, APP_VERSION, CHANGELOG};
 use crate::state::use_app;
@@ -20,26 +20,28 @@ pub fn WhatsNew() -> Element {
         return rsx! {};
     }
     rsx! {
-        div { class: "fade-in fixed inset-0 z-[60] flex items-end justify-center bg-black/30 sm:items-center",
-            div { class: "sheet-up safe-bottom flex max-h-[92vh] w-full max-w-md flex-col rounded-t-[22px] bg-bg sm:rounded-[22px]",
-                div { class: "overflow-y-auto px-7 pt-10",
-                    h2 { class: "text-[34px] font-bold leading-[1.1] tracking-tight",
-                        "What's New in"
+        div { class: "fade-in fixed inset-0 z-[60] flex items-end justify-center bg-black/40 sm:items-center",
+            div { class: "sheet-up safe-bottom flex max-h-[92vh] w-full max-w-md flex-col rounded-t-[28px] border border-separator bg-surface sm:rounded-[28px]",
+                div { class: "mx-auto mt-2.5 h-1 w-9 rounded-full bg-[var(--app-separator)] sm:hidden" }
+                div { class: "overflow-y-auto px-7 pt-8",
+                    p { class: "eyebrow", "Just updated" }
+                    h2 { class: "display mt-2",
+                        "What's new in"
                         br {}
                         span { class: "text-accent", "{APP_NAME} {APP_VERSION}" }
                     }
-                    ul { class: "mt-8 space-y-5 pb-4",
+                    ul { class: "mt-7 mb-2",
                         for (i, n) in notes.iter().enumerate() {
-                            li { key: "{i}", class: "flex gap-4",
-                                span { class: "mt-0.5 shrink-0 text-accent", Sparkles { size: 22, stroke_width: "2" } }
+                            li { key: "{i}", class: "flex gap-3 border-t border-separator py-4",
+                                span { class: "mt-0.5 shrink-0 text-label-2", Sparkles { size: 18, stroke_width: "1.9" } }
                                 span { class: "text-[16px] leading-snug", "{n}" }
                             }
                         }
                     }
                 }
-                div { class: "px-7 pt-3 pb-5",
+                div { class: "px-7 pt-4 pb-5",
                     button {
-                        class: "press h-[52px] w-full rounded-[14px] bg-accent text-[17px] font-semibold text-white",
+                        class: "btn btn-primary btn-block",
                         onclick: move |_| app.settings.write().last_seen_version = APP_VERSION.to_string(),
                         "Continue"
                     }
