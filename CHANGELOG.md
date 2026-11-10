@@ -5,6 +5,12 @@ All notable changes to this app. The release workflow copies the section for eac
 Format: [Keep a Changelog](https://keepachangelog.com), versions follow [SemVer](https://semver.org).
 
 ## [Unreleased]
+### Added
+- A rebuilt website: the app itself runs live on the landing page, so you can try the Bible, the lesson and the reader before you download anything, and every screen is shown in light and dark
+- Download links now offer the build for the device you are actually on, with a separate Intel Mac download
+### Fixed
+- The Bible reader no longer leaves a screen of empty space under the last verse of a short chapter
+- The Settings switch sits centred in its track instead of two pixels low
 
 ## [0.2.1] - 2026-10-14
 ### Fixed
