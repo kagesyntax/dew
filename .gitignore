@@ -14,3 +14,6 @@ node_modules
 # Android signing keys never go in git
 *.jks
 *.keystore
+
+# Local design review screenshots and audit output
+review/
