@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 401 860" width="401" height="860" role="img" aria-label="">
+  <defs>
+    <!-- Body: graphite, lit from the top left, so it reads as a solid object rather than an outline. -->
+    <linearGradient id="body" x1="0.08" y1="0" x2="0.92" y2="1">
+      <stop offset="0"    stop-color="#2b2b30"/>
+      <stop offset="0.35" stop-color="#1b1b1e"/>
+      <stop offset="0.72" stop-color="#131316"/>
+      <stop offset="1"    stop-color="#0b0b0d"/>
+    </linearGradient>
+    <!-- The rim: a bright chamfer down the left, a shadowed seam, a return of light on the right. -->
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#7a7a82"/>
+      <stop offset="0.06" stop-color="#c9c9d1"/>
+      <stop offset="0.18" stop-color="#585860"/>
+      <stop offset="0.42" stop-color="#232328"/>
+      <stop offset="0.62" stop-color="#3e3e45"/>
+      <stop offset="0.84" stop-color="#a8a8b1"/>
+      <stop offset="1"    stop-color="#5e5e66"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="#5c5c65"/>
+      <stop offset="0.30" stop-color="#c8c8d1"/>
+      <stop offset="0.70" stop-color="#3d3d45"/>
+      <stop offset="1"    stop-color="#17171b"/>
+    </linearGradient>
+    <filter id="btnShadow" x="-60%" y="-10%" width="220%" height="120%">
+      <feDropShadow dx="-1" dy="0.6" stdDeviation="1.1" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+    <linearGradient id="screenEdge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="#000000" stop-opacity="0.85"/>
+      <stop offset="0.35" stop-color="#000000" stop-opacity="0.35"/>
+      <stop offset="1"    stop-color="#000000" stop-opacity="0.55"/>
+    </linearGradient>
+
+    <!-- Bezel = body minus the glass. Inner radius = outer radius - bezel, so the
+         band is the same thickness at the sides and through the corners. -->
+    <mask id="bezel">
+      <rect x="0" y="0" width="393" height="852" rx="60" fill="#fff"/>
+      <rect x="10.5" y="10.5" width="372" height="831" rx="49.5" fill="#000"/>
+    </mask>
+  </defs>
+
+  <!-- Side buttons, proud of the body by 3.6, lit from the outer edge. -->
+  <g filter="url(#btnShadow)">
+    <g fill="url(#metal)" stroke="#000000" stroke-opacity="0.45" stroke-width="0.5">
+      <rect x="-3.6" y="146" width="4" height="34" rx="2"/>
+      <rect x="-3.6" y="201" width="4" height="62" rx="2"/>
+      <rect x="-3.6" y="275" width="4" height="62" rx="2"/>
+      <rect x="392.6" y="242" width="4" height="100" rx="2"/>
+    </g>
+  </g>
+
+  <!-- Body: one solid slab with the glass cut out of it. -->
+  <rect x="0" y="0" width="393" height="852" rx="60" fill="url(#body)" mask="url(#bezel)"/>
+
+  <!-- Rim: the outer millimetre of metal, plus a hairline where it meets the glass. -->
+  <rect x="0.6" y="0.6" width="391.8" height="850.8" rx="59.4" fill="none"
+        stroke="url(#rim)" stroke-width="1.2" mask="url(#bezel)"/>
+  <rect x="0" y="0" width="393" height="852" rx="60" fill="none"
+        stroke="#ffffff" stroke-opacity="0.18" stroke-width="0.5"/>
+
+  <!-- Glass edge: a dark inner line so the app never looks pasted on. -->
+  <rect x="10.5" y="10.5" width="372" height="831" rx="49.5" fill="none"
+        stroke="url(#screenEdge)" stroke-width="1.25"/>
+  <rect x="11.75" y="11.75" width="369.5" height="828.5" rx="48.25" fill="none"
+        stroke="#ffffff" stroke-opacity="0.10" stroke-width="0.75"/>
+
+  <!-- Dynamic Island -->
+  <rect x="137.5" y="20" width="118" height="34" rx="17" fill="#000000"/>
+  <circle cx="232" cy="37" r="3.4" fill="#0a1220"/>
+  <circle cx="232" cy="37" r="1.5" fill="#2c4a7d" fill-opacity="0.85"/>
+</svg>
