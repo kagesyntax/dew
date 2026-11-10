@@ -5,6 +5,8 @@ All notable changes to this app. The release workflow copies the section for eac
 Format: [Keep a Changelog](https://keepachangelog.com), versions follow [SemVer](https://semver.org).
 
 ## [Unreleased]
+
+## [0.2.2] - 2026-11-10
 ### Added
 - A rebuilt website: the app itself runs live on the landing page, so you can try the Bible, the lesson and the reader before you download anything, and every screen is shown in light and dark
 - Download links now offer the build for the device you are actually on, with a separate Intel Mac download
