@@ -111,7 +111,7 @@ pub fn Reader(book: String, chapter: u16, focus: String) -> Element {
             trailing: rsx! { TranslationPill {} },
         }
 
-        article { class: "wrap tight pb-36", id: "article",
+        article { class: "wrap tight pb-20", id: "article",
             header { class: "pt-10 pb-6 text-center",
                 p { class: "eyebrow", "{meta.name}" }
                 p { class: "num mt-1", "{chapter}" }

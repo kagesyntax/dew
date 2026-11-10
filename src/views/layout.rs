@@ -38,7 +38,7 @@ pub fn TabLayout() -> Element {
     rsx! {
         PreviewHost {
             crate::views::bible::TranslationHost {
-                main { class: "min-h-screen pb-32", Outlet::<Route> {} }
+                main { class: "min-h-screen pb-12", Outlet::<Route> {} }
                 ReturnPill {}
                 TabBar {}
                 crate::views::WhatsNew {}
