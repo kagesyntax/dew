@@ -1,0 +1,17 @@
+{
+  "version": "0.2.1",
+  "notes": "The Android app no longer closes the instant it opens. Dew read the device's API level with the wrong kind of JNI field lookup, which raised a Java error that was never cleared. Android's runtime treats a leftover error as fatal and killed the process on launch. Dew now reads the field correctly and clears any pending error on every code path, so a missing Android API degrades gracefully instead of crashing.",
+  "highlights": [
+    "The Android app no longer closes the instant it opens. Dew read the device's API level with the wrong kind of JNI field lookup, which raised a Java error that was never cleared. Android's runtime treats a leftover error as fatal and killed the process on launch. Dew now reads the field correctly and clears any pending error on every code path, so a missing Android API degrades gracefully instead of crashing.",
+    "The Mac app now opens. The download shipped a bundle whose code signature was incomplete, so macOS reported Dew as \"damaged\" rather than as an app from an unknown developer. Every Mac build is now signed, checked, and only then packed into the disk image, so the file you download is verified before it is published."
+  ],
+  "url": "https://github.com/kagesyntax/dew/releases/tag/v0.2.1",
+  "published_at": "2026-10-14T19:19:32Z",
+  "downloads": {
+    "macos": "https://github.com/kagesyntax/dew/releases/download/v0.2.1/Dew-macos.dmg",
+    "macos-intel": "https://github.com/kagesyntax/dew/releases/download/v0.2.1/Dew-macos-intel.dmg",
+    "windows": "https://github.com/kagesyntax/dew/releases/download/v0.2.1/Dew-windows.exe",
+    "linux": "https://github.com/kagesyntax/dew/releases/download/v0.2.1/Dew-linux.AppImage",
+    "android": "https://github.com/kagesyntax/dew/releases/download/v0.2.1/Dew-android.apk"
+  }
+}

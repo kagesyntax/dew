@@ -14,7 +14,9 @@ OUT="$TARGET/site"
 # 1. The app, built for /<base>/app/
 cp Dioxus.toml /tmp/Dioxus.toml.bak
 trap 'cp /tmp/Dioxus.toml.bak Dioxus.toml' EXIT
-sed -i "s|^\[web.app\]|[web.app]\nbase_path = \"$APP_BASE\"|" Dioxus.toml
+# Portable in-place edit: macOS sed has no -i without a suffix.
+awk -v base="$APP_BASE" '/^\[web.app\]/{print; print "base_path = \"" base "\""; next} {print}' \
+  Dioxus.toml > /tmp/Dioxus.toml.site && mv /tmp/Dioxus.toml.site Dioxus.toml
 dx bundle --platform web --release
 APP="$TARGET/dx/dew/release/web/public"
 
@@ -23,9 +25,10 @@ rm -rf "$OUT" && mkdir -p "$OUT/screens"
 cp -r site/. "$OUT/"
 cp -r "$APP" "$OUT/app"
 cp public/version.json "$OUT/version.json"
-cp -r public/icons "$OUT/icons"
-cp public/favicon.ico "$OUT/favicon.ico"
-for s in 13-lesson 15-verse-preview-sheet 17-reader-dark; do cp "docs/screenshots/$s.png" "$OUT/screens/"; done
+# site/ is self-contained (icons, favicon, screens, version.json) so it also reads
+# correctly when index.html is opened straight off disk; the release script only
+# needs to refresh version.json from the build.
+cp public/version.json "$OUT/version.json"
 # GitHub Pages serves 404.html for unknown paths: hand deep links (/app/bible/JHN/3) to the app.
 cp "$OUT/app/index.html" "$OUT/404.html"
 touch "$OUT/.nojekyll"
