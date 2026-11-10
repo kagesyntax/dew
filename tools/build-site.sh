@@ -24,10 +24,9 @@ APP="$TARGET/dx/dew/release/web/public"
 rm -rf "$OUT" && mkdir -p "$OUT/screens"
 cp -r site/. "$OUT/"
 cp -r "$APP" "$OUT/app"
-cp public/version.json "$OUT/version.json"
 # site/ is self-contained (icons, favicon, screens, version.json) so it also reads
 # correctly when index.html is opened straight off disk; the release script only
-# needs to refresh version.json from the build.
+# needs to refresh version.json from the build above.
 cp public/version.json "$OUT/version.json"
 # GitHub Pages serves 404.html for unknown paths: hand deep links (/app/bible/JHN/3) to the app.
 cp "$OUT/app/index.html" "$OUT/404.html"
