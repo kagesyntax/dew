@@ -1,23 +1,17 @@
 {
-  "version": "0.1.0",
-  "notes": "Bible reader with King James, World English, Berean Standard and American Standard versions, fully offline",
+  "version": "0.2.1",
+  "notes": "The Android app no longer closes the instant it opens. Dew read the device's API level with the wrong kind of JNI field lookup, which raised a Java error that was never cleared. Android's runtime treats a leftover error as fatal and killed the process on launch. Dew now reads the field correctly and clears any pending error on every code path, so a missing Android API degrades gracefully instead of crashing.",
   "highlights": [
-    "Bible reader with King James, World English, Berean Standard and American Standard versions, fully offline",
-    "Sunday School manual with memory verse, discussion questions, leader notes and Daily Dew Drops",
-    "Tap any reference in a lesson to preview it, expand it inline, or jump to the Bible and back",
-    "Highlights in four colours, bookmarks, copy and share",
-    "Welcome tour and in-context tips",
-    "Light and dark appearance, text size, and verse-number options",
-    "Software Update in Settings, delivered from GitHub releases",
-    "Apps for Android, Windows, Mac and Linux, plus the web",
-    "The Dew website, where you can try the app before downloading it"
+    "The Android app no longer closes the instant it opens. Dew read the device's API level with the wrong kind of JNI field lookup, which raised a Java error that was never cleared. Android's runtime treats a leftover error as fatal and killed the process on launch. Dew now reads the field correctly and clears any pending error on every code path, so a missing Android API degrades gracefully instead of crashing.",
+    "The Mac app now opens. The download shipped a bundle whose code signature was incomplete, so macOS reported Dew as \"damaged\" rather than as an app from an unknown developer. Every Mac build is now signed, checked, and only then packed into the disk image, so the file you download is verified before it is published."
   ],
-  "url": "https://github.com/agc-oshodi/dew/releases/tag/v0.1.0",
-  "published_at": "2026-10-13T21:42:22Z",
+  "url": "https://github.com/kagesyntax/dew/releases/tag/v0.2.1",
+  "published_at": "2026-10-14T19:19:32Z",
   "downloads": {
-    "macos": "https://github.com/agc-oshodi/dew/releases/download/v0.1.0/Dew-macos.dmg",
-    "windows": "https://github.com/agc-oshodi/dew/releases/download/v0.1.0/Dew-windows.exe",
-    "linux": "https://github.com/agc-oshodi/dew/releases/download/v0.1.0/Dew-linux.AppImage",
-    "android": "https://github.com/agc-oshodi/dew/releases/download/v0.1.0/Dew-android.apk"
+    "macos": "https://github.com/kagesyntax/dew/releases/download/v0.2.1/Dew-macos.dmg",
+    "macos-intel": "https://github.com/kagesyntax/dew/releases/download/v0.2.1/Dew-macos-intel.dmg",
+    "windows": "https://github.com/kagesyntax/dew/releases/download/v0.2.1/Dew-windows.exe",
+    "linux": "https://github.com/kagesyntax/dew/releases/download/v0.2.1/Dew-linux.AppImage",
+    "android": "https://github.com/kagesyntax/dew/releases/download/v0.2.1/Dew-android.apk"
   }
 }
