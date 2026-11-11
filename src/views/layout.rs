@@ -29,12 +29,16 @@ pub fn TabLayout() -> Element {
         if app.pending_scroll.peek().is_none() {
             crate::platform::js::scroll_top();
         }
+        // Re-bind the scroll/pointer engine to the freshly rendered page.
+        document::eval(
+            "(() => { let n = 24; const go = () => { if (window.AGN) window.AGN.remount(); else if (n-- > 0) setTimeout(go, 50); }; go(); })();",
+        );
     }));
 
     rsx! {
         PreviewHost {
             crate::views::bible::TranslationHost {
-                main { class: "min-h-screen pb-32", Outlet::<Route> {} }
+                main { class: "min-h-screen pb-12", Outlet::<Route> {} }
                 ReturnPill {}
                 TabBar {}
                 crate::views::WhatsNew {}

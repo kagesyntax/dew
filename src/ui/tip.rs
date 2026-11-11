@@ -1,4 +1,4 @@
-//! In-context tips modelled on Apple's TipKit: a small card with a symbol, a bold title and
+//! In-context tips modelled on Apple's TipKit: a small tile with a symbol, a bold title and
 //! one sentence, shown once where the feature lives and dismissed with ×. This is the
 //! "product tour" after onboarding: it teaches features at the moment they are useful
 //! instead of front-loading them.
@@ -22,17 +22,17 @@ pub fn Tip(id: String, title: String, message: String, icon: Element, #[props(de
         return rsx! {};
     }
     rsx! {
-        div { class: "tip-in flex gap-3 rounded-card bg-surface p-4 shadow-sm {class}", role: "note",
-            div { class: "mt-0.5 shrink-0 text-accent", {icon} }
+        div { class: "tip-in tile soft flex gap-3 {class}", role: "note",
+            div { class: "mt-0.5 shrink-0 text-label-2", {icon} }
             div { class: "min-w-0 flex-1",
-                p { class: "text-[15px] font-semibold", "{title}" }
-                p { class: "mt-0.5 text-[15px] leading-snug text-label-2", "{message}" }
+                p { class: "text-[15px] font-semibold tracking-tight", "{title}" }
+                p { class: "caption mt-1 leading-snug text-label-2", "{message}" }
             }
             button {
-                class: "press -mt-1 -mr-1 h-7 w-7 shrink-0 rounded-full text-label-3",
+                class: "press -mt-1 -mr-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-label-3",
                 aria_label: "Dismiss tip",
                 onclick: move |_| app.progress.write().mark_seen(&id),
-                X { size: 17, stroke_width: "2.4" }
+                X { size: 16, stroke_width: "2.2" }
             }
         }
     }

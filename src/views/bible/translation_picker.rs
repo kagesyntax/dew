@@ -35,7 +35,7 @@ pub fn TranslationPill() -> Element {
     let abbr = crate::bible::translation(&app.settings.read().translation).abbreviation;
     rsx! {
         button {
-            class: "press rounded-full bg-fill px-3 py-1 text-[13px] font-bold tracking-wide",
+            class: "press badge px-2.5",
             aria_label: "Translation {abbr}",
             onclick: move |_| picker.open(),
             "{abbr}"
@@ -50,33 +50,33 @@ pub fn TranslationSheet(open: Signal<bool>) -> Element {
     rsx! {
         Sheet { open: open(), on_open_change: move |v| open.set(v), "data-side": "bottom",
             div { class: "px-5 pt-1",
-                SheetTitle { class: "text-[22px] font-bold", "Translation" }
+                SheetTitle { class: "text-[24px] font-bold tracking-tight", "Translation" }
             }
-            div { class: "mx-4 overflow-hidden rounded-card bg-surface-2 [&>*:not(:last-child)]:border-b [&>*:not(:last-child)]:border-separator",
+            div { class: "tile flush rows mx-4",
                 for t in TRANSLATIONS.iter() {
                     button {
                         key: "{t.id}",
-                        class: "press flex w-full items-center gap-3 px-4 py-3 text-left",
+                        class: "row press",
                         onclick: move |_| {
                             app.settings.write().translation = t.id.to_string();
                             open.set(false);
                         },
-                        span { class: "w-12 text-[15px] font-bold", "{t.abbreviation}" }
+                        span { class: "w-12 text-[13px] font-semibold tracking-[0.04em]", "{t.abbreviation}" }
                         span { class: "flex-1 text-[16px]", "{t.name}" }
                         if selected == t.id {
-                            Check { size: 20, class: "text-accent", stroke_width: "3" }
+                            Check { size: 18, class: "text-accent", stroke_width: "2.6" }
                         }
                     }
                 }
                 button {
-                    class: "press flex w-full items-center gap-3 px-4 py-3 text-left",
+                    class: "row press",
                     onclick: move |_| js::open_url(LSB_READER_URL),
-                    span { class: "w-12 text-[15px] font-bold text-label-2", "LSB" }
+                    span { class: "w-12 text-[13px] font-semibold tracking-[0.04em] text-label-3", "LSB" }
                     span { class: "flex-1 text-[16px] text-label-2", "Legacy Standard Bible" }
-                    ExternalLink { size: 18, class: "text-label-3" }
+                    ExternalLink { size: 17, class: "text-label-3" }
                 }
             }
-            p { class: "px-6 text-[13px] leading-snug text-label-2",
+            p { class: "caption px-6 leading-snug text-label-2",
                 "KJV, WEB, BSB and ASV are public domain and work offline. The LSB is copyrighted (© The Lockman Foundation) and opens on LSBible.org."
             }
         }

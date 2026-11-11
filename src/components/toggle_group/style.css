@@ -1,29 +1,35 @@
-/* iOS segmented control, restyled from the dioxus-components registry copy. */
+/* Segmented control restyled as the district site's filter chips:
+ * outlined pills on the page, the chosen one filled with ink. */
 .dx-toggle-group {
   display: flex;
   width: 100%;
-  padding: 2px;
-  border-radius: 9px;
-  background: var(--app-fill);
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+  background: transparent;
   box-sizing: border-box;
 }
 .dx-toggle-item {
-  flex: 1;
-  padding: 6px 10px;
-  border: none;
-  border-radius: 7px;
-  background: transparent;
+  flex: 1 1 0;
+  min-width: max-content;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--app-separator);
+  border-radius: 980px;
+  background: var(--app-surface);
   color: var(--app-label);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
+  letter-spacing: -0.01em;
   outline: none;
   cursor: pointer;
-  transition: background-color 200ms ease, box-shadow 200ms ease;
+  white-space: nowrap;
+  transition: background-color 200ms cubic-bezier(.28,.11,.32,1), color 200ms, border-color 200ms;
 }
 .dx-toggle-item[data-state="on"] {
-  background: var(--app-surface);
-  box-shadow: 0 3px 8px rgb(0 0 0 / 12%), 0 3px 1px rgb(0 0 0 / 4%);
+  background: var(--app-ink);
+  border-color: var(--app-ink);
+  color: var(--app-bg);
   font-weight: 600;
 }
-html[data-theme="dark"] .dx-toggle-item[data-state="on"] { background: #636366; }
-.dx-toggle-item:focus-visible { outline: 2px solid var(--app-accent); outline-offset: 1px; }
+.dx-toggle-item:focus-visible { outline: 2px solid var(--app-accent); outline-offset: 3px; }

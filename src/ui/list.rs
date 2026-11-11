@@ -1,4 +1,4 @@
-//! Inset grouped table views (Settings-style lists).
+//! Inset lists in the district design language: an eyebrow, one tile, hairline rows.
 
 use dioxus::prelude::*;
 use dioxus_icons::lucide::ChevronRight;
@@ -6,30 +6,26 @@ use dioxus_icons::lucide::ChevronRight;
 #[component]
 pub fn GroupedList(header: Option<String>, footer: Option<String>, children: Element) -> Element {
     rsx! {
-        section { class: "mx-auto mb-7 max-w-2xl px-4",
+        section { class: "mx-auto mb-8 max-w-[780px] px-4",
             if let Some(h) = header {
-                h2 { class: "mb-1.5 px-4 text-[13px] uppercase tracking-wide text-label-2", "{h}" }
+                h2 { class: "eyebrow mb-2 px-2", "{h}" }
             }
-            div { class: "overflow-hidden rounded-card bg-surface [&>*:not(:last-child)]:border-b [&>*:not(:last-child)]:border-separator",
-                {children}
-            }
+            div { class: "tile flush rows", {children} }
             if let Some(f) = footer {
-                p { class: "mt-1.5 px-4 text-[13px] leading-snug text-label-2", "{f}" }
+                p { class: "caption mt-2 px-2 leading-snug text-label-2", "{f}" }
             }
         }
     }
 }
 
-/// One row: optional coloured icon tile, title, subtitle, detail text, trailing accessory.
+/// One row: title, optional subtitle, right-aligned detail, trailing control, chevron.
+/// `icon` is rendered as a quiet monochrome glyph, not a colour tile.
 #[component]
 pub fn ListRow(
     title: String,
     subtitle: Option<String>,
     detail: Option<String>,
     icon: Option<Element>,
-    /// Background colour of the icon tile (iOS Settings style).
-    #[props(default = "#0a7aff".to_string())]
-    tint: String,
     trailing: Option<Element>,
     #[props(default)] chevron: bool,
     onclick: Option<EventHandler<MouseEvent>>,
@@ -37,23 +33,23 @@ pub fn ListRow(
     let clickable = onclick.is_some();
     rsx! {
         div {
-            class: if clickable { "press flex min-h-11 cursor-pointer items-center gap-3 py-2.5 pr-4 pl-4 active:bg-fill" } else { "flex min-h-11 items-center gap-3 py-2.5 pr-4 pl-4" },
+            class: if clickable { "row press cursor-pointer" } else { "row" },
             onclick: move |e| if let Some(h) = &onclick { h.call(e) },
             if let Some(i) = icon {
-                div { class: "flex h-[29px] w-[29px] shrink-0 items-center justify-center rounded-[7px] text-white", style: "background: {tint}", {i} }
+                div { class: "shrink-0 text-label-2", {i} }
             }
-            div { class: "flex-1",
-                p { class: "text-[17px] whitespace-nowrap", "{title}" }
+            div { class: "min-w-0 flex-1",
+                p { class: "truncate text-[16px]", "{title}" }
                 if let Some(s) = subtitle {
-                    p { class: "text-[13px] leading-snug text-label-2", "{s}" }
+                    p { class: "caption leading-snug text-label-2", "{s}" }
                 }
             }
             if let Some(d) = detail {
-                span { class: "min-w-0 shrink truncate text-right text-[17px] text-label-2", "{d}" }
+                span { class: "min-w-0 shrink truncate text-right text-[15px] text-label-2", "{d}" }
             }
             {trailing}
             if chevron {
-                ChevronRight { size: 18, class: "shrink-0 text-label-3", stroke_width: "2.5" }
+                ChevronRight { size: 17, class: "shrink-0 text-label-3", stroke_width: "2.2" }
             }
         }
     }

@@ -1,4 +1,4 @@
-//! Settings → Acknowledgements: where every text in the app comes from and under what terms.
+//! Settings → Credits: where every text in the app comes from and under what terms.
 
 use crate::platform::js;
 use crate::ui::{BackBar, GroupedList, ListRow};
@@ -27,18 +27,37 @@ const SOFTWARE: &[(&str, &str, &str)] = &[
 pub fn Acknowledgements() -> Element {
     rsx! {
         BackBar { back_label: "Settings", title: "Credits", onback: move |_| { navigator().push(crate::routes::Route::SettingsView {}); } }
+        div { class: "wrap pt-8",
+            h1 { class: "display grad", "Credits" }
+            p { class: "lead mt-2 max-w-[32ch]", "Every text in Dew, and the open-source work it stands on." }
+        }
         div { class: "pt-6",
-            GroupedList { header: "Bible Translations",
+            GroupedList { header: "Bible translations",
                 for (name, terms, url) in ITEMS.iter().copied() {
-                    ListRow { key: "{name}", title: name, subtitle: terms.to_string(), chevron: true, onclick: move |_| js::open_url(url) }
+                    ListRow {
+                        key: "{name}",
+                        title: name.to_string(),
+                        subtitle: Some(terms.to_string()),
+                        chevron: true,
+                        onclick: move |_| js::open_url(url),
+                    }
                 }
             }
-            GroupedList { header: "Sunday School Manual",
-                ListRow { title: "Radiant Life Teen Manual", subtitle: "© its publisher. Used for the church's own classes".to_string() }
+            GroupedList { header: "Sunday School manual",
+                ListRow {
+                    title: "Radiant Life Teen Manual".to_string(),
+                    subtitle: Some("© its publisher. Used for the church's own classes".to_string()),
+                }
             }
-            GroupedList { header: "Open Source",
+            GroupedList { header: "Open source",
                 for (name, terms, url) in SOFTWARE.iter().copied() {
-                    ListRow { key: "{name}", title: name, detail: terms.to_string(), chevron: true, onclick: move |_| js::open_url(url) }
+                    ListRow {
+                        key: "{name}",
+                        title: name.to_string(),
+                        detail: Some(terms.to_string()),
+                        chevron: true,
+                        onclick: move |_| js::open_url(url),
+                    }
                 }
             }
         }

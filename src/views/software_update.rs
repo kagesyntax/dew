@@ -34,13 +34,13 @@ pub fn SoftwareUpdate() -> Element {
 
     rsx! {
         BackBar { back_label: "Settings", title: "Software Update", onback: move |_| { navigator().push(crate::routes::Route::SettingsView {}); } }
-        div { class: "mx-auto max-w-2xl px-4 pt-4",
+        div { class: "wrap pt-4",
             match status.clone() {
                 UpdateStatus::Available(m) => {
                     let notes = if m.highlights.is_empty() { release_notes(CHANGELOG, &m.version) } else { m.highlights.clone() };
                     let required = m.is_required_for(APP_VERSION);
                     rsx! {
-                        div { class: "rounded-card bg-surface p-5",
+                        div { class: "tile",
                             div { class: "flex items-center gap-4",
                                 img { src: APP_ICON, class: "h-14 w-14 rounded-[13px]", alt: "" }
                                 div {
@@ -65,7 +65,7 @@ pub fn SoftwareUpdate() -> Element {
                                 }
                             }
                             button {
-                                class: "press mt-5 h-[50px] w-full rounded-[12px] bg-accent text-[17px] font-semibold text-white",
+                                class: "btn btn-primary btn-block mt-5",
                                 onclick: move |_| {
                                     app.update.set(UpdateStatus::Installing);
                                     updater::apply(&m);
@@ -112,18 +112,18 @@ pub fn SoftwareUpdate() -> Element {
                 GroupedList {
                     footer: "Updates are published by the church's GitHub releases. The web app installs them in place; phone and desktop builds download the new installer.".to_string(),
                     ListRow {
-                        title: "Automatic Updates", tint: "#34c759",
-                        subtitle: "Check every time the app opens".to_string(),
-                        icon: rsx! { ArrowDownToLine { size: 17, stroke_width: "2.2" } },
+                        title: "Automatic updates".to_string(),
+                        subtitle: Some("Check every time the app opens".to_string()),
+                        icon: rsx! { ArrowDownToLine { size: 18, stroke_width: "1.9" } },
                         trailing: rsx! { Switch { checked: auto, on_checked_change: move |v| app.settings.write().auto_update_check = v } },
                     }
                 }
                 GroupedList {
-                    ListRow { title: "Version", detail: APP_VERSION.to_string() }
-                    ListRow { title: "Build", detail: build }
-                    ListRow { title: "Channel", detail: RELEASE_CHANNEL.to_string() }
+                    ListRow { title: "Version".to_string(), detail: Some(APP_VERSION.to_string()) }
+                    ListRow { title: "Build".to_string(), detail: Some(build) }
+                    ListRow { title: "Channel".to_string(), detail: Some(RELEASE_CHANNEL.to_string()) }
                     if !matches!(status, UpdateStatus::Checking | UpdateStatus::Installing) {
-                        ListRow { title: "Check for Update", onclick: move |_| check() }
+                        ListRow { title: "Check for update".to_string(), chevron: true, onclick: move |_| check() }
                     }
                 }
             }

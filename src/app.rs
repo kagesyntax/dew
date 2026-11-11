@@ -10,7 +10,9 @@ use dioxus::prelude::*;
 const FAVICON: Asset = asset!("/public/icons/icon.svg");
 const TAILWIND_CSS: Asset = asset!("/assets/tailwind.css");
 const APP_CSS: Asset = asset!("/assets/app.css");
+const AGN_CSS: Asset = asset!("/assets/agn.css");
 const COMPONENTS_THEME: Asset = asset!("/assets/dx-components-theme.css");
+const MOTION_JS: Asset = asset!("/assets/motion.js");
 
 #[component]
 pub fn App() -> Element {
@@ -31,12 +33,14 @@ pub fn App() -> Element {
         document::Meta { name: "description", content: "Dew: the Bible and the teens' Sunday School lesson for AGC Oshodi." }
         document::Link { rel: "icon", href: FAVICON, r#type: "image/svg+xml" }
         document::Link { rel: "alternate icon", href: "/favicon.ico" }
-        document::Meta { name: "theme-color", content: "#f2f2f7" }
+        document::Meta { name: "theme-color", content: "#fbfbfd" }
         document::Link { rel: "manifest", href: "/manifest.webmanifest" }
         document::Link { rel: "apple-touch-icon", href: "/icons/icon-180.png" }
         document::Stylesheet { href: COMPONENTS_THEME }
-        document::Stylesheet { href: APP_CSS }
         document::Stylesheet { href: TAILWIND_CSS }
+        document::Stylesheet { href: APP_CSS }
+        document::Stylesheet { href: AGN_CSS }
+        document::Script { src: MOTION_JS }
         Router::<Route> {}
     }
 }

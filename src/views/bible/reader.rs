@@ -1,6 +1,6 @@
-//! Chapter reader in the style of YouVersion / Apple Books: serif text, verse numbers,
-//! tap-to-select with a highlight/copy/bookmark bar, a floating reader toolbar (previous, passage
-//! picker, translation, next), and the "Back to lesson" pill when you arrived from the manual.
+//! Chapter reader: serif text in the app's reading scale, verse numbers, tap-to-select with a
+//! highlight/copy/bookmark bar, a docked reader toolbar and the "Back to lesson" pill when you
+//! arrived from the manual. Chrome follows the district design language.
 
 use super::reader_bar::ReaderBar;
 use super::selection_bar::SelectionBar;
@@ -55,20 +55,25 @@ fn route_label(r: &Route) -> String {
 #[component]
 pub fn Reader(book: String, chapter: u16, focus: String) -> Element {
     let mut app = use_app();
-    let Some(meta) = books::by_id(&book) else {
+    // Accept any spelling in the URL ("john", "JHN", "1 cor") so links from outside the app work.
+    let Some(meta) = books::by_id(&book).or_else(|| books::lookup(&book)) else {
         return rsx! { p { class: "p-8 text-center text-label-2", "Unknown book “{book}”." } };
     };
+    let book_id = meta.id.to_string();
     let chapter = chapter.clamp(1, meta.chapters);
     let focus_range = parse_focus(&focus);
     let mut selected: Signal<BTreeSet<u16>> = use_signal(BTreeSet::new);
 
     // Remember position for the Bible tab and "Continue reading".
     use_effect(use_reactive!(|book, chapter, focus| {
-        app.progress.write().last_read = Some(ReadingPosition { book: book.clone(), chapter, focus: focus.clone() });
+        let _ = &book;
+        app.progress.write().last_read = Some(ReadingPosition { book: book_id.clone(), chapter, focus: focus.clone() });
         selected.write().clear();
     }));
 
-    let mut book_sig = use_reactive!(|book| book);
+    let mut book_sig = use_reactive!(|book| {
+        books::by_id(&book).or_else(|| books::lookup(&book)).map(|b| b.id.to_string()).unwrap_or(book)
+    });
     let text = use_resource(move || {
         let tr = app.settings.read().translation.clone();
         let b = book_sig();
@@ -97,6 +102,8 @@ pub fn Reader(book: String, chapter: u16, focus: String) -> Element {
     let start_verse = focus_range.map(|(s, _)| s).unwrap_or(1);
 
     rsx! {
+        div { class: "progress", id: "readProgress", style: "top: calc(var(--safe-top) + 46px)" }
+
         BackBar {
             back_label: "Books",
             onback: move |_| { nav.push(Route::BibleHome {}); },
@@ -104,68 +111,70 @@ pub fn Reader(book: String, chapter: u16, focus: String) -> Element {
             trailing: rsx! { TranslationPill {} },
         }
 
-        article { class: "mx-auto max-w-2xl bg-bg px-6 pt-6 pb-36 sm:rounded-b-card",
-            header { class: "mb-6 text-center",
-                p { class: "text-[15px] font-semibold uppercase tracking-[0.18em] text-label-2", "{meta.name}" }
-                p { class: "font-serif text-[64px] leading-none font-light", "{chapter}" }
+        article { class: "wrap tight pb-20", id: "article",
+            header { class: "pt-10 pb-6 text-center",
+                p { class: "eyebrow", "{meta.name}" }
+                p { class: "num mt-1", "{chapter}" }
+                div { class: "mx-auto mt-5 h-px w-10 bg-[var(--app-separator)]" }
             }
             Tip {
                 id: tips::READER_SELECT,
                 title: "Tap a verse",
                 message: "Select verses to highlight, bookmark, copy or share them.",
-                icon: rsx! { Highlighter { size: 22, stroke_width: "2" } },
-                class: "mb-6 font-sans",
+                icon: rsx! { Highlighter { size: 20, stroke_width: "1.9" } },
             }
-            match &*text.read() {
-                None => rsx! { Spinner {} },
-                Some(Err(e)) => rsx! { p { class: "py-10 text-center text-label-2", "{e}" } },
-                Some(Ok(data)) => match data.get(chapter as usize - 1) {
-                    None => rsx! { p { class: "py-10 text-center text-label-2", "This chapter isn't available." } },
-                    Some(verses) => rsx! {
-                        if verse_nav == VerseNav::Scrubber && verses.len() >= MIN_VERSES {
-                            VerseScrubber { key: "{meta.id}-{chapter}", label: format!("{} {}", meta.name, chapter), count: verses.len() }
-                        }
-                        p { class: "reader-text",
-                            for (i, v) in verses.iter().enumerate() {
-                                {
-                                    let n = i as u16 + 1;
-                                    let key = verse_key(meta.id, chapter, n);
-                                    let hl = highlights.get(&key).map(|h| h.as_str()).unwrap_or("");
-                                    let focused = focus_range.is_some_and(|(s, e)| n >= s && n <= e);
-                                    let is_sel = selected.read().contains(&n);
-                                    rsx! {
-                                        span {
-                                            key: "{n}",
-                                            id: "v{n}",
-                                            class: "verse",
-                                            "data-hl": "{hl}",
-                                            "data-focus": if focused && hl.is_empty() { "true" } else { "false" },
-                                            "data-selected": if is_sel { "true" } else { "false" },
-                                            onclick: move |_| {
-                                                let mut s = selected.write();
-                                                if !s.remove(&n) { s.insert(n); }
-                                            },
-                                            if show_numbers {
-                                                sup { class: "mr-1 font-sans text-[0.58em] font-semibold text-label-2 select-none", "{n}" }
+            div { class: "mt-4",
+                match &*text.read() {
+                    None => rsx! { Spinner {} },
+                    Some(Err(e)) => rsx! { p { class: "py-10 text-center text-label-2", "{e}" } },
+                    Some(Ok(data)) => match data.get(chapter as usize - 1) {
+                        None => rsx! { p { class: "py-10 text-center text-label-2", "This chapter isn't available." } },
+                        Some(verses) => rsx! {
+                            if verse_nav == VerseNav::Scrubber && verses.len() >= MIN_VERSES {
+                                VerseScrubber { key: "{meta.id}-{chapter}", label: format!("{} {}", meta.name, chapter), count: verses.len() }
+                            }
+                            p { class: "reader-text",
+                                for (i, v) in verses.iter().enumerate() {
+                                    {
+                                        let n = i as u16 + 1;
+                                        let key = verse_key(meta.id, chapter, n);
+                                        let hl = highlights.get(&key).map(|h| h.as_str()).unwrap_or("");
+                                        let focused = focus_range.is_some_and(|(s, e)| n >= s && n <= e);
+                                        let is_sel = selected.read().contains(&n);
+                                        rsx! {
+                                            span {
+                                                key: "{n}",
+                                                id: "v{n}",
+                                                class: "verse",
+                                                "data-hl": "{hl}",
+                                                "data-focus": if focused && hl.is_empty() { "true" } else { "false" },
+                                                "data-selected": if is_sel { "true" } else { "false" },
+                                                onclick: move |_| {
+                                                    let mut s = selected.write();
+                                                    if !s.remove(&n) { s.insert(n); }
+                                                },
+                                                if show_numbers {
+                                                    sup { class: "mr-1 font-sans text-[0.58em] font-semibold text-label-3 select-none", "{n}" }
+                                                }
+                                                "{v} "
                                             }
-                                            "{v} "
                                         }
                                     }
                                 }
                             }
-                        }
+                        },
                     },
-                },
+                }
             }
 
-            // End of chapter: carry straight on, Apple Books style.
+            // End of chapter: carry straight on.
             if let Some(n) = next.clone() {
-                Link { to: n.clone(), class: "press mt-10 flex items-center justify-between rounded-card bg-surface px-4 py-3.5 font-sans",
-                    span {
-                        span { class: "block text-[13px] text-label-2", "Next Chapter" }
-                        span { class: "text-[17px] font-semibold", "{route_label(&n)}" }
+                Link { to: n.clone(), class: "tile link press mt-10 flex items-center justify-between font-sans",
+                    div {
+                        p { class: "eyebrow", "Next chapter" }
+                        p { class: "mt-1 text-[17px] font-semibold tracking-tight", "{route_label(&n)}" }
                     }
-                    ChevronRight { size: 22, class: "text-label-3", stroke_width: "2.4" }
+                    ChevronRight { size: 20, class: "text-label-3", stroke_width: "2.2" }
                 }
             }
         }

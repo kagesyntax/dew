@@ -162,24 +162,55 @@ pub fn parse_book(input: &str) -> Option<&'static Book> {
 /// Find every reference inside free text. Stricter than [`parse`] to avoid false positives in
 /// prose ("it is 5 days"): short abbreviations need a `chapter:verse` form, full names don't.
 pub fn find_references(text: &str) -> Vec<Found> {
+    let re = regex();
     let mut found = Vec::new();
-    for caps in regex().captures_iter(text) {
+    // Advance by the *accepted* end, not the regex match end: "Deut 15:7-11; 1 Kings …"
+    // hands the "1" back to the next book, and the scan must resume there.
+    let mut cursor = 0;
+    while cursor < text.len() {
+        let Some(caps) = re.captures(&text[cursor..]) else { break };
         let (Some(all), Some(book_m), Some(body_m)) = (caps.get(0), caps.name("book"), caps.name("body")) else {
+            break;
+        };
+        let start = cursor + all.start();
+        let prefix = caps.name("prefix").map(|m| m.as_str());
+        let Some(book) = resolve_book(prefix, book_m.as_str()) else {
+            cursor += all.end();
             continue;
         };
-        let prefix = caps.name("prefix").map(|m| m.as_str());
-        let Some(book) = resolve_book(prefix, book_m.as_str()) else { continue };
         let body = body_m.as_str().trim_end_matches([',', ';', ' ', '-', '–']);
         let is_full_name = {
             let typed = books::normalize(&format!("{} {}", prefix.unwrap_or(""), book_m.as_str()));
             typed == books::normalize(book.name) || book_m.as_str().len() >= 4
         };
         if !is_full_name && !body.contains(':') {
+            cursor += all.end();
             continue;
         }
-        let Some(passages) = parse_body(book, body) else { continue };
-        let end = body_m.start() + body.len();
-        found.push(Found { start: all.start(), end, reference: Reference { passages } });
+        // "Deut 15:7-11; 1 Kings 17:7-16": the trailing "1" is the next book's number,
+        // not verse 1 of Deuteronomy.
+        let mut body = body.to_string();
+        let mut end = cursor + body_m.start() + body.len();
+        if let Some((head, tail)) = body.rsplit_once(';') {
+            if let Ok(number) = tail.trim().parse::<u8>() {
+                let rest = text[end..].trim_start();
+                let word: String = rest.chars().take_while(|c| c.is_alphabetic() || *c == ' ').collect();
+                let word = word.trim();
+                if number <= 3 && !word.is_empty() && books::lookup(&format!("{number} {word}")).is_some() {
+                    body = head.trim_end().to_string();
+                    end = cursor + body_m.start() + body.len();
+                }
+            }
+        }
+        let Some(passages) = parse_body(book, &body) else {
+            cursor += all.end();
+            continue;
+        };
+        found.push(Found { start, end, reference: Reference { passages } });
+        cursor = end.max(cursor + all.start() + 1);
+        if cursor <= start {
+            cursor = start + all.end();
+        }
     }
     found
 }
@@ -243,6 +274,22 @@ mod tests {
         let text = "Read John 3:16-18 and Rom. 8:28; it is 5 days until Acts 2. See also Heb 11:1, 6.";
         let refs: Vec<String> = find_references(text).iter().map(|f| f.reference.label()).collect();
         assert_eq!(refs, vec!["John 3:16–18", "Romans 8:28", "Acts 2", "Hebrews 11:1, 6"]);
+    }
+
+    #[test]
+    fn numbered_book_after_semicolon() {
+        let text = "Deut 15:7-11; 1 Kings 17:7-16; 18:1-16";
+        let refs: Vec<String> = find_references(text).iter().map(|f| f.reference.label()).collect();
+        assert_eq!(refs[0], "Deuteronomy 15:7–11");
+        assert!(refs[1].starts_with("1 Kings 17:7–16"));
+        let joined: String = segment(text)
+            .into_iter()
+            .map(|s| match s {
+                Segment::Text(t) => t,
+                Segment::Ref { text, .. } => text,
+            })
+            .collect();
+        assert_eq!(joined, text);
     }
 
     #[test]

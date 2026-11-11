@@ -1,4 +1,5 @@
-//! Settings: simple on top, powerful underneath. Grouped like iOS Settings.
+//! Settings: simple on top, powerful underneath. Eyebrow + tile groups, filter chips for the
+//! either/or choices, hairline rows for everything else.
 
 use crate::bible::translation;
 use crate::components::switch::Switch;
@@ -51,13 +52,18 @@ pub fn SettingsView() -> Element {
     }
     .to_string();
     rsx! {
-        LargeTitle { title: "Settings" }
+        LargeTitle {
+            title: "Settings".to_string(),
+            subtitle: APP_NAME.to_string(),
+            lead: Some(format!("{CHURCH_NAME} · on this device only.")),
+        }
 
+        div { class: "pt-4" }
         GroupedList { header: "Appearance",
-            div { class: "px-4 py-3",
-                div { class: "mb-2.5 flex items-center gap-3",
-                    div { class: "flex h-[29px] w-[29px] items-center justify-center rounded-[7px] bg-indigo-500 text-white", Palette { size: 17, stroke_width: "2.2" } }
-                    span { class: "text-[17px]", "Theme" }
+            div { class: "px-[18px] py-4",
+                div { class: "mb-3 flex items-center gap-2",
+                    Palette { size: 17, class: "text-label-2", stroke_width: "1.9" }
+                    span { class: "text-[16px]", "Theme" }
                 }
                 ToggleGroup {
                     horizontal: true,
@@ -68,47 +74,50 @@ pub fn SettingsView() -> Element {
                     }
                 }
             }
-            div { class: "px-4 py-3",
-                div { class: "mb-2 flex items-center gap-3",
-                    div { class: "flex h-[29px] w-[29px] items-center justify-center rounded-[7px] bg-orange-500 text-white", Type { size: 17, stroke_width: "2.2" } }
-                    span { class: "flex-1 text-[17px]", "Text Size" }
+            div { class: "px-[18px] py-4",
+                div { class: "mb-1 flex items-center gap-2",
+                    Type { size: 17, class: "text-label-2", stroke_width: "1.9" }
+                    span { class: "flex-1 text-[16px]", "Reading size" }
+                    span { class: "micro tabular-nums text-label-3", "{[16, 18, 20, 23, 26][s.text_size.min(4) as usize]}pt" }
                 }
-                div { class: "flex items-center gap-3",
-                    span { class: "text-[13px] text-label-2", "A" }
+                div { class: "mt-2 flex items-center gap-3",
+                    span { class: "text-[13px] text-label-3", "A" }
                     input {
                         r#type: "range", min: "0", max: "4", value: "{s.text_size}",
                         class: "flex-1 accent-[var(--app-accent)]",
                         aria_label: "Text size",
                         oninput: move |e| if let Ok(v) = e.value().parse::<u8>() { app.settings.write().text_size = v },
                     }
-                    span { class: "text-[22px] text-label-2", "A" }
+                    span { class: "text-[22px] text-label-3", "A" }
                 }
             }
         }
 
         GroupedList { header: "Bible", footer: bible_footer,
             ListRow {
-                title: "Translation", detail: tr.abbreviation.to_string(), chevron: true, tint: "#0a7aff",
-                icon: rsx! { BookOpen { size: 17, stroke_width: "2.2" } },
+                title: "Translation".to_string(),
+                detail: Some(format!("{} · {}", tr.abbreviation, tr.name)),
+                chevron: true,
+                icon: rsx! { BookOpen { size: 18, stroke_width: "1.9" } },
                 onclick: move |_| translation_open.set(true),
             }
             ListRow {
-                title: "Verse Numbers", tint: "#8e8e93",
-                icon: rsx! { Hash { size: 17, stroke_width: "2.2" } },
+                title: "Verse Numbers".to_string(),
+                icon: rsx! { Hash { size: 18, stroke_width: "1.9" } },
                 trailing: rsx! { Switch { checked: s.verse_numbers, on_checked_change: move |v| app.settings.write().verse_numbers = v } },
             }
             ListRow {
-                title: "Open Where I Left Off", tint: "#ff9500",
-                icon: rsx! { History { size: 17, stroke_width: "2.2" } },
+                title: "Open where I left off".to_string(),
+                icon: rsx! { History { size: 18, stroke_width: "1.9" } },
                 trailing: rsx! { Switch { checked: s.resume_reading, on_checked_change: move |v| app.settings.write().resume_reading = v } },
             }
         }
 
-        GroupedList { header: "Find a Verse", footer: s.verse_nav.description().to_string(),
-            div { class: "px-4 py-3",
-                div { class: "mb-2.5 flex items-center gap-3",
-                    div { class: "flex h-[29px] w-[29px] items-center justify-center rounded-[7px] bg-[#34c759] text-white", ListOrdered { size: 17, stroke_width: "2.2" } }
-                    span { class: "text-[17px]", "Verse Navigation" }
+        GroupedList { header: "Find a verse", footer: s.verse_nav.description().to_string(),
+            div { class: "px-[18px] py-4",
+                div { class: "mb-3 flex items-center gap-2",
+                    ListOrdered { size: 17, class: "text-label-2", stroke_width: "1.9" }
+                    span { class: "text-[16px]", "Verse navigation" }
                 }
                 ToggleGroup {
                     horizontal: true,
@@ -124,10 +133,10 @@ pub fn SettingsView() -> Element {
         GroupedList {
             header: "Sunday School",
             footer: s.link_mode.description().to_string(),
-            div { class: "px-4 py-3",
-                div { class: "mb-2.5 flex items-center gap-3",
-                    div { class: "flex h-[29px] w-[29px] items-center justify-center rounded-[7px] bg-teal-500 text-white", Link2 { size: 17, stroke_width: "2.2" } }
-                    span { class: "text-[17px]", "Scripture Links" }
+            div { class: "px-[18px] py-4",
+                div { class: "mb-3 flex items-center gap-2",
+                    Link2 { size: 17, class: "text-label-2", stroke_width: "1.9" }
+                    span { class: "text-[16px]", "Scripture links" }
                 }
                 ToggleGroup {
                     horizontal: true,
@@ -139,53 +148,60 @@ pub fn SettingsView() -> Element {
                 }
             }
             ListRow {
-                title: "Teacher Mode", subtitle: "Show leader notes and hints".to_string(), tint: "#ff9f0a",
-                icon: rsx! { NotebookPen { size: 17, stroke_width: "2.2" } },
+                title: "Teacher mode".to_string(),
+                subtitle: Some("Show leader notes and hints".to_string()),
+                icon: rsx! { NotebookPen { size: 18, stroke_width: "1.9" } },
                 trailing: rsx! { Switch { checked: s.leader_notes, on_checked_change: move |v| app.settings.write().leader_notes = v } },
             }
             ListRow {
-                title: "Sync Lessons", detail: sync_detail, tint: "#5856d6",
+                title: "Sync lessons".to_string(),
+                detail: sync_detail,
                 subtitle: if turso_ready { None } else { Some("Church database not configured — using built-in lessons".to_string()) },
-                icon: rsx! { Database { size: 17, stroke_width: "2.2" } },
+                icon: rsx! { Database { size: 18, stroke_width: "1.9" } },
                 onclick: move |_| if turso_ready { spawn(manual::sync(store)); },
             }
         }
 
         GroupedList { header: "Help",
             ListRow {
-                title: "Feature Tour", chevron: true, tint: "#0a7aff",
-                icon: rsx! { Compass { size: 17, stroke_width: "2.2" } },
+                title: "Feature tour".to_string(),
+                chevron: true,
+                icon: rsx! { Compass { size: 18, stroke_width: "1.9" } },
                 onclick: move |_| { navigator().push(Route::TourReplay {}); },
             }
             ListRow {
-                title: "Show Tips Again", tint: "#ffcc00",
-                icon: rsx! { Lightbulb { size: 17, stroke_width: "2.2" } },
+                title: "Show tips again".to_string(),
+                icon: rsx! { Lightbulb { size: 18, stroke_width: "1.9" } },
                 onclick: move |_| app.progress.write().seen_tips.clear(),
             }
         }
 
         GroupedList { header: "About",
             ListRow {
-                title: "Software Update", chevron: true, tint: "#8e8e93",
+                title: "Software update".to_string(),
+                chevron: true,
                 detail: if update_available.is_some() { None } else { Some(format!("Version {APP_VERSION}")) },
-                icon: rsx! { CloudDownload { size: 17, stroke_width: "2.2" } },
-                trailing: update_available.as_ref().map(|_| rsx! { span { class: "flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-[#ff3b30] px-1.5 text-[13px] font-semibold text-white", "1" } }),
+                icon: rsx! { CloudDownload { size: 18, stroke_width: "1.9" } },
+                trailing: update_available.as_ref().map(|_| rsx! { span { class: "badge on", "New" } }),
                 onclick: move |_| { navigator().push(Route::SoftwareUpdate {}); },
             }
-            ListRow { title: "Church", detail: CHURCH_NAME.to_string(), tint: "#af52de", icon: rsx! { Church { size: 17, stroke_width: "2.2" } } }
+            ListRow { title: "Church".to_string(), detail: Some(CHURCH_NAME.to_string()), icon: rsx! { Church { size: 18, stroke_width: "1.9" } } }
             ListRow {
-                title: "Share App", tint: "#0a7aff", chevron: true,
-                icon: rsx! { Share { size: 17, stroke_width: "2.2" } },
+                title: "Share app".to_string(),
+                chevron: true,
+                icon: rsx! { Share { size: 18, stroke_width: "1.9" } },
                 onclick: move |_| js::share_text(APP_NAME, &format!("{APP_NAME}: the Bible and this week's Sunday School lesson. {}", crate::config::APP_URL.trim_end_matches("app/"))),
             }
             ListRow {
-                title: "Send Feedback", tint: "#34c759", chevron: true,
-                icon: rsx! { MessageSquare { size: 17, stroke_width: "2.2" } },
+                title: "Send feedback".to_string(),
+                chevron: true,
+                icon: rsx! { MessageSquare { size: 18, stroke_width: "1.9" } },
                 onclick: move |_| js::open_url(&format!("{REPO_URL}/issues/new?template=feedback.yml&title=Feedback%20(v{APP_VERSION})")),
             }
             ListRow {
-                title: "Credits", tint: "#ff9500", chevron: true,
-                icon: rsx! { ScrollText { size: 17, stroke_width: "2.2" } },
+                title: "Credits".to_string(),
+                chevron: true,
+                icon: rsx! { ScrollText { size: 18, stroke_width: "1.9" } },
                 onclick: move |_| { navigator().push(Route::Acknowledgements {}); },
             }
         }
@@ -193,16 +209,16 @@ pub fn SettingsView() -> Element {
         GroupedList {
             footer: "No account, no tracking. Your highlights, bookmarks and settings stay on this device.".to_string(),
             ListRow {
-                title: "Privacy", tint: "#0a7aff",
-                icon: rsx! { ShieldCheck { size: 17, stroke_width: "2.2" } },
-                detail: "On Device".to_string(),
+                title: "Privacy".to_string(),
+                detail: Some("On device".to_string()),
+                icon: rsx! { ShieldCheck { size: 18, stroke_width: "1.9" } },
             }
         }
 
         GroupedList { footer: "Clears highlights, bookmarks, lesson progress and preferences on this device.".to_string(),
             ListRow {
-                title: "Reset App", tint: "#ff3b30",
-                icon: rsx! { RotateCcw { size: 17, stroke_width: "2.2" } },
+                title: "Reset app".to_string(),
+                icon: rsx! { RotateCcw { size: 18, stroke_width: "1.9" } },
                 onclick: move |_| {
                     storage::clear_all();
                     app.progress.set(Progress::default());
@@ -210,7 +226,7 @@ pub fn SettingsView() -> Element {
                 },
             }
         }
-        p { class: "pb-4 text-center text-[13px] text-label-3", "{APP_NAME} {APP_VERSION} ({BUILD_SHA})" }
+        p { class: "micro pb-6 text-center text-label-3", "{APP_NAME} {APP_VERSION} ({BUILD_SHA})" }
 
         TranslationSheet { open: translation_open }
     }

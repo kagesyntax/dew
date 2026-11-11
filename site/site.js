@@ -1,20 +1,61 @@
-// Dew website. Everything here comes from version.json, which every release rewrites, so the
-// page updates itself: version, date, What's New and the download links.
+// Dew website. The version, release notes and download links all come from
+// version.json, which the release script rewrites, so the page updates itself.
+// Everything else is static: no framework, no build step, and it must still read
+// when opened straight off disk (file://), where fetch and the app frame are absent.
 (() => {
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => document.querySelectorAll(s);
-  document.documentElement.classList.add("js");
-  const SPARK = '<svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2z"/></svg>';
+  const SPARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2z"/></svg>';
 
-  // Which device is this? Android, iOS, Windows, Mac or Linux.
+  // Which device is this? Only used to sort the download list and label the button.
   const ua = navigator.userAgent;
   const os = /android/i.test(ua) ? "android"
     : /iphone|ipad|ipod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) ? "ios"
     : /windows/i.test(ua) ? "windows"
     : /mac os x|macintosh/i.test(ua) ? "macos"
     : /linux|cros/i.test(ua) ? "linux" : "web";
-  const label = { android: "Download for Android", ios: "Add to iPhone", windows: "Download for Windows", macos: "Download for Mac", linux: "Download for Linux", web: "Open Dew" }[os];
+  const label = {
+    android: "Download for Android", ios: "Add to iPhone", windows: "Download for Windows",
+    macos: "Download for Mac", linux: "Download for Linux", web: "Open Dew",
+  }[os];
 
+  // ---- Live demo -------------------------------------------------------------
+  // The poster capture shows immediately; the frame fades in over it only after it
+  // has actually loaded. On a phone, or off disk, we never mount the frame at all.
+  const demo = $("#demo");
+  const poster = $("#poster");
+  const canRunDemo = demo && location.protocol !== "file:" && window.innerWidth > 900;
+  if (demo && !canRunDemo) demo.remove();
+  else if (demo) demo.addEventListener("load", () => { if (poster) poster.style.opacity = "0"; });
+
+  // ---- Mobile sheet ----------------------------------------------------------
+  const menu = $("#menu");
+  const sheet = $("#sheet");
+  const closeSheet = () => {
+    document.body.classList.remove("open");
+    menu.setAttribute("aria-expanded", "false");
+  };
+  if (menu && sheet) {
+    menu.addEventListener("click", () => {
+      const open = !document.body.classList.contains("open");
+      document.body.classList.toggle("open", open);
+      menu.setAttribute("aria-expanded", String(open));
+    });
+    sheet.addEventListener("click", (e) => { if (e.target.tagName === "A") closeSheet(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSheet(); });
+  }
+
+  // ---- "Start over" clears only the demo's own sandbox ------------------------
+  const restart = $("#restart");
+  if (restart) {
+    restart.addEventListener("click", () => {
+      Object.keys(localStorage).filter((k) => k.startsWith("dew.demo.v1.")).forEach((k) => localStorage.removeItem(k));
+      const frame = $("#demo");
+      if (frame) frame.src = "app/";
+    });
+  }
+
+  // ---- Release data ----------------------------------------------------------
   function render(v) {
     const dl = v.downloads || {};
     const repo = (v.url || "").split("/releases")[0];
@@ -23,63 +64,32 @@
       if (href) row.href = href;
       else if (!["ios", "web"].includes(row.dataset.os)) row.href = v.url || row.href;
       if (row.dataset.os === os) row.classList.add("suggested");
-      const ver = row.querySelector("[data-ver]");
-      if (ver && href) ver.textContent = `${ver.dataset.ver} · ${v.version}`;
     });
     const mine = $(`[data-os="${os}"]`);
     $$("[data-primary]").forEach((b, i) => {
       if (i > 0) b.textContent = label;
-      b.href = mine ? mine.getAttribute("href") : "#download";
-      if (os === "ios") b.href = "#download";
+      b.href = mine && mine.getAttribute("href") !== "#" ? mine.getAttribute("href") : "#download";
     });
     $$("[data-version]").forEach((e) => (e.textContent = `Version ${v.version}`));
-    $$("[data-version-short]").forEach((e) => (e.textContent = `Dew ${v.version}`));
-    // published_at looks like "Wed 2026-10-14 8:11 PM WAT (UTC+01:00)", which Date() cannot parse,
-    // so read the calendar date out of it and show that.
-    const ymd = /(\d{4})-(\d{2})-(\d{2})/.exec(v.published_at || "");
-    const d = ymd ? new Date(+ymd[1], ymd[2] - 1, +ymd[3]) : new Date(v.published_at);
+    $$("[data-version-short]").forEach((e) => (e.textContent = v.version));
+    const d = new Date(v.published_at);
     const when = isNaN(d) ? "" : d.toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
-    $("[data-release-line]").textContent = `Version ${v.version}${when ? `, released ${when}` : ""}. Updates arrive inside the app.`;
-    if (when) $("[data-date]").textContent = `Released ${when}`;
-    $("#highlights").innerHTML = (v.highlights || [v.notes]).filter(Boolean)
+    const line = $("[data-release-line]");
+    if (line) line.textContent = `Version ${v.version}${when ? `, released ${when}` : ""}. Updates arrive inside the app.`;
+    const date = $("[data-date]");
+    if (date) date.textContent = when ? `Released ${when}` : "";
+    const notes = $("#highlights");
+    if (notes) notes.innerHTML = (v.highlights || [v.notes]).filter(Boolean)
       .map((h) => `<li>${SPARK}<span>${h.replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" })[c])}</span></li>`).join("");
     if (repo) {
       $$("[data-repo]").forEach((a) => (a.href = repo));
-      $$("[data-feedback]").forEach((a) => (a.href = `${repo}/issues/new?template=feedback.yml`));
+      $$("[data-feedback]").forEach((a) => (a.href = `${repo}/issues/new`));
       $$("[data-notes]").forEach((a) => (a.href = `${repo}/releases`));
     }
   }
 
   fetch("version.json", { cache: "no-cache" }).then((r) => r.json()).then(render).catch(() => {
+    // Off disk, or offline: keep whatever the HTML says.
     $$("[data-primary]").forEach((b, i) => { if (i > 0) b.textContent = label; });
   });
-
-  // Gentle rise-in as sections scroll into view (skipped for prefers-reduced-motion in CSS).
-  const reveals = $$(".reveal");
-  if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    const io = new IntersectionObserver((es) => es.forEach((e) => {
-      if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
-    }), { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
-    reveals.forEach((el) => io.observe(el));
-  } else reveals.forEach((el) => el.classList.add("in"));
-
-  // "Start over": wipe only the demo's sandbox (the real web app keeps its own data) and reload.
-  $("#restart").addEventListener("click", () => {
-    Object.keys(localStorage).filter((k) => k.startsWith("dew.demo.v1.")).forEach((k) => localStorage.removeItem(k));
-    $("#demo").src = "app/";
-  });
-
-  // Show the demo at a real iPhone width (402pt, iPhone 18 Pro) and scale it to the bezel's opening.
-  const vp = $(".device .viewport");
-  if (vp && "ResizeObserver" in window) {
-    const PHONE_W = 402;
-    new ResizeObserver(() => {
-      const w = vp.clientWidth;
-      if (!w) return;
-      const logical = Math.max(PHONE_W, w);
-      vp.style.setProperty("--w", logical + "px");
-      vp.style.setProperty("--s", String(w / logical));
-      vp.classList.add("scaled");
-    }).observe(vp);
-  }
 })();

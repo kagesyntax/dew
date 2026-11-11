@@ -1,4 +1,5 @@
-/* iOS-style switch (51x31), restyled from the dioxus-components registry copy. */
+/* Switch, restyled from the dioxus-components registry copy.
+ * iOS proportions, the district site's blue accent instead of iOS green. */
 .dx-switch {
   all: unset;
   position: relative;
@@ -8,10 +9,10 @@
   border-radius: 9999px;
   background-color: var(--app-fill);
   cursor: pointer;
-  transition: background-color 200ms ease;
+  transition: background-color 220ms ease;
 }
-.dx-switch[data-state="checked"] { background-color: #34c759; }
-.dx-switch:focus-visible { box-shadow: 0 0 0 3px color-mix(in oklab, var(--app-accent) 45%, transparent); }
+.dx-switch[data-state="checked"] { background-color: var(--app-accent-solid); }
+.dx-switch:focus-visible { box-shadow: 0 0 0 3px var(--app-accent-soft); }
 .dx-switch-thumb {
   display: block;
   width: 27px;
@@ -19,8 +20,8 @@
   border-radius: 9999px;
   background-color: #fff;
   box-shadow: 0 3px 8px rgb(0 0 0 / 15%), 0 1px 1px rgb(0 0 0 / 16%);
-  transform: translateX(2px) translateY(2px);
+  transform: translateX(2px) translateY(0px);
   transition: transform 220ms cubic-bezier(.3,.7,.4,1.2);
 }
-.dx-switch[data-state="checked"] .dx-switch-thumb { transform: translateX(22px) translateY(2px); }
+.dx-switch[data-state="checked"] .dx-switch-thumb { transform: translateX(22px) translateY(0px); }
 .dx-switch[data-disabled="true"] { cursor: not-allowed; opacity: 0.5; }

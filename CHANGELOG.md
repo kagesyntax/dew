@@ -6,6 +6,14 @@ Format: [Keep a Changelog](https://keepachangelog.com), versions follow [SemVer]
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-11-10
+### Added
+- A rebuilt website: the app itself runs live on the landing page, so you can try the Bible, the lesson and the reader before you download anything, and every screen is shown in light and dark
+- Download links now offer the build for the device you are actually on, with a separate Intel Mac download
+### Fixed
+- The Bible reader no longer leaves a screen of empty space under the last verse of a short chapter
+- The Settings switch sits centred in its track instead of two pixels low
+
 ## [0.2.1] - 2026-10-14
 ### Fixed
 - **The Android app no longer closes the instant it opens.** Dew read the device's API level with the wrong kind of JNI field lookup, which raised a Java error that was never cleared. Android's runtime treats a leftover error as fatal and killed the process on launch. Dew now reads the field correctly and clears any pending error on every code path, so a missing Android API degrades gracefully instead of crashing.

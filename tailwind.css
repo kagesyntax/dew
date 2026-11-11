@@ -1,16 +1,22 @@
 @import "tailwindcss";
 
-/* Dark mode follows html[data-theme="dark"], set by src/theme (Light / Dark / System). */
+/* Dark mode follows html[data-theme="dark"], set by src/platform/theme (Light / Dark / System). */
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
-/* Apple-HIG inspired design tokens. Semantic colours flip in dark mode via app.css variables. */
+/* AGN Lagos District tokens, aliased onto the semantic names the app already uses.
+ * Colours themselves live in assets/app.css so they can flip with the theme. */
 @theme {
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, system-ui, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter var", "Inter",
+    "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-serif: "New York", "Iowan Old Style", "Charter", "Source Serif 4", Georgia, serif;
 
   --color-accent: var(--app-accent);
+  --color-accent-solid: var(--app-accent-solid);
+  --color-soft: var(--app-accent-soft);
   --color-bg: var(--app-bg);
   --color-bg-grouped: var(--app-bg-grouped);
+  --color-bg2: var(--app-bg-2);
+  --color-ink: var(--app-ink);
   --color-surface: var(--app-surface);
   --color-surface-2: var(--app-surface-2);
   --color-label: var(--app-label);
@@ -19,5 +25,10 @@
   --color-separator: var(--app-separator);
   --color-fill: var(--app-fill);
 
-  --radius-card: 14px;
+  --radius-tile: 28px;
+  --radius-card: 18px;
+  --radius-sm: 12px;
+
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 834px;
 }
